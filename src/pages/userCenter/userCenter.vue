@@ -1,0 +1,5 @@
+<template>
+    <view>
+        用户中心
+    </view>
+</template>

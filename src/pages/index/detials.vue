@@ -20,7 +20,7 @@
         </view>
       </view>
     </view>
-    <view class="goods_card" @click="NavToDetial" >
+    <view class="goods_card">
       <view class="card_top">
         <view class="price">
           <text class="price_now">￥{{ price }}</text>
@@ -30,9 +30,9 @@
           <text>全国星巴克中杯通兑券</text>
         </view>
       </view>
-      <!-- <view class="QRcode">
-        <image  />
-      </view> -->
+
+      <image src="../../static/images/RQcode.png" />
+
       <view class="card_bottom">
         <view class="left">
           <view class="number">
@@ -41,7 +41,10 @@
                 v-show="buy_number === 1"
                 src="../../static/images/no_reduce.png"
               />
-              <image v-show="buy_number !== 1" src="../../static/images/reduce.png" />
+              <image
+                v-show="buy_number !== 1"
+                src="../../static/images/reduce.png"
+              />
             </view>
             <view class="num">{{ buy_number }}</view>
             <view @click="add_number" class="add">
@@ -49,7 +52,10 @@
                 v-show="buy_number === 10"
                 src="../../static/images/no_add.png"
               />
-              <image v-show="buy_number !== 10" src="../../static/images/add.png" />
+              <image
+                v-show="buy_number !== 10"
+                src="../../static/images/add.png"
+              />
             </view>
             <!-- <uni-number-box
               :value="buy_number"
@@ -67,23 +73,10 @@
         </view>
       </view>
     </view>
-    <view class="active" >
-      <view class="card_content">
-        <view class="text1">
-          <text>你送她一杯子，她还你一辈子</text>
-        </view>
-        <view class="text2">
-          <text>超值活动超值价格超值套装</text>
-        </view>
-      </view>
-    </view>
   </view>
 </template>
-
 <script>
-import { uniNumberBox } from "@dcloudio/uni-ui";
 export default {
-  components: { uniNumberBox },
   data() {
     return {
       price: "24.00",
@@ -92,21 +85,8 @@ export default {
       sum_number: 999
     };
   },
-  onLoad() {
-    // this.Ajax("post", "xxx", {}, res => {
-    //   console.log(res);
-    // });
-  },
-  onPullDownRefresh(){
-    console.log("下拉啦！"),
-    notice = document.getElementsByClassName("tips");
-    notice.style.display = "block",
-    setTimeout(function () {
-            uni.stopPullDownRefresh();
-        }, 1000);
-  },
-  methods: {
-    // 减少购买数量
+  methods:{
+          // 减少购买数量
     reduce_number() {
       if (this.buy_number <= 1) {
         return;
@@ -128,20 +108,16 @@ export default {
       this.price = String(24 * this.buy_number) + ".00";
       this.price_original = String(33 * this.buy_number) + ".00";
     },
-    // 跳转到详情
-    NavToDetial(){
-      uni.navigateTo({
-        url:'./detials'
-      })
-    }
 
   }
 };
 </script>
-
-<style lang="scss">
+<style lang="scss" scoped>
 .content {
-  background: #e8e8e8;
+  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/69254200_1574076274.png")
+    no-repeat center;
+  background-size: cover;
+  height: 100vh;
   padding: 0 40rpx 40rpx;
 }
 .tips {
@@ -149,11 +125,11 @@ export default {
   display: flex;
   flex-direction: column;
   font-size: 26rpx;
+  color: #ffffff;
   .title {
     opacity: 0.6;
     font-family: PingFangSC-Semibold;
     font-size: 28rpx;
-    color: #000000;
     letter-spacing: -0.68px;
     padding: 10rpx;
   }
@@ -163,7 +139,6 @@ export default {
     opacity: 0.6;
     font-family: PingFangSC-Regular;
     font-size: 24rpx;
-    color: rgb(43, 43, 44);
     letter-spacing: -0.58rpx;
     line-height: 42rpx;
     .texta {
@@ -172,8 +147,7 @@ export default {
   }
 }
 .goods_card {
-  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/72823600_1574074898.png") no-repeat center;
-  background-size:cover;
+  background-color: #ffffff;
   border-radius: 15rpx;
   height: 417px;
   display: flex;
@@ -188,7 +162,7 @@ export default {
       display: flex;
       flex-direction: row;
       align-items: baseline;
-      color: #ffffff;
+      color: #000000;
       justify-content: flex-start;
       .price_now {
         font-size: 90rpx;
@@ -207,10 +181,15 @@ export default {
       font-weight: 600;
       font-family: PingFangSC-Semibold;
       font-size: 36rpx;
-      color: #ffffff;
+      color: #000000;
       letter-spacing: 0;
       margin: 10rpx;
     }
+  }
+  image {
+    height: 400rpx;
+    width: 400rpx;
+    margin: 0 auto;
   }
   .card_bottom {
     display: flex;
@@ -232,7 +211,7 @@ export default {
           }
         }
         .num {
-          color: #ffffff;
+          color: #000000;
           font-size: 30rpx;
         }
         .add {
@@ -250,57 +229,21 @@ export default {
           opacity: 0.6;
           font-family: PingFangSC-Semibold;
           font-size: 22rpx;
-          color: #ffffff;
+          color: #000000;
           letter-spacing: 0;
           text-align: right;
         }
       }
     }
     button {
-      background-color: #ffffff;
+      background-color:#005334;
       border-radius: 45rpx;
       font-family: PingFangSC-Semibold;
       padding: 0 80rpx;
       font-size: 30rpx;
-      color: #005334;
+      color: #ffffff;
       font-weight: 600;
     }
-  }
-}
-.active {
-  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/56916900_1574074896.png") no-repeat center; 
-  background-size:cover; 
-  // margin-bottom: 40rpx;
-  border-radius: 15rpx;
-  height: 417px;
-  display: flex;
-  margin-top: 30rpx;
-  flex-direction: column;
-  .card_content{
-    padding: 40rpx;
-    .text1 {
-    font-family: PingFangSC-Semibold;
-    font-size: 40rpx;
-    color: #ffffff;
-    padding: 10rpx 0;
-  }
-  .text2 {
-    opacity: 0.6;
-    font-family: PingFangSC-Regular;
-    font-size: 30rpx;
-    color: #ffffff;
-  }
-  }
-  .text1 {
-    font-family: PingFangSC-Semibold;
-    font-size: 40rpx;
-    color: #ffffff;
-  }
-  .text2 {
-    opacity: 0.6;
-    font-family: PingFangSC-Regular;
-    font-size: 30rpx;
-    color: #ffffff;
   }
 }
 </style>
