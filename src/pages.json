@@ -10,13 +10,19 @@
     {
       "path": "pages/myCardBug/cards",
       "style": {
-        "navigationBarTitleText": "我的卡券"
+        "navigationBarTitleText": "卡券详情"
+      }
+    },
+    {
+      "path": "pages/myCardBug/cardList",
+      "style": {
+        "navigationBarTitleText": ""
       }
     },
     {
       "path": "pages/userCenter/userCenter",
       "style": {
-        "navigationBarTitleText": "星中心"
+        "navigationBarTitleText": ""
       }
     },
     {
@@ -46,7 +52,7 @@
         "text": "摩卡星"
       },
       {
-        "pagePath": "pages/myCardBug/cards",
+        "pagePath": "pages/myCardBug/cardList",
         "iconPath": "static/tabs/myCardBug_u.png",
         "selectedIconPath": "static/tabs/myCardBug.png",
         "text": "我的卡券"
@@ -55,7 +61,7 @@
         "pagePath": "pages/userCenter/userCenter",
         "iconPath": "static/tabs/userCenter_u.png",
         "selectedIconPath": "static/tabs/userCenter.png",
-        "text": "星中心"
+        "text": "我的卡券"
       }
     ]
   }

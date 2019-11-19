@@ -1,6 +1,6 @@
 <template>
   <view class="content">
-    <!-- <view class="tips">
+    <view class="tips">
       <view class="title">
         <text>使用须知</text>
       </view>
@@ -19,59 +19,40 @@
           >
         </view>
       </view>
-    </view> -->
-    <swiper
-      :vertical="true"
-      previous-margin="120px"
-      next-margin="120px"
-      @change="EventHandle"
-      class="swiper"
-    >
-      <swiper-item>
-        <view class="tips">
-          <view class="title">
-            <text>使用须知</text>
-          </view>
-          <view class="tip_content">
-            <view class="texta">
-              <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
-            </view>
-            <view class="texta">
-              <text
-                >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
-              >
-            </view>
-            <view class="texta">
-              <text
-                >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
-              >
-            </view>
-          </view>
-        </view>
-      </swiper-item>
-      <swiper-item
-        class="goods_card"
-        v-for="(item, index) in cards"
-        :id="index"
-        :key="index"
+    </view>
+    <!-- <view class="swiper_content"> -->
+      <swiper
+        :vertical="true"
+        previous-margin="120px"
+        next-margin="120px"
+        @change="EventHandle"
+        class="swiper"
       >
-        <view class="card_order">
-          <text>{{ item.id }}/{{ shuliang }}</text>
-        </view>
-        <view class="name">
-          <text>全国星巴克中杯通兑券</text>
-        </view>
-        <view class="userful_time">
-          <text>有效期：{{ item.userful_time }}</text>
-        </view>
-        <view class="QRcode">
-          <image src="../../static/ceshi.jpg" />
-        </view>
-        <view class="tips">
-          <text>优惠码每30秒自动更新，24小时内有效，过期不退换</text>
-        </view>
-      </swiper-item>
-    </swiper>
+        <swiper-item
+          class="goods_card"
+          v-for="(item, index) in cards"
+          :id="index"
+          :key="index"
+        >
+          <view class="card_order">
+            <text>{{ item.id }}/{{ shuliang }}</text>
+          </view>
+          <view class="name">
+            <text>全国星巴克中杯通兑券</text>
+          </view>
+          <view class="userful_time">
+            <text>有效期：{{ item.userful_time }}</text>
+          </view>
+          <view class="QRcode">
+            <image src="../../static/ceshi.jpg" />
+          </view>
+          <view class="tips">
+            <text>优惠码每30秒自动更新，24小时内有效，过期不退换</text>
+          </view>
+        </swiper-item>
+      </swiper>
+    <!-- </view> -->
+
     <!-- <view v-for="item in cards" :key="item" class="goods_card">
       <view class="card_order">
         <text>{{ item.id }}/{{ shuliang }}</text>
@@ -153,7 +134,7 @@ export default {
 }
 .content {
   padding: 0 50rpx;
-
+  // height: 100vh;
   background: #e8e8e8;
 }
 .swiper {

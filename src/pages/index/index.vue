@@ -2,6 +2,7 @@
   <view class="content">
     <view class="tips">
       <view class="title">
+        <image src="../../static/assets/coffee.png" />
         <text>使用须知</text>
       </view>
       <view class="tip_content">
@@ -20,8 +21,8 @@
         </view>
       </view>
     </view>
-    <view class="goods_card" @click="NavToDetial" >
-      <view class="card_top">
+    <view class="goods_card" >
+      <view class="card_top" @click="NavToDetial">
         <view class="price">
           <text class="price_now">￥{{ price }}</text>
           <text class="price_original">￥{{ price_original }}</text>
@@ -31,9 +32,12 @@
         </view>
       </view>
       <!-- <view class="QRcode">
-        <image  />
+        <image  />v-if=
       </view> -->
-      <view class="card_bottom">
+      <view v-if="sum_number === 0" class="card_sell_out">
+        <text>已售罄</text>
+      </view>
+      <view v-else class="card_bottom">
         <view class="left">
           <view class="number">
             <view @click="reduce_number" class="reduce">
@@ -41,7 +45,10 @@
                 v-show="buy_number === 1"
                 src="../../static/images/no_reduce.png"
               />
-              <image v-show="buy_number !== 1" src="../../static/images/reduce.png" />
+              <image
+                v-show="buy_number !== 1"
+                src="../../static/images/reduce.png"
+              />
             </view>
             <view class="num">{{ buy_number }}</view>
             <view @click="add_number" class="add">
@@ -49,7 +56,10 @@
                 v-show="buy_number === 10"
                 src="../../static/images/no_add.png"
               />
-              <image v-show="buy_number !== 10" src="../../static/images/add.png" />
+              <image
+                v-show="buy_number !== 10"
+                src="../../static/images/add.png"
+              />
             </view>
             <!-- <uni-number-box
               :value="buy_number"
@@ -67,7 +77,7 @@
         </view>
       </view>
     </view>
-    <view class="active" >
+    <view class="active">
       <view class="card_content">
         <view class="text1">
           <text>你送她一杯子，她还你一辈子</text>
@@ -97,13 +107,12 @@ export default {
     //   console.log(res);
     // });
   },
-  onPullDownRefresh(){
-    console.log("下拉啦！"),
-    notice = document.getElementsByClassName("tips");
-    notice.style.display = "block",
-    setTimeout(function () {
-            uni.stopPullDownRefresh();
-        }, 1000);
+  onPullDownRefresh() {
+    console.log("下拉啦！"), (notice = document.getElementsByClassName("tips"));
+    (notice.style.display = "block"),
+      setTimeout(function() {
+        uni.stopPullDownRefresh();
+      }, 1000);
   },
   methods: {
     // 减少购买数量
@@ -129,12 +138,11 @@ export default {
       this.price_original = String(33 * this.buy_number) + ".00";
     },
     // 跳转到详情
-    NavToDetial(){
+    NavToDetial() {
       uni.navigateTo({
-        url:'./detials'
-      })
+        url: "./detials"
+      });
     }
-
   }
 };
 </script>
@@ -150,9 +158,18 @@ export default {
   flex-direction: column;
   font-size: 26rpx;
   .title {
-    opacity: 0.6;
+    // opacity: 0.6;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    image{
+      height: 48rpx;
+      width: 40rpx;
+      margin-right: 20rpx;
+    }
     font-family: PingFangSC-Semibold;
-    font-size: 28rpx;
+    font-size: 30rpx;
+    font-weight: 600;
     color: #000000;
     letter-spacing: -0.68px;
     padding: 10rpx;
@@ -172,8 +189,9 @@ export default {
   }
 }
 .goods_card {
-  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/72823600_1574074898.png") no-repeat center;
-  background-size:cover;
+  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/72823600_1574074898.png")
+    no-repeat center;
+  background-size: cover;
   border-radius: 15rpx;
   height: 417px;
   display: flex;
@@ -212,10 +230,21 @@ export default {
       margin: 10rpx;
     }
   }
+  .card_sell_out {
+    border-bottom-left-radius: 10rpx;
+    border-bottom-right-radius: 10rpx;
+    background-color: rgba(121, 182, 160, 0.8);
+    font-family: PingFangSC-Medium;
+    font-size: 36rpx;
+    padding: 50rpx;
+    color: #ffffff;
+    text-align: center;
+  }
   .card_bottom {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    padding-bottom: 50rpx;
     .left {
       display: flex;
       flex-direction: column;
@@ -268,28 +297,29 @@ export default {
   }
 }
 .active {
-  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/56916900_1574074896.png") no-repeat center; 
-  background-size:cover; 
+  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/56916900_1574074896.png")
+    no-repeat center;
+  background-size: cover;
   // margin-bottom: 40rpx;
   border-radius: 15rpx;
   height: 417px;
   display: flex;
   margin-top: 30rpx;
   flex-direction: column;
-  .card_content{
+  .card_content {
     padding: 40rpx;
     .text1 {
-    font-family: PingFangSC-Semibold;
-    font-size: 40rpx;
-    color: #ffffff;
-    padding: 10rpx 0;
-  }
-  .text2 {
-    opacity: 0.6;
-    font-family: PingFangSC-Regular;
-    font-size: 30rpx;
-    color: #ffffff;
-  }
+      font-family: PingFangSC-Semibold;
+      font-size: 40rpx;
+      color: #ffffff;
+      padding: 10rpx 0;
+    }
+    .text2 {
+      opacity: 0.6;
+      font-family: PingFangSC-Regular;
+      font-size: 30rpx;
+      color: #ffffff;
+    }
   }
   .text1 {
     font-family: PingFangSC-Semibold;

@@ -1,0 +1,328 @@
+<template>
+  <view class="content">
+    <view v-if="list.length === 0" class="empty">
+      <view class="tips">
+        <image src="../../static/images/empty.png" />
+        <view class="text">
+          <text>您的卡券包暂时为空 快去购买一张优惠券吧</text>
+        </view>
+      </view>
+      <button size="mini">去选购</button>
+    </view>
+    <view v-else class="not_empty">
+      <scroll-view
+        :scroll-top="scrollTop"
+        scroll-y="true"
+        class="scroll-Y"
+        @scrolltoupper="upper"
+        @scroll="scroll"
+      >
+        <view id="title" class="title">
+          <text>我的卡券 </text>
+        </view>
+        <view v-for="(item, index) in list" :key="index" class="by_mouth">
+          <view class="mouth">
+            <text>{{ item.date }}</text>
+          </view>
+          <view v-for="i in item.order" :key="i.id" class="lists">
+            <view class="card_left">00000</view>
+            <view class="listCard" @click="NavToDetail">
+              <view class="row1">
+                <view class="order_name">{{ i.name }}X{{ item.length }}</view>
+                <view class="price">
+                  <image src="../../static/assets/money.png" />
+                  {{ i.price }}</view
+                >
+              </view>
+              <view class="order_no"
+                ><text>订单编号：</text>{{ i.no }}
+                <text class="copy" @click.stop="copy_no(i.no)">复制</text></view
+              >
+              <view class="buy_time"><text>购买时间：</text>{{ i.time }}</view>
+              <view class="row4">
+                <view class="useful_time"
+                  ><text>有效期至：</text>{{ i.timeTO }}</view
+                >
+                <button size="mini">确认收货</button>
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      //   list: []
+      scrollTop:0,
+      list: [
+        {
+          date: "2019年11月",
+          length: 2,
+          order: [
+            {
+              id: 1,
+              num: 3,
+              name: "全国星巴克通用券码",
+              no: "DSDSDe324de423",
+              time: "2019.11.11 12:23:34",
+              timeTO: "2019.11.12 00:00:00",
+              price: "72.00"
+            },
+            {
+              id: 2,
+              num: 3,
+              name: "全国星巴克通用券码",
+              no: "DSDSDe324de423",
+              time: "2019.11.11 12:23:34",
+              timeTO: "2019.11.12 00:00:00",
+              price: "72.00"
+            }
+          ]
+        },
+        {
+          date: "2019年10月",
+          length: 3,
+          order: [
+            {
+              id: 3,
+              num: 3,
+              no: "DSDSDe324de423",
+              name: "全国星巴克通用券码",
+              time: "2019.11.11 12:23:34",
+              timeTO: "2019.11.12 00:00:00",
+              price: "72.00"
+            },
+            {
+              id: 4,
+              num: 4,
+              no: "DSDSDe324de423",
+              name: "全国星巴克通用券码",
+              time: "2019.11.11 12:23:34",
+              timeTO: "2019.11.12 00:00:00",
+              price: "72.00"
+            },
+            {
+              id: 5,
+              num: 3,
+              no: "DSDSDe324de423",
+              name: "全国星巴克通用券码",
+              time: "2019.11.11 12:23:34",
+              timeTO: "2019.11.12 00:00:00",
+              price: "72.00"
+            }
+          ]
+        }
+      ]
+    };
+  },
+  onShow(){
+      window.addEventListener("scroll",this.scrollFun);
+  },
+  methods: {
+      scrollFun(){
+          console.log(window);
+          let height = document.getElementById("title").clientHeight;
+          if(window.scrollY > height){
+              uni.setNavigationBarTitle({
+                  title:"我的卡券"
+              })
+          }
+          else{
+              uni.setNavigationBarTitle({
+                  title:"我的卡券"
+              })
+          }
+      },
+    //   跳转到订单详情
+    NavToDetail() {
+      uni.navigateTo({
+        url: "./cards"
+      });
+    },
+    // 复制订单号
+    copy_no(e) {
+      console.log("e:", e);
+      uni.setClipboardData({
+        data: e,
+        success: function() {
+          uni.getClipboardData({
+            success: function() {
+              uni.showToast({
+                title: "复制成功"
+              });
+            }
+          });
+        }
+      });
+    },
+    upper(e) {
+      console.log(e);
+    },
+    lower(e) {
+      console.log(e);
+    },
+    scroll(e) {
+      console.log(e);
+    //   this.old.scrollTop = e.detail.scrollTop;
+    }
+  },
+  onHide(){
+      window.removeEventListener("scroll",this.scrollFun);
+  }
+};
+</script>
+<style lang="scss" scoped>
+.content {
+  background: #f3f4f3;
+  padding-bottom: 40rpx;
+}
+.empty {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  .tips {
+    margin-top: 200rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    image {
+      margin: 0 auto;
+      height: 190rpx;
+      width: 218rpx;
+    }
+    .text {
+      margin: 0 auto;
+      text {
+        text-align: center;
+      }
+      opacity: 0.3;
+      font-family: PingFangSC-Regular;
+      font-size: 28rpx;
+      color: grey;
+    }
+  }
+  button {
+    margin-top: 400rpx;
+    border: 2rpx solid #00b657;
+    border-radius: 45rpx;
+    font-family: PingFangSC-Semibold;
+    font-size: 30rpx;
+    color: #42b069;
+    padding: 0 80rpx;
+    font-size: 500;
+  }
+}
+.not_empty {
+  .title {
+    font-family: PingFangSC-Semibold;
+    font-size: 50rpx;
+    color: #000000;
+    font-weight: 500;
+    line-height: 70rpx;
+    padding-top: 40rpx;
+    margin: 0 40rpx 40rpx;
+  }
+  .by_mouth {
+    display: flex;
+    flex-direction: column;
+    .mouth {
+      opacity: 0.6;
+      font-family: PingFangSC-Regular;
+      font-size: 30rpx;
+      color: #000000;
+      text-align: justify;
+    }
+    .lists {
+      display: flex;
+      font-size: 26rpx;
+      flex-direction: column;
+      font-family: PingFangSC-Semibold;
+      margin: 10rpx 0;
+      display: flex;
+      flex-direction: row;
+      .card_left {
+        color: #ffffff;
+        background: #ffffff;
+        width: 40rpx;
+        height: 320rpx;
+        margin-right: 4rpx;
+        border-top-right-radius: 14rpx;
+        border-bottom-right-radius: 14rpx;
+      }
+      .listCard {
+        background: #ffffff;
+        border-radius: 14rpx;
+        border-left: #979797 dashed 1px;
+        padding: 40rpx 20rpx;
+        .row1 {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          color: #000000;
+          .order_name {
+            font-size: 32rpx;
+            letter-spacing: 0.4px;
+            font-weight: 600;
+          }
+          .price {
+            image {
+              height: 36rpx;
+              width: 28rpx;
+              margin-right: 4rpx;
+            }
+            font-size: 40rpx;
+            letter-spacing: 0.5px;
+            text-align: right;
+          }
+        }
+        .order_no {
+          padding: 10rpx;
+          .copy {
+            text-decoration: underline;
+            font-size: 24rpx;
+            font-weight: 500;
+            color: #141615;
+            padding-left: 20rpx;
+          }
+          text {
+            color: gray;
+          }
+        }
+        .buy_time {
+          padding: 10rpx;
+          text {
+            color: gray;
+          }
+        }
+        .row4 {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          .useful_time {
+            color: #be9e54;
+            padding: 20rpx;
+            text {
+              font-weight: 600;
+            }
+          }
+          button {
+            margin-left: 20rpx;
+            border: 2rpx solid #00b657;
+            border-radius: 45rpx;
+            font-family: PingFangSC-Semibold;
+            font-size: 28rpx;
+            color: #42b069;
+            font-size: 600;
+          }
+        }
+      }
+    }
+  }
+}
+</style>
