@@ -40,10 +40,11 @@
               >
               <view class="buy_time"><text>购买时间：</text>{{ i.time }}</view>
               <view class="row4">
-                <view class="useful_time"
-                  ><text>有效期至：</text>{{ i.timeTO }}</view
-                >
-                <button size="mini">确认收货</button>
+                <view class="useful_time">
+                  <text>有效期至：</text>{{ i.timeTO }}
+                </view>
+                <button v-if="i.isUsed === 'true'" class="isUsed" size="mini">已收货</button>
+                <button v-else size="mini">确认收货</button>
               </view>
             </view>
           </view>
@@ -57,7 +58,7 @@ export default {
   data() {
     return {
       //   list: []
-      scrollTop:0,
+      scrollTop: 0,
       list: [
         {
           date: "2019年11月",
@@ -70,7 +71,8 @@ export default {
               no: "DSDSDe324de423",
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
-              price: "72.00"
+              price: "72.00",
+              isUsed: 'flase'
             },
             {
               id: 2,
@@ -79,7 +81,8 @@ export default {
               no: "DSDSDe324de423",
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
-              price: "72.00"
+              price: "72.00",
+              isUsed: 'flase'
             }
           ]
         },
@@ -94,7 +97,8 @@ export default {
               name: "全国星巴克通用券码",
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
-              price: "72.00"
+              price: "72.00",
+              isUsed: 'true'
             },
             {
               id: 4,
@@ -103,7 +107,8 @@ export default {
               name: "全国星巴克通用券码",
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
-              price: "72.00"
+              price: "72.00",
+              isUsed: 'true'
             },
             {
               id: 5,
@@ -112,31 +117,31 @@ export default {
               name: "全国星巴克通用券码",
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
-              price: "72.00"
+              price: "72.00",
+              isUsed: 'true'
             }
           ]
         }
       ]
     };
   },
-  onShow(){
-      window.addEventListener("scroll",this.scrollFun);
+  onShow() {
+    window.addEventListener("scroll", this.scrollFun);
   },
   methods: {
-      scrollFun(){
-          console.log(window);
-          let height = document.getElementById("title").clientHeight;
-          if(window.scrollY > height){
-              uni.setNavigationBarTitle({
-                  title:"我的卡券"
-              })
-          }
-          else{
-              uni.setNavigationBarTitle({
-                  title:"我的卡券"
-              })
-          }
-      },
+    scrollFun() {
+      console.log(window);
+      let height = document.getElementById("title").clientHeight;
+      if (window.scrollY > height) {
+        uni.setNavigationBarTitle({
+          title: "我的卡券"
+        });
+      } else {
+        uni.setNavigationBarTitle({
+          title: "我的卡券"
+        });
+      }
+    },
     //   跳转到订单详情
     NavToDetail() {
       uni.navigateTo({
@@ -167,11 +172,11 @@ export default {
     },
     scroll(e) {
       console.log(e);
-    //   this.old.scrollTop = e.detail.scrollTop;
+      //   this.old.scrollTop = e.detail.scrollTop;
     }
   },
-  onHide(){
-      window.removeEventListener("scroll",this.scrollFun);
+  onHide() {
+    window.removeEventListener("scroll", this.scrollFun);
   }
 };
 </script>
@@ -224,16 +229,17 @@ export default {
     color: #000000;
     font-weight: 500;
     line-height: 70rpx;
-    padding-top: 40rpx;
-    margin: 0 40rpx 40rpx;
+    margin: 14rpx 40rpx 40rpx;
   }
   .by_mouth {
     display: flex;
     flex-direction: column;
+    margin-bottom: 40rpx;
     .mouth {
       opacity: 0.6;
       font-family: PingFangSC-Regular;
       font-size: 30rpx;
+      margin: 0 40rpx 16rpx;
       color: #000000;
       text-align: justify;
     }
@@ -242,9 +248,12 @@ export default {
       font-size: 26rpx;
       flex-direction: column;
       font-family: PingFangSC-Semibold;
-      margin: 10rpx 0;
+      margin-bottom: 16rpx;
       display: flex;
       flex-direction: row;
+      &:last-child {
+        margin-bottom: 0;
+      }
       .card_left {
         color: #ffffff;
         background: #ffffff;
@@ -256,9 +265,11 @@ export default {
       }
       .listCard {
         background: #ffffff;
-        border-radius: 14rpx;
+        border-top-left-radius: 14rpx;
+        border-bottom-left-radius: 14rpx;
+        flex: 1;
         border-left: #979797 dashed 1px;
-        padding: 40rpx 20rpx;
+        padding: 40rpx 44rpx 50rpx 30rpx;
         .row1 {
           display: flex;
           flex-direction: row;
@@ -273,7 +284,7 @@ export default {
             image {
               height: 36rpx;
               width: 28rpx;
-              margin-right: 4rpx;
+              margin-right: 12rpx;
             }
             font-size: 40rpx;
             letter-spacing: 0.5px;
@@ -281,7 +292,7 @@ export default {
           }
         }
         .order_no {
-          padding: 10rpx;
+          margin-top: 16rpx;
           .copy {
             text-decoration: underline;
             font-size: 24rpx;
@@ -294,31 +305,39 @@ export default {
           }
         }
         .buy_time {
-          padding: 10rpx;
+          margin-top: 12rpx;
           text {
             color: gray;
           }
         }
         .row4 {
+          margin-top: 16rpx;
           display: flex;
           flex-direction: row;
           justify-content: space-between;
           align-items: center;
           .useful_time {
             color: #be9e54;
-            padding: 20rpx;
             text {
               font-weight: 600;
             }
           }
+          .isUsed{
+            color: #8F8F8F;
+            border: 2rpx solid #DFDFDF;
+          }
           button {
-            margin-left: 20rpx;
+            display: inline-block;
+            width: 160rpx;
+            height: 60rpx;
+            padding: 0 !important;
+            margin: 0 !important;
+            line-height: 60rpx;
             border: 2rpx solid #00b657;
             border-radius: 45rpx;
-            font-family: PingFangSC-Semibold;
             font-size: 28rpx;
             color: #42b069;
-            font-size: 600;
+            font-weight: 600;
           }
         }
       }

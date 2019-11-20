@@ -16,7 +16,7 @@
       </view>
     </view>
     <view class="about">
-      <view class="service deline">
+      <view class="service deline" @click="contactService">
         <view class="left">
           <image src="../../static/assets/service.png" />
           <text>联系客服</text>
@@ -32,6 +32,8 @@
         <image src="../../static/assets/toRight.png" />
       </view>
     </view>
+    <view class="share">分享海报 </view>
+    <botton class="logout">退出登录</botton>
   </view>
 </template>
 <script>
@@ -41,6 +43,19 @@ export default {
       user_icon: "../../static/images/user.png",
       user_name: "喵喵喵"
     };
+  },
+  methods: {
+    contactService() {
+      uni.showModal({
+        content: "星小孩（微信号：960411wsy）",
+        confirmText:"我知道了",
+        showCancel:false,
+        confirmColor:"#42B069",
+        success(res){
+
+        }
+      });
+    }
   }
 };
 </script>
@@ -51,18 +66,16 @@ export default {
 }
 .top_card {
   background: #ffffff;
-  padding: 20rpx 40rpx 50rpx;
+  padding: 26rpx 40rpx 50rpx;
   .title {
-    font-family: PingFangSC-Semibold;
     font-size: 50rpx;
     color: #000000;
     font-weight: 600;
     line-height: 70rpx;
-    margin: 20rpx 0 40rpx;
   }
   .bottom {
     display: flex;
-    flex-direction: row;
+    margin-top: 40rpx;
     justify-content: space-between;
     .left {
       display: flex;
@@ -72,27 +85,27 @@ export default {
         height: 120rpx;
         width: 120rpx;
         border-radius: 50%;
+        margin-right: 24rpx;
       }
       text {
-        font-family: PingFangSC-Semibold;
         font-size: 40rpx;
         color: #000000;
+        letter-spacing: 0.5px;
       }
     }
     .right {
       display: flex;
-      flex-direction: row;
       align-items: center;
       text {
         opacity: 0.4;
-        font-family: PingFangSC-Regular;
         font-size: 26rpx;
         color: #000000;
+        letter-spacing: 0.32px;
       }
       image {
-        height: 26rpx;
-        width: 26rpx;
-        margin-left: 10rpx;
+        height: 25rpx;
+        width: 25rpx;
+        margin-left: 19rpx;
       }
     }
   }
@@ -100,12 +113,15 @@ export default {
 .about {
   margin-top: 20rpx;
   background: #ffffff;
+  padding: 0 50rpx 0 40rpx;
   .service {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-bottom: 4rpx;
     padding: 30rpx 0;
+    font-size: 30rpx;
+    color: #000000;
+    letter-spacing: 0.38px;
     .left {
       display: flex;
       flex-direction: row;
@@ -114,11 +130,28 @@ export default {
     image {
       height: 26rpx;
       width: 26rpx;
-      margin: 10rpx 20rpx;
+      margin-right: 12rpx;
     }
   }
   .deline {
-    border-bottom: 0.5px solid #979797;
+    border-bottom: 0.5px solid rgba(97, 97, 97, 0.2);
   }
+}
+.share {
+  height: 260rpx;
+  margin: 16rpx 40rpx 0;
+  background: #ffffff;
+  border-radius: 16rpx;
+  color: #ffffff;
+}
+.logout {
+  display: inline-block;
+  padding: 20rpx 203rpx;
+  margin: 50rpx 110rpx 0 !important;
+  border: 2rpx solid #00b360;
+  border-radius: 40rpx;
+  font-size: 30rpx;
+  color: #00b35f;
+  letter-spacing: 0;
 }
 </style>

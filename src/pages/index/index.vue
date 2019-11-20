@@ -24,8 +24,8 @@
     <view class="goods_card" >
       <view class="card_top" @click="NavToDetial">
         <view class="price">
-          <text class="price_now">￥{{ price }}</text>
-          <text class="price_original">￥{{ price_original }}</text>
+          <text class="price_now">&yen;{{ price }}</text>
+          <text class="price_original">&yen;{{ price_original }}</text>
         </view>
         <view class="name">
           <text>全国星巴克中杯通兑券</text>
@@ -51,7 +51,7 @@
               />
             </view>
             <view class="num">{{ buy_number }}</view>
-            <view @click="add_number" class="add">
+            <view @click="add_number" class="reduce">
               <image
                 v-show="buy_number === 10"
                 src="../../static/images/no_add.png"
@@ -150,24 +150,22 @@ export default {
 <style lang="scss">
 .content {
   background: #e8e8e8;
-  padding: 0 40rpx 40rpx;
+  padding: 24rpx 40rpx 40rpx;
 }
 .tips {
   display: none;
-  display: flex;
-  flex-direction: column;
+  // display: flex;
+  // flex-direction: column;
   font-size: 26rpx;
   .title {
     // opacity: 0.6;
     display: flex;
-    flex-direction: row;
     align-items: center;
     image{
       height: 48rpx;
       width: 40rpx;
       margin-right: 20rpx;
     }
-    font-family: PingFangSC-Semibold;
     font-size: 30rpx;
     font-weight: 600;
     color: #000000;
@@ -178,7 +176,6 @@ export default {
     display: flex;
     flex-direction: column;
     opacity: 0.6;
-    font-family: PingFangSC-Regular;
     font-size: 24rpx;
     color: rgb(43, 43, 44);
     letter-spacing: -0.58rpx;
@@ -193,29 +190,25 @@ export default {
     no-repeat center;
   background-size: cover;
   border-radius: 15rpx;
+  padding: 43rpx 50rpx 64rpx;
   height: 417px;
   display: flex;
-  margin-top: 30rpx;
   flex-direction: column;
   justify-content: space-between;
   .card_top {
     display: flex;
     flex-direction: column;
-    padding: 40rpx 50rpx 0;
     .price {
       display: flex;
-      flex-direction: row;
       align-items: baseline;
       color: #ffffff;
-      justify-content: flex-start;
       .price_now {
         font-size: 90rpx;
         font-weight: 600;
-        margin-left: 40rpx;
-        font-family: HelveticaNeue-Bold;
-        margin: 0 20rpx;
       }
       .price_original {
+        margin-left: 15rpx;
+        opacity: 0.6;
         font-size: 30rpx;
         text-decoration: line-through;
       }
@@ -223,18 +216,15 @@ export default {
     .name {
       opacity: 0.8;
       font-weight: 600;
-      font-family: PingFangSC-Semibold;
       font-size: 36rpx;
       color: #ffffff;
       letter-spacing: 0;
-      margin: 10rpx;
     }
   }
   .card_sell_out {
     border-bottom-left-radius: 10rpx;
     border-bottom-right-radius: 10rpx;
     background-color: rgba(121, 182, 160, 0.8);
-    font-family: PingFangSC-Medium;
     font-size: 36rpx;
     padding: 50rpx;
     color: #ffffff;
@@ -242,19 +232,18 @@ export default {
   }
   .card_bottom {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    padding-bottom: 50rpx;
+    justify-content: space-between;
     .left {
       display: flex;
       flex-direction: column;
       .number {
         display: flex;
-        width: 200rpx;
-        flex-direction: row;
+        width: 184rpx;
         align-items: center;
-        justify-content: space-around;
+        justify-content: space-between;
         .reduce {
+          display: flex;
+          align-items: center;
           image {
             height: 40rpx;
             width: 40rpx;
@@ -264,32 +253,27 @@ export default {
           color: #ffffff;
           font-size: 30rpx;
         }
-        .add {
-          image {
-            height: 40rpx;
-            width: 40rpx;
-          }
-        }
       }
       .purchase_limit {
         display: flex;
-        flex-direction: row;
+        margin-top: 14rpx;
         text {
-          padding: 10rpx;
           opacity: 0.6;
-          font-family: PingFangSC-Semibold;
           font-size: 22rpx;
           color: #ffffff;
           letter-spacing: 0;
           text-align: right;
+          margin-right: 16rpx;
+          &:last-child{
+            margin-right: 0;
+          }
         }
       }
     }
     button {
       background-color: #ffffff;
       border-radius: 45rpx;
-      font-family: PingFangSC-Semibold;
-      padding: 0 80rpx;
+      width: 260rpx;
       font-size: 30rpx;
       color: #005334;
       font-weight: 600;
@@ -305,30 +289,26 @@ export default {
   height: 417px;
   display: flex;
   margin-top: 30rpx;
+  padding: 60rpx 50rpx 0;
   flex-direction: column;
   .card_content {
-    padding: 40rpx;
     .text1 {
-      font-family: PingFangSC-Semibold;
+      margin-bottom: 8rpx;
       font-size: 40rpx;
       color: #ffffff;
-      padding: 10rpx 0;
     }
     .text2 {
       opacity: 0.6;
-      font-family: PingFangSC-Regular;
       font-size: 30rpx;
       color: #ffffff;
     }
   }
   .text1 {
-    font-family: PingFangSC-Semibold;
     font-size: 40rpx;
     color: #ffffff;
   }
   .text2 {
     opacity: 0.6;
-    font-family: PingFangSC-Regular;
     font-size: 30rpx;
     color: #ffffff;
   }

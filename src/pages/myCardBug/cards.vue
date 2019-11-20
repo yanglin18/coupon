@@ -2,6 +2,7 @@
   <view class="content">
     <view class="tips">
       <view class="title">
+        <image src="../../static/assets/coffee.png" />
         <text>使用须知</text>
       </view>
       <view class="tip_content">
@@ -20,37 +21,36 @@
         </view>
       </view>
     </view>
-    <!-- <view class="swiper_content"> -->
-      <swiper
-        :vertical="true"
-        previous-margin="120px"
-        next-margin="120px"
-        @change="EventHandle"
-        class="swiper"
+    <swiper
+      :vertical="true"
+      previous-margin="120px"
+      next-margin="120px"
+      @change="EventHandle"
+      class="swiper"
+    >
+      <swiper-item
+        class="goods_card"
+        v-for="(item, index) in cards"
+        :id="index"
+        :key="index"
       >
-        <swiper-item
-          class="goods_card"
-          v-for="(item, index) in cards"
-          :id="index"
-          :key="index"
-        >
-          <view class="card_order">
-            <text>{{ item.id }}/{{ shuliang }}</text>
-          </view>
-          <view class="name">
-            <text>全国星巴克中杯通兑券</text>
-          </view>
-          <view class="userful_time">
-            <text>有效期：{{ item.userful_time }}</text>
-          </view>
-          <view class="QRcode">
-            <image src="../../static/ceshi.jpg" />
-          </view>
-          <view class="tips">
-            <text>优惠码每30秒自动更新，24小时内有效，过期不退换</text>
-          </view>
-        </swiper-item>
-      </swiper>
+        <view class="card_order">
+          <text>{{ item.id }}/{{ shuliang }}</text>
+        </view>
+        <view class="name">
+          <text>全国星巴克中杯通兑券</text>
+        </view>
+        <view class="userful_time">
+          <text>有效期：{{ item.userful_time }}</text>
+        </view>
+        <view class="QRcode">
+          <image src="../../static/QRcode.png" />
+        </view>
+        <view class="tips">
+          <text>优惠码每30秒自动更新，24小时内有效，过期不退换</text>
+        </view>
+      </swiper-item>
+    </swiper>
     <!-- </view> -->
 
     <!-- <view v-for="item in cards" :key="item" class="goods_card">
@@ -87,29 +87,29 @@ export default {
         {
           image: "",
           id: 1,
-          userful_time: "2019.11.08 00:00～2019.11.09 24:00"
+          userful_time: "2019.11.09 23:00:02"
         },
         {
           image: "",
           id: 2,
-          userful_time: "2019.11.08 00:00～2019.11.09 24:00"
+          userful_time: "2019.11.09 23:00:02"
         },
         {
           image: "",
           id: 3,
-          userful_time: "2019.11.08 00:00～2019.11.09 24:00"
+          userful_time: "2019.11.09 23:00:02"
         },
         {
           image: "",
           id: 4,
-          userful_time: "2019.11.08 00:00～2019.11.09 24:00"
+          userful_time: "2019.11.09 23:00:02"
         },
         {
           image: "",
           id: 5,
-          userful_time: "2019.11.08 00:00～2019.11.09 24:00"
+          userful_time: "2019.11.09 23:00:02"
         },
-        { image: "", id: 6, userful_time: "2019.11.08 00:00～2019.11.09 24:00" }
+        { image: "", id: 6, userful_time: "2019.11.09 23:00:02" }
       ]
     };
   },
@@ -133,82 +133,75 @@ export default {
   align-items: center;
 }
 .content {
-  padding: 0 50rpx;
+  padding: 0 40rpx;
   // height: 100vh;
-  background: #e8e8e8;
+  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/69254200_1574076274.png")
+    no-repeat center;
+  background-size: cover;
 }
 .swiper {
-  height: 600px;
+  height: 650px;
 }
 .tips {
   display: flex;
+  padding-top: 19rpx;
   flex-direction: column;
+  color: #ffffff;
   font-size: 26rpx;
   .title {
-    opacity: 0.6;
-    font-family: PingFangSC-Semibold;
-    font-size: 28rpx;
-    color: #000000;
+    display: flex;
+    align-items: center;
+    image {
+      height: 48rpx;
+      width: 40rpx;
+      margin-right: 20rpx;
+    }
+    font-size: 30rpx;
     letter-spacing: -0.68px;
-    padding: 10rpx;
   }
   .tip_content {
     display: flex;
     flex-direction: column;
     opacity: 0.6;
-    font-family: PingFangSC-Regular;
     font-size: 24rpx;
-    color: rgb(43, 43, 44);
-    letter-spacing: -0.58rpx;
-    line-height: 42rpx;
     .texta {
-      padding: 10rpx;
+      margin-top: 10rpx;
     }
   }
 }
 .goods_card {
-  :active {
-    opacity: 1;
-  }
-  opacity: 0.5;
   background: #ffffff;
-  border-radius: 15rpx;
-  width: calc(100% - 30px);
+  border-radius: 24rpx;
   display: flex;
-  margin: 40rpx 0;
+  margin-top: 40rpx;
+  margin-bottom: 114rpx;
+  color: #000000;
   flex-direction: column;
   .card_order {
-    @extend .center;
-    margin: 50rpx 0 20rpx 0;
+    margin: 34rpx auto 0 ;
   }
   .name {
-    @extend .center;
-    opacity: 0.8;
+    margin: 7rpx auto 0;
     font-weight: 600;
-    font-family: PingFangSC-Semibold;
-    font-size: 36rpx;
-    color: #000000;
-    letter-spacing: 0;
-    margin: 10rpx;
+    font-size: 40rpx;
   }
   .userful_time {
-    @extend .center;
-    color: #000000;
     font-size: 26rpx;
-    margin: 10rpx;
+    margin: 7rpx auto 0;
+    letter-spacing: 0.43px;
+    opacity: 0.6;
   }
   .QRcode {
-    @extend .center;
+    margin: 36rpx auto 0;
     image {
       height: 400rpx;
       width: 400rpx;
     }
   }
   .tips {
-    @extend .center;
-    color: gray;
-    font-size: 24rpx;
-    margin: 20rpx 0 60rpx 10rpx;
+    // opacity: 0.4;
+    font-size: 22rpx;
+    margin: 40rpx auto 0;
   }
 }
 .active {
