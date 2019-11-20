@@ -43,7 +43,9 @@
                 <view class="useful_time">
                   <text>有效期至：</text>{{ i.timeTO }}
                 </view>
-                <button v-if="i.isUsed === 'true'" class="isUsed" size="mini">已收货</button>
+                <button v-if="i.isUsed === 'true'" class="isUsed" size="mini">
+                  已收货
+                </button>
                 <button v-else size="mini">确认收货</button>
               </view>
             </view>
@@ -72,7 +74,7 @@ export default {
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
               price: "72.00",
-              isUsed: 'flase'
+              isUsed: "flase"
             },
             {
               id: 2,
@@ -82,7 +84,7 @@ export default {
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
               price: "72.00",
-              isUsed: 'flase'
+              isUsed: "flase"
             }
           ]
         },
@@ -98,7 +100,7 @@ export default {
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
               price: "72.00",
-              isUsed: 'true'
+              isUsed: "true"
             },
             {
               id: 4,
@@ -108,7 +110,7 @@ export default {
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
               price: "72.00",
-              isUsed: 'true'
+              isUsed: "true"
             },
             {
               id: 5,
@@ -118,29 +120,37 @@ export default {
               time: "2019.11.11 12:23:34",
               timeTO: "2019.11.12 00:00:00",
               price: "72.00",
-              isUsed: 'true'
+              isUsed: "true"
             }
           ]
         }
       ]
     };
   },
-  onShow() {
-    window.addEventListener("scroll", this.scrollFun);
+  onShow() {},
+  onPageScroll(top) {
+    console.log("e:", top);
+    this.scrollFun(top);
   },
   methods: {
-    scrollFun() {
-      console.log(window);
-      let height = document.getElementById("title").clientHeight;
-      if (window.scrollY > height) {
+    scrollFun(top) {
+      //创建节点选择器
+      var query = wx.createSelectorQuery();
+      //选择id
+      query.select("#title").boundingClientRect();
+      query.exec(function(res) {
+        //res就是 所有标签为myText的元素的信息 的数组
+        let height = res[0].height;
+        if (top.scrollTop > height) {
         uni.setNavigationBarTitle({
           title: "我的卡券"
         });
-      } else {
+      } else { 
         uni.setNavigationBarTitle({
-          title: "我的卡券"
+          title: ""
         });
       }
+      });
     },
     //   跳转到订单详情
     NavToDetail() {
@@ -175,9 +185,7 @@ export default {
       //   this.old.scrollTop = e.detail.scrollTop;
     }
   },
-  onHide() {
-    window.removeEventListener("scroll", this.scrollFun);
-  }
+  onHide() {}
 };
 </script>
 <style lang="scss" scoped>
@@ -229,7 +237,7 @@ export default {
     color: #000000;
     font-weight: 500;
     line-height: 70rpx;
-    margin: 14rpx 40rpx 40rpx;
+    padding: 14rpx 40rpx 40rpx;
   }
   .by_mouth {
     display: flex;
@@ -322,9 +330,9 @@ export default {
               font-weight: 600;
             }
           }
-          .isUsed{
-            color: #8F8F8F;
-            border: 2rpx solid #DFDFDF;
+          .isUsed {
+            color: #8f8f8f;
+            border: 2rpx solid #dfdfdf;
           }
           button {
             display: inline-block;
