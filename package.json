@@ -38,6 +38,7 @@
     "node-sass": "^4.13.0",
     "regenerator-runtime": "^0.12.1",
     "sass-loader": "^8.0.0",
+    "uni-ui": "^1.0.0",
     "vue": "^2.6.10",
     "vuex": "^3.0.1"
   },

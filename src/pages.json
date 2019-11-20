@@ -26,6 +26,24 @@
       }
     },
     {
+      "path": "pages/userCenter/about",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/userCenter/About/privacyPolicy",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/userCenter/About/commonProblem",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
       "path": "pages/index/detials",
       "style": {
         "navigationBarTitleText": "全国星巴克中杯通兑券"

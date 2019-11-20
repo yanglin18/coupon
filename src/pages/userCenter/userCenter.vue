@@ -23,7 +23,7 @@
         </view>
         <image src="../../static/assets/toRight.png" />
       </view>
-      <view class="service">
+      <view class="service" @click="NavToAbout">
         <view class="left">
           <image src="../../static/assets/about.png" />
           <text>关于</text>
@@ -55,6 +55,11 @@ export default {
 
         }
       });
+    },
+    NavToAbout(){
+      uni.navigateTo({
+        url:"./about"
+      })
     }
   }
 };
