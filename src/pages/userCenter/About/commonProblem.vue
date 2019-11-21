@@ -1,26 +1,25 @@
 <template>
-  <view>
-    <view class="content">
-      <view class="collapse" @change="change">
-        <view
-          class="collapse_item"
-          :title="issue.question"
-          :name="index"
-          v-for="(issue, index) in issues"
-          :key="index"
-        >
-          <view class="text">{{ issue.answer }}</view>
-        </view>
-      </view>
-    </view>
+  <view class="content">
+    <uniCollapse @change="change">
+      <uniCollapseItem
+        class="collapse_item"
+        :title="issue.question"
+        :name="index"
+        v-for="(issue, index) in issues"
+        :key="index"
+      >
+        <view class="text">{{ issue.answer }}</view></uniCollapseItem
+      >
+    </uniCollapse>
   </view>
 </template>
 <script>
-// import {uniCollapse,uniCollapseItem} from "uni-ui"
+import uniCollapse from "@/components/uni-collapse/uni-collapse.vue";
+import uniCollapseItem from "@/components/uni-collapse-item/uni-collapse-item.vue";
 export default {
   components: {
-    // uniCollapse,
-    // uniCollapseItem
+    uniCollapse,
+    uniCollapseItem
   },
   data() {
     return {
@@ -41,10 +40,21 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.collapse {
-  font-size: 14px;
+.collapse_item {
+  
+}
+.content{
+  font-size: 36rpx;
+  color: #000000;
+  letter-spacing: 0.45px;
 }
 .text {
-  padding: 20rpx 20rpx 30rpx 30rpx;
+  padding: 16rpx 40rpx 40rpx;
+  opacity: 0.6;
+  font-size: 26rpx;
+  color: #000000;
+  letter-spacing: 0.43px;
+  text-align: justify;
+  line-height: 48rpx;
 }
 </style>

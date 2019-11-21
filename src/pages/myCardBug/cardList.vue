@@ -4,7 +4,8 @@
       <view class="tips">
         <image src="../../static/images/empty.png" />
         <view class="text">
-          <text>您的卡券包暂时为空 快去购买一张优惠券吧</text>
+          <text>您的卡券包暂时为空 
+            快去购买一张优惠券吧</text>
         </view>
       </view>
       <button size="mini">去选购</button>
@@ -59,7 +60,7 @@
 export default {
   data() {
     return {
-      //   list: []
+        // list: [],
       scrollTop: 0,
       list: [
         {
@@ -129,17 +130,15 @@ export default {
   },
   onShow() {},
   onPageScroll(top) {
-    console.log("e:", top);
     this.scrollFun(top);
   },
   methods: {
     scrollFun(top) {
       //创建节点选择器
-      var query = wx.createSelectorQuery();
+      var query = uni.createSelectorQuery();
       //选择id
       query.select("#title").boundingClientRect();
       query.exec(function(res) {
-        //res就是 所有标签为myText的元素的信息 的数组
         let height = res[0].height;
         if (top.scrollTop > height) {
         uni.setNavigationBarTitle({
@@ -207,6 +206,7 @@ export default {
       margin: 0 auto;
       height: 190rpx;
       width: 218rpx;
+      margin-bottom: 36rpx;
     }
     .text {
       margin: 0 auto;

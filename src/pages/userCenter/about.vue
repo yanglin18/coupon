@@ -2,15 +2,15 @@
   <view class="content">
     <view class="title">关于</view>
     <view class="top">
-      <view class="row">
+      <view class="row" @click="NavTo('./About/aboutMKX')">
         <text>关于摩卡星</text>
         <image src="../../static/assets/toRight.png" />
       </view>
-      <view class="row" @click="NavToPrivacy">
+      <view class="row" @click="NavTo('./About/privacyPolicy')">
         <text>隐私权保护政策</text>
         <image src="../../static/assets/toRight.png" />
       </view>
-      <view class="row" @click="NavToCommon">
+      <view class="row" @click="NavTo('./About/commonProblem')">
         <text>常见问题</text>
         <image src="../../static/assets/toRight.png" />
       </view>
@@ -24,16 +24,12 @@ export default {
     return {};
   },
   methods: {
-    NavToPrivacy() {
+
+    NavTo(e) {
       uni.navigateTo({
-        url: "./About/privacyPolicy"
+        url: e
       });
     },
-    NavToCommon() {
-      uni.navigateTo({
-        url: "./About/commonProblem"
-      });
-    }
   }
 };
 </script>

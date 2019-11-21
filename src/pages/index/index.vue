@@ -1,6 +1,6 @@
 <template>
   <view class="content">
-    <view class="tips">
+    <view id="tips" style="display:none" class="tips">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
         <text>使用须知</text>
@@ -21,8 +21,8 @@
         </view>
       </view>
     </view>
-    <view class="goods_card" >
-      <view class="card_top" @click="NavToDetial">
+    <view class="goods_card" @click="NavToDetial">
+      <view class="card_top">
         <view class="price">
           <text class="price_now">&yen;{{ price }}</text>
           <text class="price_original">&yen;{{ price_original }}</text>
@@ -40,7 +40,7 @@
       <view v-else class="card_bottom">
         <view class="left">
           <view class="number">
-            <view @click="reduce_number" class="reduce">
+            <view @click.stop="reduce_number" class="reduce">
               <image
                 v-show="buy_number === 1"
                 src="../../static/images/no_reduce.png"
@@ -51,7 +51,7 @@
               />
             </view>
             <view class="num">{{ buy_number }}</view>
-            <view @click="add_number" class="reduce">
+            <view @click.stop="add_number" class="reduce">
               <image
                 v-show="buy_number === 10"
                 src="../../static/images/no_add.png"
@@ -73,7 +73,10 @@
           </view>
         </view>
         <view class="right">
-          <button size="mini">去支付</button>
+          <!-- <button size="mini">去支付</button> -->
+          <button open-type="getUserInfo" @getuserinfo="GetUserInfo">
+            去购买
+          </button>
         </view>
       </view>
     </view>
@@ -87,15 +90,68 @@
         </view>
       </view>
     </view>
+    <view v-if="userAgree === false" class="warmPrompt">
+      <view class="Prompttitle">
+        <text>温馨提示</text>
+      </view>
+      <view class="Promptcontent">
+        <text>
+          欢迎您来到星冰乐用心券大家庭，我们更新了《星冰乐小程序服务指南》、《星冰乐付费服务协议》和《用户隐私政策协议》，请先点击下方链接，仔细阅读，充分理解协议中的条款内容后通过勾选统一的形式后，再次进入星冰乐用心券大家庭。
+        </text>
+      </view>
+      <view class="check">
+        <view>
+          <image
+            @click="agree"
+            v-show="userOptions === true"
+            src="../../static/assets/option.png"
+          />
+          <image
+            @click="agree"
+            v-show="userOptions === false"
+            src="../../static/assets/option_no.png"
+          />
+        </view>
+        <view>
+          <text>
+            同意
+            <text
+              class="agreement"
+              @click="NavToagreement('/pages/userCenter/About/privacyPolicy')"
+              >《星冰乐小程序服务指南》</text
+            >
+            、
+            <text
+              class="agreement"
+              @click="NavToagreement('/pages/userCenter/About/privacyPolicy')"
+              >《星冰乐付费服务协议》</text
+            >
+            和
+            <text
+              class="agreement"
+              @click="NavToagreement('/pages/userCenter/About/privacyPolicy')"
+              >《用户隐私政策协议》</text
+            >
+          </text>
+        </view>
+      </view>
+      <button
+        open-type="getUserInfo"
+        @getuserinfo="GetUserInfo"
+        @click="IHaveLearned"
+      >
+        我已了解
+      </button>
+    </view>
   </view>
 </template>
 
 <script>
-import { uniNumberBox } from "@dcloudio/uni-ui";
 export default {
-  components: { uniNumberBox },
   data() {
     return {
+      userOptions: false,
+      userAgree: false,
       price: "24.00",
       price_original: "33.00",
       buy_number: 1,
@@ -108,13 +164,22 @@ export default {
     // });
   },
   onPullDownRefresh() {
-    console.log("下拉啦！"), (notice = document.getElementsByClassName("tips"));
-    (notice.style.display = "block"),
-      setTimeout(function() {
-        uni.stopPullDownRefresh();
-      }, 1000);
+    console.log("下拉啦！");
+    this.setData({ display: "flex" }) 
+    // this.pullDown();
   },
   methods: {
+    // 下拉出现提示
+    pullDown(){
+    var query = uni.createSelectorQuery();
+    // 选择id
+    query.select("#tips").boundingClientRect();
+    console.log("query",query)
+    query.exec(function(res){
+      let height = res[0].height;
+      console.log("res:",res)
+    }
+    )},
     // 减少购买数量
     reduce_number() {
       if (this.buy_number <= 1) {
@@ -142,6 +207,39 @@ export default {
       uni.navigateTo({
         url: "./detials"
       });
+    },
+    // 获取基本信息
+    GetUserInfo(res) {
+      console.log(res);
+      if (res.detail.userInfo) {
+        console.log("点击了同意授权");
+      } else {
+        console.log("点击了拒绝授权");
+      }
+    },
+    // 我已了解
+    IHaveLearned() {
+      if (this.userOptions === false) {
+        uni.showToast({
+          title: "请勾选服务/隐私协议",
+          duration: 1000,
+          icon: "none"
+        });
+        return;
+      } else {
+        this.userAgree = true;
+      }
+    },
+    // 用户同意协议
+    agree() {
+      this.userOptions = !this.userOptions;
+    },
+    // 跳转到协议详情
+    NavToagreement(e) {
+      console.log(e);
+      uni.navigateTo({
+        url: e
+      });
     }
   }
 };
@@ -152,8 +250,61 @@ export default {
   background: #e8e8e8;
   padding: 24rpx 40rpx 40rpx;
 }
+.warmPrompt {
+  display: flex;
+  flex-direction: column;
+  margin: 100rpx 50rpx;
+  padding: 60rpx 60rpx 100rpx;
+  position: fixed;
+  top: 226rpx;
+  left: 0;
+  z-index: 100;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 24rpx;
+  .Prompttitle {
+    font-size: 40rpx;
+    margin: 0 auto;
+  }
+  .Promptcontent {
+    font-size: 30rpx;
+    margin: 24rpx auto 0;
+    opacity: 0.6;
+    letter-spacing: 0;
+    text-align: justify;
+    line-height: 52rpx;
+  }
+  .check {
+    display: flex;
+    align-items: center;
+    font-size: 22rpx;
+    color: #000000;
+    opacity: 0.4;
+    margin: 38rpx auto 0;
+    letter-spacing: 0.28px;
+    text-align: justify;
+    line-height: 40rpx;
+    image {
+      height: 36rpx;
+      width: 36rpx;
+      margin-right: 12rpx;
+    }
+    .agreement {
+      color: #be9e54;
+      opacity: 1;
+    }
+  }
+  button {
+    background: #42b069;
+    border-radius: 40rpx;
+    margin: 52rpx auto 0;
+    width: 530rpx;
+    font-size: 30rpx;
+    color: #f8f8f8;
+  }
+}
 .tips {
-  display: none;
+  // display: none;
   // display: flex;
   // flex-direction: column;
   font-size: 26rpx;
@@ -161,7 +312,7 @@ export default {
     // opacity: 0.6;
     display: flex;
     align-items: center;
-    image{
+    image {
       height: 48rpx;
       width: 40rpx;
       margin-right: 20rpx;
@@ -264,7 +415,7 @@ export default {
           letter-spacing: 0;
           text-align: right;
           margin-right: 16rpx;
-          &:last-child{
+          &:last-child {
             margin-right: 0;
           }
         }

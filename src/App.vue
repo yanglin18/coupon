@@ -1,13 +1,7 @@
 <script>
 export default {
   onLaunch: function() {
-    uni.authorize({
-      scope: "scope.userInfo",
-      success() {
-		  console.log("userinfo")
-        uni.getuserInfo();
-      }
-    });
+
   },
   onShow: function() {
     console.log("App Show");

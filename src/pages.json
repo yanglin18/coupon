@@ -44,6 +44,12 @@
       }
     },
     {
+      "path": "pages/userCenter/About/aboutMKX",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
       "path": "pages/index/detials",
       "style": {
         "navigationBarTitleText": "全国星巴克中杯通兑券"
