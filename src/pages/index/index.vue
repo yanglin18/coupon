@@ -1,6 +1,6 @@
 <template>
-  <view class="content">
-    <view id="tips" style="display:none" class="tips">
+  <view class="content" :animation="animationData">
+    <view id="tips" style="height=0" class="tips">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
         <text>使用须知</text>
@@ -155,31 +155,53 @@ export default {
       price: "24.00",
       price_original: "33.00",
       buy_number: 1,
-      sum_number: 999
+      sum_number: 999,
+      animationData: {}
     };
   },
   onLoad() {
     // this.Ajax("post", "xxx", {}, res => {
     //   console.log(res);
     // });
+    let animation = uni.createAnimation({
+      duration: 1000
+    });
+    this.animation = animation;
+
+    animation.translate(0, -175).step();
+    this.animationData = animation.export();
+  },
+  onPageScroll() {
+    let animation = uni.createAnimation({
+      duration: 1000
+    });
+    this.animation = animation;
+
+    animation.translate(0, -175).step();
+    this.animationData = animation.export();
   },
   onPullDownRefresh() {
     console.log("下拉啦！");
-    this.setData({ display: "flex" }) 
-    // this.pullDown();
+    let animation = uni.createAnimation({
+      duration: 1000
+    });
+    this.animation = animation;
+
+    animation.translate(0, 0).step();
+    this.animationData = animation.export();
   },
   methods: {
     // 下拉出现提示
-    pullDown(){
-    var query = uni.createSelectorQuery();
-    // 选择id
-    query.select("#tips").boundingClientRect();
-    console.log("query",query)
-    query.exec(function(res){
-      let height = res[0].height;
-      console.log("res:",res)
-    }
-    )},
+    pullDown() {
+      var query = uni.createSelectorQuery();
+      // 选择id
+      query.select("#tips").boundingClientRect();
+      console.log("query", query);
+      query.exec(function(res) {
+        let height = res[0].height;
+        console.log("res:", res);
+      });
+    },
     // 减少购买数量
     reduce_number() {
       if (this.buy_number <= 1) {
@@ -228,6 +250,12 @@ export default {
         return;
       } else {
         this.userAgree = true;
+        var animation = uni.createAnimation({
+          duration: 1000
+        });
+        this.animation = animation;
+        animation.translate(0, 0).step();
+        this.animationData = animation.export();
       }
     },
     // 用户同意协议
@@ -256,7 +284,7 @@ export default {
   margin: 100rpx 50rpx;
   padding: 60rpx 60rpx 100rpx;
   position: fixed;
-  top: 226rpx;
+  top: 556rpx;
   left: 0;
   z-index: 100;
   background: #ffffff;
@@ -465,3 +493,5 @@ export default {
   }
 }
 </style>
+
+function newFunction() { animationData; { } }
