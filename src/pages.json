@@ -1,6 +1,12 @@
 {
   "pages": [
     {
+      "path": "pages/loading/loading",
+      "style": {
+        "navigationBarTitleText": "加载中"
+      }
+    },
+    {
       "path": "pages/index/index",
       "style": {
         "navigationBarTitleText": "摩卡星",
@@ -27,6 +33,12 @@
     },
     {
       "path": "pages/userCenter/about",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/userCenter/modifyData",
       "style": {
         "navigationBarTitleText": ""
       }

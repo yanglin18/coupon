@@ -135,7 +135,13 @@
           </text>
         </view>
       </view>
+      <!-- 因为此按钮绑定的事件有三个：1.已经勾选隐私协议。2.调起基本信息授权。3.控制页面下滑露出使用须知 -->
+      <!-- 因为调起基本信息无法控制，所以用两个一模一样的按钮。控制这三件事 -->
+      <button v-if="!userOptions" @click="NotLearned">
+        我已了解
+      </button>
       <button
+        v-else
         open-type="getUserInfo"
         @getuserinfo="GetUserInfo"
         @click="IHaveLearned"
@@ -150,8 +156,8 @@
 export default {
   data() {
     return {
-      userOptions: false,
-      userAgree: false,
+      userOptions: false, //用户是否勾选
+      userAgree: false, //用户是否点击“我已了解”
       price: "24.00",
       price_original: "33.00",
       buy_number: 1,
@@ -239,14 +245,17 @@ export default {
         console.log("点击了拒绝授权");
       }
     },
+    // 未勾选情况下点我已了解
+    NotLearned() {
+      uni.showToast({
+        title: "请勾选服务/隐私协议",
+        duration: 1000,
+        icon: "none"
+      });
+    },
     // 我已了解
     IHaveLearned() {
       if (this.userOptions === false) {
-        uni.showToast({
-          title: "请勾选服务/隐私协议",
-          duration: 1000,
-          icon: "none"
-        });
         return;
       } else {
         this.userAgree = true;
@@ -442,7 +451,7 @@ export default {
           color: #ffffff;
           letter-spacing: 0;
           text-align: right;
-          margin-right: 16rpx;
+          // margin-right: 16rpx;
           &:last-child {
             margin-right: 0;
           }

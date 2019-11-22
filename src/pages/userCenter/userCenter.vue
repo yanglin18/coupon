@@ -9,7 +9,7 @@
           <image src="../../static/images/user.jpg" />
           <text>{{ user_name }}</text>
         </view>
-        <view class="right">
+        <view class="right" @click="NavToModify">
           <text>修改资料</text>
           <image src="../../static/assets/toRight.png" />
         </view>
@@ -23,7 +23,7 @@
         </view>
         <image src="../../static/assets/toRight.png" />
       </view>
-      <view class="service" @click="NavToAbout">
+      <view class="service" @click="NavTo('./about')">
         <view class="left">
           <image src="../../static/assets/about.png" />
           <text>关于</text>
@@ -41,7 +41,10 @@ export default {
   data() {
     return {
       user_icon: "../../static/images/user.png",
-      user_name: "喵喵喵"
+      user_name: "喵喵喵",
+      gender:"男",
+      phoneNumber:'12345678212',
+      weixin:'XXXXXX'
     };
   },
   methods: {
@@ -56,9 +59,19 @@ export default {
         }
       });
     },
-    NavToAbout(){
+    NavTo(e){
       uni.navigateTo({
-        url:"./about"
+        url:e
+      })
+    },
+    NavToModify(){
+      let name = this.user_name;
+      let icon = this.user_icon;
+      let gender = this.gender;
+      let phoneNumber = this.phoneNumber;
+      let weixin = this.weixin
+      uni.navigateTo({
+        url:'./modifyData?name='+name+'&icon='+icon+'&gender='+gender+'&phoneNumber='+phoneNumber+'&weixin='+weixin
       })
     }
   }

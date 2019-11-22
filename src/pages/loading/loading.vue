@@ -9,9 +9,9 @@ export default {
       console.log("loadding")
     setTimeout(function () {
             uni.switchTab({
-                url:`pages/index/index`
+                url:`../index/index`
             });
-        }, 7000);
+        }, 3000);
   }
 };
 </script>
