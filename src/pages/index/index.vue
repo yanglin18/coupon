@@ -1,92 +1,94 @@
 <template>
   <view class="content" :animation="animationData">
-    <view id="tips" style="height=0" class="tips">
-      <view class="title">
-        <image src="../../static/assets/coffee.png" />
-        <text>使用须知</text>
-      </view>
-      <view class="tip_content">
-        <view class="texta">
-          <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
+    <view :class="userAgree === true ? '' : 'contentOp'">
+      <view id="tips" style="height=0" class="tips">
+        <view class="title">
+          <image src="../../static/assets/coffee.png" />
+          <text>使用须知</text>
         </view>
-        <view class="texta">
-          <text
-            >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
-          >
-        </view>
-        <view class="texta">
-          <text
-            >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
-          >
-        </view>
-      </view>
-    </view>
-    <view class="goods_card" @click="NavToDetial">
-      <view class="card_top">
-        <view class="price">
-          <text class="price_now">&yen;{{ price }}</text>
-          <text class="price_original">&yen;{{ price_original }}</text>
-        </view>
-        <view class="name">
-          <text>全国星巴克中杯通兑券</text>
+        <view class="tip_content">
+          <view class="texta">
+            <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
+          </view>
+          <view class="texta">
+            <text
+              >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
+            >
+          </view>
+          <view class="texta">
+            <text
+              >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
+            >
+          </view>
         </view>
       </view>
-      <!-- <view class="QRcode">
+      <view class="goods_card" @click="NavToDetial">
+        <view class="card_top">
+          <view class="price">
+            <text class="price_now">&yen;{{ price }}</text>
+            <text class="price_original">&yen;{{ price_original }}</text>
+          </view>
+          <view class="name">
+            <text>全国星巴克中杯通兑券</text>
+          </view>
+        </view>
+        <!-- <view class="QRcode">
         <image  />v-if=
       </view> -->
-      <view v-if="sum_number === 0" class="card_sell_out">
-        <text>已售罄</text>
-      </view>
-      <view v-else class="card_bottom">
-        <view class="left">
-          <view class="number">
-            <view @click.stop="reduce_number" class="reduce">
-              <image
-                v-show="buy_number === 1"
-                src="../../static/images/no_reduce.png"
-              />
-              <image
-                v-show="buy_number !== 1"
-                src="../../static/images/reduce.png"
-              />
-            </view>
-            <view class="num">{{ buy_number }}</view>
-            <view @click.stop="add_number" class="reduce">
-              <image
-                v-show="buy_number === 10"
-                src="../../static/images/no_add.png"
-              />
-              <image
-                v-show="buy_number !== 10"
-                src="../../static/images/add.png"
-              />
-            </view>
-            <!-- <uni-number-box
+        <view v-if="sum_number === 0" class="card_sell_out">
+          <text>已售罄</text>
+        </view>
+        <view v-else class="card_bottom">
+          <view class="left">
+            <view class="number">
+              <view @click.stop="reduce_number" class="reduce">
+                <image
+                  v-show="buy_number === 1"
+                  src="../../static/images/no_reduce.png"
+                />
+                <image
+                  v-show="buy_number !== 1"
+                  src="../../static/images/reduce.png"
+                />
+              </view>
+              <view class="num">{{ buy_number }}</view>
+              <view @click.stop="add_number" class="reduce">
+                <image
+                  v-show="buy_number === 10"
+                  src="../../static/images/no_add.png"
+                />
+                <image
+                  v-show="buy_number !== 10"
+                  src="../../static/images/add.png"
+                />
+              </view>
+              <!-- <uni-number-box
               :value="buy_number"
               :min="1"
               :max="10"
             ></uni-number-box> -->
+            </view>
+            <view class="purchase_limit">
+              <text>每日限购十张</text>
+              <text>库存：{{ sum_number }}</text>
+            </view>
           </view>
-          <view class="purchase_limit">
-            <text>每日限购十张</text>
-            <text>库存：{{ sum_number }}</text>
+          <view class="right">
+            <!-- <button size="mini">去支付</button> -->
+            <button open-type="getUserInfo" @getuserinfo="GetUserInfo">
+              去购买
+            </button>
           </view>
-        </view>
-        <view class="right">
-          <!-- <button size="mini">去支付</button> -->
-          <button open-type="getUserInfo" @getuserinfo="GetUserInfo">
-            去购买
-          </button>
         </view>
       </view>
-    </view>
-    <view class="active">
-      <view class="card_content">
-        <view class="text1">
-          <text>你送她一杯子，她还你一辈子</text>
-        </view>
-        <view class="text2">
-          <text>超值活动超值价格超值套装</text>
+      <view class="active">
+        <view class="card_content">
+          <view class="text1">
+            <text>你送她一杯子，她还你一辈子</text>
+          </view>
+          <view class="text2">
+            <text>超值活动超值价格超值套装</text>
+          </view>
         </view>
       </view>
     </view>
@@ -286,6 +288,9 @@ export default {
 .content {
   background: #e8e8e8;
   padding: 24rpx 40rpx 40rpx;
+}
+.contentOp {
+  opacity: 0.4;
 }
 .warmPrompt {
   display: flex;
