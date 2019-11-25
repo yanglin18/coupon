@@ -28,7 +28,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .content {
-  background: #f3f4f3;
+  background: #ffffff;
   height: 100vh;
   color: #000000;
 }
@@ -39,15 +39,15 @@ export default {
   background: #ffffff;
 }
 .top {
+  border-top: #f3f4f3 4px solid;
   background: #ffffff;
-  margin-top: 8rpx;
-  padding: 40rpx;
+  padding:0 40rpx;
   .row1 {
     font-size: 36rpx;
     letter-spacing: 0.45px;
   }
   .p1 {
-    padding: 8rpx 0;
+    margin: 8rpx 0;
     opacity: 0.6;
     font-size: 26rpx;
     color: #000000;

@@ -42,37 +42,54 @@ export default {
     return {
       user_icon: "../../static/images/user.png",
       user_name: "喵喵喵",
-      gender:"男",
-      phoneNumber:'12345678212',
-      weixin:'XXXXXX'
+      gender: "男",
+      phoneNumber: "12345678212",
+      weixin: "XXXXXX"
     };
+  },
+  onLoad() {
+    uni.login({
+      provider: "weixin",
+      success: function(loginRes) {
+        console.log(loginRes);
+        // 获取用户信息
+      }
+    });
   },
   methods: {
     contactService() {
       uni.showModal({
         content: "星小孩（微信号：960411wsy）",
-        confirmText:"我知道了",
-        showCancel:false,
-        confirmColor:"#42B069",
-        success(res){
-
-        }
+        confirmText: "我知道了",
+        showCancel: false,
+        confirmColor: "#42B069",
+        success(res) {}
       });
     },
-    NavTo(e){
+    NavTo(e) {
       uni.navigateTo({
-        url:e
-      })
+        url: e
+      });
     },
-    NavToModify(){
+    NavToModify() {
       let name = this.user_name;
       let icon = this.user_icon;
       let gender = this.gender;
       let phoneNumber = this.phoneNumber;
-      let weixin = this.weixin
+      let weixin = this.weixin;
       uni.navigateTo({
-        url:'./modifyData?name='+name+'&icon='+icon+'&gender='+gender+'&phoneNumber='+phoneNumber+'&weixin='+weixin
-      })
+        url:
+          "./modifyData?name=" +
+          name +
+          "&icon=" +
+          icon +
+          "&gender=" +
+          gender +
+          "&phoneNumber=" +
+          phoneNumber +
+          "&weixin=" +
+          weixin
+      });
     }
   }
 };

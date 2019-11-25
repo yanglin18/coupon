@@ -1,6 +1,6 @@
 <template>
   <view class="content" :animation="animationData">
-    <view :class="userAgree === true ? '' : 'contentOp'">
+    <view :class="userAgree === false || share === true ? 'contentOp' : ''">
       <view id="tips" style="height=0" class="tips">
         <view class="title">
           <image src="../../static/assets/coffee.png" />
@@ -35,7 +35,11 @@
         <!-- <view class="QRcode">
         <image  />v-if=
       </view> -->
-        <view v-if="sum_number === 0" class="card_sell_out">
+        <view
+          v-if="sum_number === 0"
+          class="card_sell_out"
+          @click.stop="Toast('该优惠券暂时没货哦')"
+        >
           <text>已售罄</text>
         </view>
         <view v-else class="card_bottom">
@@ -45,6 +49,7 @@
                 <image
                   v-show="buy_number === 1"
                   src="../../static/images/no_reduce.png"
+                  @click="Toast('只有一张，不能再减少啦')"
                 />
                 <image
                   v-show="buy_number !== 1"
@@ -56,6 +61,7 @@
                 <image
                   v-show="buy_number === 10"
                   src="../../static/images/no_add.png"
+                  @click="Toast('该优惠券最多只能买十张哦')"
                 />
                 <image
                   v-show="buy_number !== 10"
@@ -75,13 +81,18 @@
           </view>
           <view class="right">
             <!-- <button size="mini">去支付</button> -->
-            <button open-type="getUserInfo" @getuserinfo="GetUserInfo">
+            <button
+              @click.stop="To_buy"
+              :open-type="is_getuserInfo?'getPhoneNumber':'getUserInfo'"
+              @getphonenumber="GetPhoneNumber"
+              @getuserinfo="GetUserInfo"
+            >
               去购买
             </button>
           </view>
         </view>
       </view>
-      <view class="active">
+      <view class="active" @click="Share">
         <view class="card_content">
           <view class="text1">
             <text>你送她一杯子，她还你一辈子</text>
@@ -139,17 +150,30 @@
       </view>
       <!-- 因为此按钮绑定的事件有三个：1.已经勾选隐私协议。2.调起基本信息授权。3.控制页面下滑露出使用须知 -->
       <!-- 因为调起基本信息无法控制，所以用两个一模一样的按钮。控制这三件事 -->
-      <button v-if="!userOptions" @click="NotLearned">
-        我已了解
-      </button>
       <button
-        v-else
-        open-type="getUserInfo"
+        :open-type="userOptions ? 'getUserInfo' : ''"
         @getuserinfo="GetUserInfo"
         @click="IHaveLearned"
       >
         我已了解
       </button>
+    </view>
+    <!-- 分享弹窗 -->
+    <view v-if="share" class="sharePopup">
+      <view class="img">
+        <view></view>
+      </view>
+      <view class="weixinIcon">
+        <view class="image_share">
+          <image src="../../static/assets/weixin.png" />
+        </view>
+        <view class="text_weixin">
+          <text>微信好友</text>
+        </view>
+      </view>
+      <view class="close" @click="close_share">
+        <image class="close_img" src="../../static/assets/close.png" />
+      </view>
     </view>
   </view>
 </template>
@@ -159,12 +183,15 @@ export default {
   data() {
     return {
       userOptions: false, //用户是否勾选
-      userAgree: false, //用户是否点击“我已了解”
+      userAgree: true, //用户是否点击“我已了解”
+      share: false,
       price: "24.00",
       price_original: "33.00",
       buy_number: 1,
-      sum_number: 999,
-      animationData: {}
+      sum_number: 66,
+      animationData: {},
+      user_info:{}, //用户信息,
+      is_getuserInfo:false
     };
   },
   onLoad() {
@@ -190,6 +217,7 @@ export default {
   },
   onPullDownRefresh() {
     console.log("下拉啦！");
+    uni.stopPullDownRefresh();
     let animation = uni.createAnimation({
       duration: 1000
     });
@@ -228,6 +256,15 @@ export default {
         this.NumChange();
       }
     },
+    // 提示
+    Toast(e) {
+      uni.showToast({
+        title: e,
+        duration: 3000,
+        icon: "none"
+      });
+    },
+    // 数量增减
     NumChange() {
       this.price = String(24 * this.buy_number) + ".00";
       this.price_original = String(33 * this.buy_number) + ".00";
@@ -238,11 +275,26 @@ export default {
         url: "./detials"
       });
     },
+    // 直接去购买
+    ToBuy() {
+
+    },
+    // 获取手机号
+    GetPhoneNumber(res) {
+      console.log(res);
+      if (res.detail.userInfo) {
+        console.log("点击了同意授权");
+      } else {
+        console.log("点击了拒绝授权");
+      }
+    },
     // 获取基本信息
     GetUserInfo(res) {
       console.log(res);
       if (res.detail.userInfo) {
         console.log("点击了同意授权");
+        this.user_info = res.detail.userInfo;
+        this.is_getuserInfo = true;
       } else {
         console.log("点击了拒绝授权");
       }
@@ -251,14 +303,14 @@ export default {
     NotLearned() {
       uni.showToast({
         title: "请勾选服务/隐私协议",
-        duration: 1000,
+        duration: 3000,
         icon: "none"
       });
     },
     // 我已了解
     IHaveLearned() {
-      if (this.userOptions === false) {
-        return;
+      if (!this.userOptions) {
+        this.NotLearned();
       } else {
         this.userAgree = true;
         var animation = uni.createAnimation({
@@ -279,7 +331,16 @@ export default {
       uni.navigateTo({
         url: e
       });
+    },
+    // 分享
+    Share() {
+      this.share = true;
+    },
+    // 关闭分享
+    close_share(){
+      this.share = false;
     }
+    
   }
 };
 </script>
@@ -346,14 +407,12 @@ export default {
   }
 }
 .tips {
-  // display: none;
-  // display: flex;
-  // flex-direction: column;
   font-size: 26rpx;
+  padding: 50rpx 0 20rpx;
   .title {
-    // opacity: 0.6;
     display: flex;
     align-items: center;
+    margin-top: 8rpx;
     image {
       height: 48rpx;
       width: 40rpx;
@@ -363,7 +422,6 @@ export default {
     font-weight: 600;
     color: #000000;
     letter-spacing: -0.68px;
-    padding: 10rpx;
   }
   .tip_content {
     display: flex;
@@ -374,7 +432,7 @@ export default {
     letter-spacing: -0.58rpx;
     line-height: 42rpx;
     .texta {
-      padding: 10rpx;
+      margin-top: 8rpx;
     }
   }
 }
@@ -419,7 +477,7 @@ export default {
     border-bottom-right-radius: 10rpx;
     background-color: rgba(121, 182, 160, 0.8);
     font-size: 36rpx;
-    padding: 50rpx;
+    padding: 50rpx 0;
     color: #ffffff;
     text-align: center;
   }
@@ -506,6 +564,64 @@ export default {
     color: #ffffff;
   }
 }
+.sharePopup {
+  margin: 0 50rpx;
+  display: flex;
+  flex-direction: column;
+  margin: 100rpx 50rpx;
+  position: fixed;
+  top: 556rpx;
+  left: 0;
+  z-index: 100;
+  border-radius: 24rpx;
+  .img {
+    background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/17860300_1574677608.png")
+      no-repeat center;
+    background-size: cover;
+    height: 820rpx;
+    width: 650rpx;
+  }
+  .weixinIcon {
+    background: #ffffff;
+    padding: 42rpx 0;
+    .image_share {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 9rpx;
+      image {
+        height: 72rpx;
+        margin: 0 auto;
+        width: 87rpx;
+      }
+    }
+    .text_weixin {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text {
+        opacity: 0.6;
+        margin: 0 auto;
+        font-size: 26rpx;
+        color: #311b0e;
+        letter-spacing: 0.43px;
+        display: inline-block;
+        margin: 0 auto;
+      }
+    }
+  }
+  .close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    image {
+      height: 70rpx;
+      width: 70rpx;
+      margin-top: 15rpx;
+      opacity: 0.6;
+      transform: rotate(-270deg);
+      background: #ffffff;
+    }
+  }
+}
 </style>
-
-function newFunction() { animationData; { } }

@@ -16,11 +16,7 @@
       </view>
       <view class="row">
         <text>绑定手机</text>
-        <text>{{ userData.phoneNumber }}</text>
-      </view>
-      <view class="row">
-        <text>绑定微信</text>
-        <text class="right">{{ userData.weixin }}</text>
+        <text class="right">{{ userData.phoneNumber }}</text>
       </view>
       <view class="row">
         <text>生日</text>

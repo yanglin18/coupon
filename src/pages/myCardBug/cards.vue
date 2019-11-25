@@ -1,8 +1,5 @@
 <template>
   <view class="content">
-    <!-- <swiper active-class="active_items" circular= true  vertical= true>
-
-    </swiper> -->
     <view :class="clickScna === false ? '' : 'contentOp'">
       <view class="tips">
         <view class="title">
@@ -25,7 +22,51 @@
           </view>
         </view>
       </view>
-      <view v-for="item in cards" :key="item" class="goods_card">
+      <swiper class="card_swiper" vertical="true">
+        <!-- <swiper-item class="tips">
+          <view class="title">
+            <image src="../../static/assets/coffee.png" />
+            <text>使用须知</text>
+          </view>
+          <view class="tip_content">
+            <view class="texta">
+              <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
+            </view>
+            <view class="texta">
+              <text
+                >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
+              >
+            </view>
+            <view class="texta">
+              <text
+                >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
+              >
+            </view>
+          </view>
+        </swiper-item> -->
+        <swiper-item v-for="item in cards" :key="item" class="goods_card">
+          <view class="card_order">
+            <text>{{ item.id }}/{{ shuliang }}</text>
+          </view>
+          <view class="name">
+            <text>全国星巴克中杯通兑券</text>
+          </view>
+          <view class="userful_time">
+            <text>有效期：{{ item.userful_time }}</text>
+          </view>
+          <view class="QRcode">
+            <image src="../../static/ceshi.jpg" />
+          </view>
+          <view class="bottom">
+            <text>优惠码每30秒自动更新，当天24时前有效，过期不退换</text>
+          </view>
+        </swiper-item>
+        <!-- <swiper-item>
+          <button class="affirm" @click="HaveScan">确认星伙伴已扫码</button>
+        </swiper-item> -->
+      </swiper>
+
+      <!-- <view v-for="item in cards" :key="item" class="goods_card">
         <view class="card_order">
           <text>{{ item.id }}/{{ shuliang }}</text>
         </view>
@@ -41,7 +82,7 @@
         <view class="bottom">
           <text>优惠码每30秒自动更新，当天24时前有效，过期不退换</text>
         </view>
-      </view>
+      </view> -->
       <button class="affirm" @click="HaveScan">确认星伙伴已扫码</button>
     </view>
     <!-- 弹窗 -->
@@ -51,7 +92,9 @@
       <view class="row2"> （在“我的摩卡券”可查看已购买的券码）</view>
       <view class="button">
         <button size="mini" class="button1" @click="cancel">未完成</button>
-        <button size="mini" class="button2" @click="submit">确认星伙伴已扫码</button>
+        <button size="mini" class="button2" @click="submit">
+          确认星伙伴已扫码
+        </button>
       </view>
     </view>
   </view>
@@ -171,14 +214,21 @@ export default {
   background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/69254200_1574076274.png")
     no-repeat center;
   background-size: cover;
+  /deep/ .uni-swiper-slide-frame{
+    height: 476px !important;
+  }
 }
 .contentOp {
   opacity: 0.4;
 }
-.swiper {
-  height: 650px;
+.card_swiper {
+  height: 800px;
+}
+swiper.uni-swiper-slide-frame {
+  height: 786rpx !important;
 }
 .tips {
+  height: 256rpx !important;
   display: flex;
   padding-top: 19rpx;
   flex-direction: column;
@@ -207,6 +257,8 @@ export default {
   }
 }
 .goods_card {
+  height: 786rpx !important;
+  width: calc(100% - 128rpx) !important;
   background: #ffffff;
   border-radius: 24rpx;
   display: flex;
@@ -278,7 +330,7 @@ export default {
     opacity: 0.6;
     font-size: 26rpx;
     line-height: 52rrpx;
-    margin:0 auto 50rpx; 
+    margin: 0 auto 50rpx;
   }
   .button {
     .button1 {
@@ -292,7 +344,7 @@ export default {
       margin-left: 20rpx;
       border-radius: 40rpx;
       background: #42b069;
-      
+
       font-size: 30rpx;
       color: #f8f8f8;
       letter-spacing: 0;

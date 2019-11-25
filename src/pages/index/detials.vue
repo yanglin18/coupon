@@ -40,6 +40,7 @@
               <image
                 v-show="buy_number === 1"
                 src="../../static/images/no_reduce.png"
+                @click="Toast('只有一张，不能再减少啦')"
               />
               <image
                 v-show="buy_number !== 1"
@@ -51,6 +52,7 @@
               <image
                 v-show="buy_number === 10"
                 src="../../static/images/no_add.png"
+                @click="Toast('该优惠券最多只能买十张哦')"
               />
               <image
                 v-show="buy_number !== 10"
@@ -85,8 +87,8 @@ export default {
       sum_number: 999
     };
   },
-  methods:{
-          // 减少购买数量
+  methods: {
+    // 减少购买数量
     reduce_number() {
       if (this.buy_number <= 1) {
         return;
@@ -108,7 +110,14 @@ export default {
       this.price = String(24 * this.buy_number) + ".00";
       this.price_original = String(33 * this.buy_number) + ".00";
     },
-
+    // 提示
+    Toast(e) {
+      uni.showToast({
+        title: e,
+        duration: 3000,
+        icon: "none"
+      });
+    }
   }
 };
 </script>
@@ -236,7 +245,7 @@ export default {
       }
     }
     button {
-      background-color:#005334;
+      background-color: #005334;
       border-radius: 45rpx;
       font-family: PingFangSC-Semibold;
       padding: 0 80rpx;
