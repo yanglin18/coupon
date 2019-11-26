@@ -32,8 +32,28 @@
         <image src="../../static/assets/toRight.png" />
       </view>
     </view>
-    <view class="share">分享海报 </view>
+    <view @click="Share" class="share">分享海报 </view>
     <botton class="logout">退出登录</botton>
+    <!-- 分享弹窗 -->
+    <view v-if="share" class="sharePopup">
+      <view @longpress="saveImg" class="img">
+        <image src="data:image/png;base64,{{src2}}"></image>
+      </view>
+      <image src="data:image/png;base64,{{src2}}"></image>
+      <view class="weixinIcon">
+        <view class="image_share">
+          <button open-type="share">
+            <image src="../../static/assets/weixin.png" />
+          </button>
+        </view>
+        <view class="text_weixin">
+          <text>微信好友</text>
+        </view>
+      </view>
+      <view class="close" @click="close_share">
+        <image class="close_img" src="../../static/assets/close.png" />
+      </view>
+    </view>
   </view>
 </template>
 <script>
@@ -44,19 +64,78 @@ export default {
       user_name: "喵喵喵",
       gender: "男",
       phoneNumber: "12345678212",
-      weixin: "XXXXXX"
+      weixin: "XXXXXX",
+      share: false, //点击分享
+      access_token: "",
+      user_info: {},
+      src2: ""
     };
   },
   onLoad() {
-    uni.login({
-      provider: "weixin",
-      success: function(loginRes) {
-        console.log(loginRes);
-        // 获取用户信息
+    // uni.login({
+    //   provider: "weixin",
+    //   success: function(loginRes) {
+    //     console.log(loginRes);
+    //     // 获取用户信息
+    //   }
+    // });
+    this.getUserInfo();
+    // 获取access_token
+    uni.request({
+      url:
+        "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx57c616cdb4fe8bd7&secret=f9978d2f3071dc8ab2b500df05512b17",
+      success: res => {
+        // console.log("获取access_token", res);
+        this.access_token = res.data.access_token;
+        // console.log("access_token:", this.access_token);
+      }
+    });
+    // const scene = decodeURIComponent(query.scene);
+    // 生成页面的二维码
+    uni.request({
+      //注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
+      url:
+        "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" +
+        this.access_token,
+      data: {
+        scene: "1234",
+        page: "" //这里按照需求设置值和参数
+      },
+      method: "POST",
+      responseType: "arraybuffer", //设置响应类型
+      success: res => {
+        // console.log("小程序码", res);
+        this.src2 = uni.arrayBufferToBase64(res.data); //对数据进行转换操作
+      },
+      fail: e => {
+        console.log("错误", e);
       }
     });
   },
   methods: {
+    // 获取基本信息
+
+    getUserInfo() {
+      let that = this;
+      let session3rd = "";
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          that.Ajax(
+            "post",
+            "member/user/index",
+            { session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                that.user_info = res.data.data;
+                console.log("user_info:", this.user_info);
+              }
+            }
+          );
+        }
+      });
+    },
+    // 联系客服
     contactService() {
       uni.showModal({
         content: "星小孩（微信号：960411wsy）",
@@ -66,11 +145,13 @@ export default {
         success(res) {}
       });
     },
+    // 跳转
     NavTo(e) {
       uni.navigateTo({
         url: e
       });
     },
+    // 跳转到修改
     NavToModify() {
       let name = this.user_name;
       let icon = this.user_icon;
@@ -90,6 +171,54 @@ export default {
           "&weixin=" +
           weixin
       });
+    },
+    // 分享
+    Share() {
+      this.share = true;
+      // 获取相册权限
+      uni.authorize({
+        scope: "scope.writePhotosAlbum",
+        success(res) {
+          console.log("授权成功", res);
+        },
+        fail(error) {
+          console.log("error:", error);
+          uni.showToast({
+            title: "请授权后再保存",
+            duration: 1000
+          });
+        },
+        complete() {
+          console.log("调起相册授权");
+        }
+      });
+    },
+    // 关闭分享
+    close_share() {
+      this.share = false;
+    },
+    // 长按保存图片
+    saveImg() {
+      console.log("长按图片");
+      // 处理图片
+      uni.getImageInfo({
+        src: "../../static/images/share2.png",
+        success: function(image) {
+          let image_path = image.path;
+          uni.saveImageToPhotosAlbum({
+            filePath: image_path,
+            success: function(res) {
+              uni.showToast({
+                title: "保存成功",
+                duration: 1000
+              });
+            },
+            fail: function(error) {
+              console.log(error);
+            }
+          });
+        }
+      });
     }
   }
 };
@@ -98,6 +227,9 @@ export default {
 .content {
   background: #f3f4f3;
   height: 100vh;
+  /deep/ .uni-button:after {
+    border: 0 !important;
+  }
 }
 .top_card {
   background: #ffffff;
@@ -188,5 +320,72 @@ export default {
   font-size: 30rpx;
   color: #00b35f;
   letter-spacing: 0;
+}
+.sharePopup {
+  margin: 0 50rpx;
+  display: flex;
+  flex-direction: column;
+  margin: 100rpx 50rpx;
+  position: fixed;
+  top: 100rpx;
+  left: 0;
+  z-index: 100;
+  border-radius: 24rpx;
+  .img {
+    background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/17860300_1574677608.png")
+      no-repeat center;
+    background-size: cover;
+    height: 820rpx;
+    width: 650rpx;
+  }
+  .weixinIcon {
+    background: #ffffff;
+    padding: 42rpx 0;
+    .image_share {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 9rpx;
+      button {
+        background: #ffffff;
+        border: 0 !important;
+        :after {
+          border: 0;
+        }
+      }
+      image {
+        height: 72rpx;
+        margin: 0 auto;
+        width: 87rpx;
+      }
+    }
+    .text_weixin {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text {
+        opacity: 0.6;
+        margin: 0 auto;
+        font-size: 26rpx;
+        color: #311b0e;
+        letter-spacing: 0.43px;
+        display: inline-block;
+        margin: 0 auto;
+      }
+    }
+  }
+  .close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    image {
+      height: 70rpx;
+      width: 70rpx;
+      margin-top: 15rpx;
+      opacity: 0.6;
+      transform: rotate(-270deg);
+      background: #ffffff;
+    }
+  }
 }
 </style>

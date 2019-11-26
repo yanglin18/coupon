@@ -6,9 +6,9 @@
       </view>
       <view class="tip_content">
         <view class="texta">
-          <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
+          <text>{{instructionsForUse}}</text>
         </view>
-        <view class="texta">
+        <!-- <view class="texta">
           <text
             >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
           >
@@ -17,17 +17,19 @@
           <text
             >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
           >
-        </view>
+        </view> -->
       </view>
     </view>
     <view class="goods_card">
       <view class="card_top">
         <view class="price">
-          <text class="price_now">￥{{ price }}</text>
-          <text class="price_original">￥{{ price_original }}</text>
+          <text class="price_now">&yen;{{ goodsInfo.price }}</text>
+          <text class="price_original"
+            >&yen;{{ goodsInfo.original_price }}</text
+          >
         </view>
         <view class="name">
-          <text>全国星巴克中杯通兑券</text>
+          <text>{{ goodsInfo.goods_name }}</text>
         </view>
       </view>
 
@@ -67,7 +69,7 @@
           </view>
           <view class="purchase_limit">
             <text>每日限购十张</text>
-            <text>库存：{{ sum_number }}</text>
+            <text>库存：{{ goodsInfo.inventory }}</text>
           </view>
         </view>
         <view class="right">
@@ -84,10 +86,49 @@ export default {
       price: "24.00",
       price_original: "33.00",
       buy_number: 1,
-      sum_number: 999
+      sum_number: 999,
+      goodsId: "",
+      goodsInfo: {},
+      instructionsForUse:''
     };
   },
+  onLoad(id) {
+    this.goodsId = id.id;
+    this.getGoodInfo();
+    this.getInstructionsForUse();
+    console.log("id:", this.goodsId);
+  },
   methods: {
+    // 获取商品信息
+    getGoodInfo() {
+      this.Ajax(
+        "post",
+        "member/index/goods_info",
+        { goods_id: this.goodsId },
+        res => {
+          console.log(res);
+          if (res.data.code === "200") {
+            this.goodsInfo = res.data.data.info;
+          }
+          console.log("信息：", this.goodsInfo);
+        }
+      );
+    },
+    // 获取使用须知
+    getInstructionsForUse() {
+      this.Ajax(
+        "post",
+        "member/index/instructions_for_use",
+        { brand_id: 1 },
+        res => {
+          console.log(res);
+          if (res.data.code === "200") {
+            this.instructionsForUse = res.data.data.instructions;
+          }
+          console.log("信息：", this.instructionsForUse);
+        }
+      );
+    },
     // 减少购买数量
     reduce_number() {
       if (this.buy_number <= 1) {

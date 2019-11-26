@@ -1,6 +1,6 @@
 <template>
   <view class="content" :animation="animationData">
-    <view :class="userAgree === false || share === true ? 'contentOp' : ''">
+    <view :class="userAgree === false ? 'contentOp' : ''">
       <view id="tips" style="height=0" class="tips">
         <view class="title">
           <image src="../../static/assets/coffee.png" />
@@ -22,14 +22,25 @@
           </view>
         </view>
       </view>
-      <view class="goods_card" @click="NavToDetial">
+      <view
+        class="goods_card"
+        @click="NavToDetial"
+        v-bind:style="{
+          background: 'url(' + goodsInfo.img + ')no-repeat center',
+          height: goodsInfo.height + 'rpx',
+          width: goodsInfo.width + 'rpx',
+          color: goodsInfo.color
+        }"
+      >
         <view class="card_top">
           <view class="price">
-            <text class="price_now">&yen;{{ price }}</text>
-            <text class="price_original">&yen;{{ price_original }}</text>
+            <text class="price_now">&yen;{{ goodsInfo.price }}</text>
+            <text class="price_original"
+              >&yen;{{ goodsInfo.original_price }}</text
+            >
           </view>
           <view class="name">
-            <text>全国星巴克中杯通兑券</text>
+            <text>{{ goodsInfo.goods_name }}</text>
           </view>
         </view>
         <!-- <view class="QRcode">
@@ -76,14 +87,14 @@
             </view>
             <view class="purchase_limit">
               <text>每日限购十张</text>
-              <text>库存：{{ sum_number }}</text>
+              <text>库存：{{ goodsInfo.inventory }}</text>
             </view>
           </view>
           <view class="right">
             <!-- <button size="mini">去支付</button> -->
             <button
               @click.stop="To_buy"
-              :open-type="is_getuserInfo?'getPhoneNumber':'getUserInfo'"
+              :open-type="is_getuserInfo ? 'getPhoneNumber' : 'getUserInfo'"
               @getphonenumber="GetPhoneNumber"
               @getuserinfo="GetUserInfo"
             >
@@ -92,13 +103,23 @@
           </view>
         </view>
       </view>
-      <view class="active" @click="Share">
+      <view
+        class="banner"
+        v-for="(item, index) in banners"
+        :key="index"
+        v-bind:style="{
+          background: 'url(' + item.img + ')no-repeat center',
+          height: item.height + 'rpx',
+          width: item.width + 'rpx',
+          color: item.color
+        }"
+      >
         <view class="card_content">
           <view class="text1">
-            <text>你送她一杯子，她还你一辈子</text>
+            <text>{{ item.title }}</text>
           </view>
           <view class="text2">
-            <text>超值活动超值价格超值套装</text>
+            <text>{{ item.introduce }}</text>
           </view>
         </view>
       </view>
@@ -158,23 +179,6 @@
         我已了解
       </button>
     </view>
-    <!-- 分享弹窗 -->
-    <view v-if="share" class="sharePopup">
-      <view class="img">
-        <view></view>
-      </view>
-      <view class="weixinIcon">
-        <view class="image_share">
-          <image src="../../static/assets/weixin.png" />
-        </view>
-        <view class="text_weixin">
-          <text>微信好友</text>
-        </view>
-      </view>
-      <view class="close" @click="close_share">
-        <image class="close_img" src="../../static/assets/close.png" />
-      </view>
-    </view>
   </view>
 </template>
 
@@ -183,21 +187,21 @@ export default {
   data() {
     return {
       userOptions: false, //用户是否勾选
-      userAgree: true, //用户是否点击“我已了解”
-      share: false,
-      price: "24.00",
-      price_original: "33.00",
+      userAgree: false, //用户是否点击“我已了解”
+      goodsInfo: {}, //商品信息
+      instructions_for_use: "", //使用须知
+      banners: {}, //banner
       buy_number: 1,
       sum_number: 66,
-      animationData: {},
-      user_info:{}, //用户信息,
-      is_getuserInfo:false
+      animationData: {}, //动画
+      user_info: {}, //用户信息,
+      is_getuserInfo: false
     };
   },
   onLoad() {
-    // this.Ajax("post", "xxx", {}, res => {
-    //   console.log(res);
-    // });
+    this.getGoodsInfo();
+    this.getInstructionsForUse();
+    this.getBanner();
     let animation = uni.createAnimation({
       duration: 1000
     });
@@ -205,6 +209,17 @@ export default {
 
     animation.translate(0, -175).step();
     this.animationData = animation.export();
+  },
+  // 用户分享
+  onShareAppMessage({ res }) {
+    if (res.from === "button") {
+      // 来自页面内分享按钮
+      console.log(res.target);
+    }
+    return {
+      title: "摩卡星",
+      path: "/pages/index/index"
+    };
   },
   onPageScroll() {
     let animation = uni.createAnimation({
@@ -212,11 +227,10 @@ export default {
     });
     this.animation = animation;
 
-    animation.translate(0, -175).step();
+    animation.translate(0, -180).step();
     this.animationData = animation.export();
   },
   onPullDownRefresh() {
-    console.log("下拉啦！");
     uni.stopPullDownRefresh();
     let animation = uni.createAnimation({
       duration: 1000
@@ -227,6 +241,37 @@ export default {
     this.animationData = animation.export();
   },
   methods: {
+    // 获取商品信息
+    getGoodsInfo() {
+      this.Ajax("post", "member/index/index", { brand_id: 1 }, res => {
+        if (res.data.code === "200") {
+          this.goodsInfo = res.data.data.list[0];
+        }
+      });
+    },
+    // 获取使用须知
+    getInstructionsForUse() {
+      this.Ajax(
+        "post",
+        "member/index/instructions_for_use",
+        { brand_id: 1 },
+        res => {
+          if (res.data.code === "200") {
+            this.instructions_for_use = res.data.data;
+          }
+        }
+      );
+    },
+    // 获取banner
+    getBanner() {
+      this.Ajax("post", "member/index/banner", {}, res => {
+        console.log(res);
+        if (res.data.code === "200") {
+          this.banners = res.data.data.list;
+        }
+        console.log("信息：", this.banners);
+      });
+    },
     // 下拉出现提示
     pullDown() {
       var query = uni.createSelectorQuery();
@@ -266,24 +311,71 @@ export default {
     },
     // 数量增减
     NumChange() {
-      this.price = String(24 * this.buy_number) + ".00";
-      this.price_original = String(33 * this.buy_number) + ".00";
+      this.goodsInfo.price =
+        String(this.goodsInfo.price * this.buy_number) + ".00";
+      this.goodsInfo.original_price =
+        String(this.goodsInfo.original_price * this.buy_number) + ".00";
     },
     // 跳转到详情
     NavToDetial() {
       uni.navigateTo({
-        url: "./detials"
+        url: "./detials?id=" + this.goodsInfo.goods_id
       });
     },
     // 直接去购买
-    ToBuy() {
-
+    To_buy() {
+      uni.requestPayment({
+        provider: "wxpay",
+        timeStamp: String(Date.now()),
+        nonceStr: "A1B2C3D4E5",
+        package: "prepay_id=wx20180101abcdefg",
+        signType: "MD5",
+        paySign: "",
+        success: function(res) {
+          console.log("success:" + JSON.stringify(res));
+        },
+        fail: function(err) {
+          console.log("fail:" + JSON.stringify(err));
+        }
+      });
     },
     // 获取手机号
-    GetPhoneNumber(res) {
-      console.log(res);
-      if (res.detail.userInfo) {
+    GetPhoneNumber(res0) {
+      console.log(res0);
+      if (res0.detail) {
         console.log("点击了同意授权");
+        uni.login({
+          success: reslogin => {
+            console.log("登录返回：", reslogin);
+            if (reslogin.code) {
+              //发起网络请求
+              this.Ajax(
+                "post",
+                "member/Login/getLogin",
+                {
+                  brand_id: 1,
+                  channel: "wechat",
+                  code: reslogin,
+                  detail: this.user_info
+                },
+                res => {
+                  console.log("调登录接口返回：", res);
+                  if (res.data.code === "200") {
+                    uni.setStorage({
+                      key: "storage_key",
+                      data: res.data.data,
+                      success: function(e) {
+                        console.log("success", e);
+                      }
+                    });
+                  }
+                }
+              );
+            } else {
+              console.log("登录失败！" + res.errMsg);
+            }
+          }
+        });
       } else {
         console.log("点击了拒绝授权");
       }
@@ -331,16 +423,7 @@ export default {
       uni.navigateTo({
         url: e
       });
-    },
-    // 分享
-    Share() {
-      this.share = true;
-    },
-    // 关闭分享
-    close_share(){
-      this.share = false;
     }
-    
   }
 };
 </script>
@@ -437,16 +520,15 @@ export default {
   }
 }
 .goods_card {
-  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/72823600_1574074898.png")
-    no-repeat center;
+  // background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/72823600_1574074898.png")
+  //   no-repeat center;
   background-size: cover;
   border-radius: 15rpx;
-  padding: 43rpx 50rpx 64rpx;
-  height: 417px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   .card_top {
+    padding: 43rpx 50rpx 0;
     display: flex;
     flex-direction: column;
     .price {
@@ -482,6 +564,7 @@ export default {
     text-align: center;
   }
   .card_bottom {
+    padding: 0 50rpx 64rpx;
     display: flex;
     justify-content: space-between;
     .left {
@@ -531,18 +614,17 @@ export default {
     }
   }
 }
-.active {
-  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/56916900_1574074896.png")
-    no-repeat center;
+.banner {
+  // background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/56916900_1574074896.png")
+  //   no-repeat center;
   background-size: cover;
   // margin-bottom: 40rpx;
   border-radius: 15rpx;
-  height: 417px;
   display: flex;
   margin-top: 30rpx;
-  padding: 60rpx 50rpx 0;
   flex-direction: column;
   .card_content {
+    padding: 60rpx 50rpx 0;
     .text1 {
       margin-bottom: 8rpx;
       font-size: 40rpx;
@@ -552,75 +634,6 @@ export default {
       opacity: 0.6;
       font-size: 30rpx;
       color: #ffffff;
-    }
-  }
-  .text1 {
-    font-size: 40rpx;
-    color: #ffffff;
-  }
-  .text2 {
-    opacity: 0.6;
-    font-size: 30rpx;
-    color: #ffffff;
-  }
-}
-.sharePopup {
-  margin: 0 50rpx;
-  display: flex;
-  flex-direction: column;
-  margin: 100rpx 50rpx;
-  position: fixed;
-  top: 556rpx;
-  left: 0;
-  z-index: 100;
-  border-radius: 24rpx;
-  .img {
-    background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/17860300_1574677608.png")
-      no-repeat center;
-    background-size: cover;
-    height: 820rpx;
-    width: 650rpx;
-  }
-  .weixinIcon {
-    background: #ffffff;
-    padding: 42rpx 0;
-    .image_share {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 9rpx;
-      image {
-        height: 72rpx;
-        margin: 0 auto;
-        width: 87rpx;
-      }
-    }
-    .text_weixin {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text {
-        opacity: 0.6;
-        margin: 0 auto;
-        font-size: 26rpx;
-        color: #311b0e;
-        letter-spacing: 0.43px;
-        display: inline-block;
-        margin: 0 auto;
-      }
-    }
-  }
-  .close {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    image {
-      height: 70rpx;
-      width: 70rpx;
-      margin-top: 15rpx;
-      opacity: 0.6;
-      transform: rotate(-270deg);
-      background: #ffffff;
     }
   }
 }

@@ -214,15 +214,15 @@ export default {
   background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/69254200_1574076274.png")
     no-repeat center;
   background-size: cover;
-  /deep/ .uni-swiper-slide-frame{
-    height: 476px !important;
-  }
+  // /deep/ .uni-swiper-slide-frame{
+  //   height: 476px !important;
+  // }
 }
 .contentOp {
   opacity: 0.4;
 }
 .card_swiper {
-  height: 800px;
+  height: 934rpx;
 }
 swiper.uni-swiper-slide-frame {
   height: 786rpx !important;

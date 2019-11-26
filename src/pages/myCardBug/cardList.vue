@@ -4,8 +4,7 @@
       <view class="tips">
         <image src="../../static/images/empty.png" />
         <view class="text">
-          <text>您的卡券包暂时为空 
-            快去购买一张优惠券吧</text>
+          <text>您的卡券包暂时为空 快去购买一张优惠券吧</text>
         </view>
       </view>
       <button size="mini">去选购</button>
@@ -60,8 +59,9 @@
 export default {
   data() {
     return {
-        // list: [],
+      // list: [],
       scrollTop: 0,
+      orderList: "",
       list: [
         {
           date: "2019年11月",
@@ -128,11 +128,34 @@ export default {
       ]
     };
   },
-  onShow() {},
+  onLoad() {
+    this.getOrderList();
+  },
   onPageScroll(top) {
     this.scrollFun(top);
   },
   methods: {
+    // 获取storage里的session3rd
+
+    // 获取订单信息
+    getOrderList() {
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          this.Ajax(
+            "post",
+            "member/order/order_list",
+            { brand_id: 1, session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                this.orderList = res.data.data;
+              }
+              console.log("数据：", this.orderList);
+            }
+          );
+        }
+      });
+    },
     scrollFun(top) {
       //创建节点选择器
       var query = uni.createSelectorQuery();
@@ -141,14 +164,14 @@ export default {
       query.exec(function(res) {
         let height = res[0].height;
         if (top.scrollTop > height) {
-        uni.setNavigationBarTitle({
-          title: "我的卡券"
-        });
-      } else { 
-        uni.setNavigationBarTitle({
-          title: ""
-        });
-      }
+          uni.setNavigationBarTitle({
+            title: "我的卡券"
+          });
+        } else {
+          uni.setNavigationBarTitle({
+            title: ""
+          });
+        }
       });
     },
     //   跳转到订单详情
