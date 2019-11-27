@@ -1,59 +1,63 @@
 <template>
   <view class="content">
-    <view class="top_card">
-      <view class="title">
-        <text>个人中心 </text>
-      </view>
-      <view class="bottom">
-        <view class="left">
-          <image src="../../static/images/user.jpg" />
-          <text>{{ user_name }}</text>
+    <view>
+      <view class="top_card">
+        <view class="title">
+          <text>个人中心 </text>
         </view>
-        <view class="right" @click="NavToModify">
-          <text>修改资料</text>
+        <view class="bottom">
+          <view class="left">
+            <image src="../../static/images/user.jpg" />
+            <text>{{ user_name }}</text>
+          </view>
+          <view class="right" @click="NavToModify">
+            <text>修改资料</text>
+            <image src="../../static/assets/toRight.png" />
+          </view>
+        </view>
+      </view>
+      <view class="about">
+        <view class="service deline" @click="contactService">
+          <view class="left">
+            <image src="../../static/assets/service.png" />
+            <text>联系客服</text>
+          </view>
+          <image src="../../static/assets/toRight.png" />
+        </view>
+        <view class="service" @click="NavTo('./about')">
+          <view class="left">
+            <image src="../../static/assets/about.png" />
+            <text>关于</text>
+          </view>
+
           <image src="../../static/assets/toRight.png" />
         </view>
       </view>
+      <view @click="Share" class="share">分享海报 </view>
+      <botton class="logout">退出登录</botton>
     </view>
-    <view class="about">
-      <view class="service deline" @click="contactService">
-        <view class="left">
-          <image src="../../static/assets/service.png" />
-          <text>联系客服</text>
-        </view>
-        <image src="../../static/assets/toRight.png" />
-      </view>
-      <view class="service" @click="NavTo('./about')">
-        <view class="left">
-          <image src="../../static/assets/about.png" />
-          <text>关于</text>
-        </view>
-
-        <image src="../../static/assets/toRight.png" />
-      </view>
-    </view>
-    <view @click="Share" class="share">分享海报 </view>
-    <botton class="logout">退出登录</botton>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
       <view @longpress="saveImg" class="img">
-        <image src="data:image/png;base64,{{src2}}"></image>
+        <!-- <image src="data:image/png;base64,{{src2}}"></image> -->
+        <image :src="src2" />
       </view>
-      <image src="data:image/png;base64,{{src2}}"></image>
       <view class="weixinIcon">
         <view class="image_share">
           <button open-type="share">
             <image src="../../static/assets/weixin.png" />
           </button>
-        </view>
-        <view class="text_weixin">
-          <text>微信好友</text>
+          <view class="text_weixin">
+            微信好友
+          </view>
         </view>
       </view>
       <view class="close" @click="close_share">
         <image class="close_img" src="../../static/assets/close.png" />
       </view>
     </view>
+    <!-- 遮罩 -->
+    <view class="shadowBox" v-show="share"></view>
   </view>
 </template>
 <script>
@@ -104,8 +108,9 @@ export default {
       method: "POST",
       responseType: "arraybuffer", //设置响应类型
       success: res => {
-        // console.log("小程序码", res);
-        this.src2 = uni.arrayBufferToBase64(res.data); //对数据进行转换操作
+        console.log("小程序码", res);
+        this.src2 =
+          "data:image/png;base64," + uni.arrayBufferToBase64(res.data); //对数据进行转换操作
       },
       fail: e => {
         console.log("错误", e);
@@ -225,11 +230,20 @@ export default {
 </script>
 <style lang="scss" scoped>
 .content {
+  position: relative;
   background: #f3f4f3;
   height: 100vh;
   /deep/ .uni-button:after {
     border: 0 !important;
   }
+}
+.shadowBox {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
 }
 .top_card {
   background: #ffffff;
@@ -325,7 +339,7 @@ export default {
   margin: 0 50rpx;
   display: flex;
   flex-direction: column;
-  margin: 100rpx 50rpx;
+  margin: 0 50rpx;
   position: fixed;
   top: 100rpx;
   left: 0;
@@ -341,16 +355,18 @@ export default {
   .weixinIcon {
     background: #ffffff;
     padding: 42rpx 0;
+    border-bottom-right-radius: 24rpx;
+    border-bottom-left-radius: 24rpx;
     .image_share {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      margin-bottom: 9rpx;
       button {
+        line-height: inherit;
         background: #ffffff;
-        border: 0 !important;
-        :after {
-          border: 0;
+        &:after {
+          border: none;
         }
       }
       image {
@@ -363,28 +379,26 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      text {
-        opacity: 0.6;
-        margin: 0 auto;
-        font-size: 26rpx;
-        color: #311b0e;
-        letter-spacing: 0.43px;
-        display: inline-block;
-        margin: 0 auto;
-      }
+      opacity: 0.6;
+      margin: 0 auto;
+      font-size: 26rpx;
+      color: #311b0e;
+      letter-spacing: 0.43px;
     }
   }
   .close {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 70rpx;
+    width: 70rpx;
+    margin: 0 auto;
+    margin-top: 30rpx;
     image {
-      height: 70rpx;
-      width: 70rpx;
-      margin-top: 15rpx;
-      opacity: 0.6;
+      height: 100%;
+      width: 100%;
       transform: rotate(-270deg);
-      background: #ffffff;
+      border-radius: 50%;
     }
   }
 }

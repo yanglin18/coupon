@@ -1,6 +1,6 @@
 <template>
   <view class="content" :animation="animationData">
-    <view :class="userAgree === false ? 'contentOp' : ''">
+    <view>
       <view id="tips" style="height=0" class="tips">
         <view class="title">
           <image src="../../static/assets/coffee.png" />
@@ -154,12 +154,6 @@
               @click="NavToagreement('/pages/userCenter/About/privacyPolicy')"
               >《星冰乐小程序服务指南》</text
             >
-            、
-            <text
-              class="agreement"
-              @click="NavToagreement('/pages/userCenter/About/privacyPolicy')"
-              >《星冰乐付费服务协议》</text
-            >
             和
             <text
               class="agreement"
@@ -179,6 +173,8 @@
         我已了解
       </button>
     </view>
+    <!-- 遮罩 -->
+    <view class="shadowBox" v-show="!userAgree"></view>
   </view>
 </template>
 
@@ -202,13 +198,7 @@ export default {
     this.getGoodsInfo();
     this.getInstructionsForUse();
     this.getBanner();
-    let animation = uni.createAnimation({
-      duration: 1000
-    });
-    this.animation = animation;
-
-    animation.translate(0, -175).step();
-    this.animationData = animation.export();
+    this.topAnimation([0, -175]);
   },
   // 用户分享
   onShareAppMessage({ res }) {
@@ -222,25 +212,23 @@ export default {
     };
   },
   onPageScroll() {
-    let animation = uni.createAnimation({
-      duration: 1000
-    });
-    this.animation = animation;
-
-    animation.translate(0, -180).step();
-    this.animationData = animation.export();
+    this.topAnimation();
   },
   onPullDownRefresh() {
     uni.stopPullDownRefresh();
-    let animation = uni.createAnimation({
-      duration: 1000
-    });
-    this.animation = animation;
-
-    animation.translate(0, 0).step();
-    this.animationData = animation.export();
+    this.topAnimation([0, 0]);
   },
   methods: {
+    // 顶部使用须知动画
+    topAnimation(arr = [0, -180]) {
+      let animation = uni.createAnimation({
+        duration: 1000
+      });
+      this.animation = animation;
+
+      animation.translate(...arr).step();
+      this.animationData = animation.export();
+    },
     // 获取商品信息
     getGoodsInfo() {
       this.Ajax("post", "member/index/index", { brand_id: 1 }, res => {
@@ -355,7 +343,7 @@ export default {
                 {
                   brand_id: 1,
                   channel: "wechat",
-                  code: reslogin,
+                  code: reslogin.code,
                   detail: this.user_info
                 },
                 res => {
@@ -385,7 +373,7 @@ export default {
       console.log(res);
       if (res.detail.userInfo) {
         console.log("点击了同意授权");
-        this.user_info = res.detail.userInfo;
+        this.user_info = res.detail;
         this.is_getuserInfo = true;
       } else {
         console.log("点击了拒绝授权");
@@ -405,12 +393,7 @@ export default {
         this.NotLearned();
       } else {
         this.userAgree = true;
-        var animation = uni.createAnimation({
-          duration: 1000
-        });
-        this.animation = animation;
-        animation.translate(0, 0).step();
-        this.animationData = animation.export();
+        this.topAnimation([0, 0]);
       }
     },
     // 用户同意协议
@@ -430,11 +413,17 @@ export default {
 
 <style lang="scss">
 .content {
+  position: relative;
   background: #e8e8e8;
   padding: 24rpx 40rpx 40rpx;
 }
-.contentOp {
-  opacity: 0.4;
+.shadowBox {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
 }
 .warmPrompt {
   display: flex;
