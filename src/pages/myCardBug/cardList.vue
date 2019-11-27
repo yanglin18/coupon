@@ -148,9 +148,9 @@ export default {
             { brand_id: 1, session3rd: res0.data.session3rd },
             res => {
               if (res.data.code === "200") {
-                this.orderList = res.data.data;
+                this.orderList = res.data.data.list;
               }
-              console.log("数据：", this.orderList);
+              console.log("订单列表数据：", this.orderList);
             }
           );
         }

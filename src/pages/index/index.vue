@@ -340,10 +340,10 @@ export default {
               if (res.data.code === "200") {
                 console.log("去支付参数", res);
                 // 调起支付
-                console.log("签名:",res.data.data.paySign)
+                console.log("签名:", res.data.data.paySign);
                 uni.requestPayment({
                   provider: "wxpay",
-                  timeStamp: String(Date.now()),
+                  timeStamp: String(res.data.data.timeStamp),
                   nonceStr: res.data.data.nonceStr,
                   package: res.data.data.package,
                   signType: res.data.data.signType,
@@ -363,9 +363,9 @@ export default {
     },
     // 获取手机号
     GetPhoneNumber(res0) {
-      console.log(res0);
       if (res0.detail) {
-        console.log("点击了同意授权");
+        console.log("点击了同意授权", res0.detail);
+
         uni.login({
           success: reslogin => {
             console.log("登录返回：", reslogin);
@@ -383,6 +383,22 @@ export default {
                 res => {
                   console.log("调登录接口返回：", res);
                   if (res.data.code === "200") {
+                    // 获取手机号
+                    this.Ajax(
+                      "post",
+                      "member/user/set_mobile",
+                      {
+                        session3rd: res.data.data.session3rd,
+                        code:reslogin.code,
+                        encryptedData: res0.detail.encryptedData,
+                        iv: res0.detail.iv
+                      },
+                      resMobile => {
+                        if (resMobile.data.code === "200") {
+                          // this.instructions_for_use = res.data.data;
+                        }
+                      }
+                    );
                     uni.setStorage({
                       key: "storage_key",
                       data: res.data.data,

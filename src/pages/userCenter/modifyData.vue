@@ -2,21 +2,21 @@
   <view class="content">
     <view class="title" id="title">修改资料</view>
     <view class="top">
-      <view class="row1">
+      <view class="row1" @click="Toast">
         <text>头像</text>
-        <image :src="userData.icon" />
+        <image :src="user_info.head_img" />
       </view>
-      <view class="row">
+      <view class="row" @click="Toast">
         <text>昵称</text>
-        <text class="right">{{ userData.name }}</text>
+        <text class="right">{{ user_info.user_name }}</text>
       </view>
-      <view class="row">
+      <view class="row" @click="Toast">
         <text>性别</text>
-        <text class="right">{{ userData.gender }}</text>
+        <text class="right">{{ user_info.gender }}</text>
       </view>
-      <view class="row">
+      <view class="row" @click="Toast">
         <text>绑定手机</text>
-        <text class="right">{{ userData.phoneNumber }}</text>
+        <text class="right">{{ user_info.mobile }}</text>
       </view>
       <view class="row">
         <text>生日</text>
@@ -24,14 +24,18 @@
           birthday
         }}</text> -->
         <picker
+          v-if="user_info.birthday === '请选择生日'"
           mode="date"
-          :value="birthday"
+          :value="user_info.birthday"
           :start="startDate"
           :end="endDate"
           @change="bindDateChange"
         >
-          <view class="uni-input">{{ birthday }}</view>
+          <view class="uni-input">{{ user_info.birthday }} </view>
         </picker>
+        <text  v-else class="right">{{
+          user_info.birthday
+        }}</text>
       </view>
     </view>
   </view>
@@ -43,7 +47,7 @@ export default {
       userData: {},
       startDate: "1900-00-00",
       endDate: "2019-00-00",
-      birthday: "请选择生日"
+      user_info: {}
     };
   },
   onLoad(e) {
@@ -54,9 +58,32 @@ export default {
   },
   methods: {
     bindDateChange(e) {
+      // uni.showToast({
+      //   title: "生日只能修改一次，请确认无误",
+      //   duration: 1000,
+            // icon:"none"
+      // });
       console.log("e:", e);
-      this.birthday = e.detail.value;
-      console.log(this.birthday);
+      this.user_info.birthday = e.detail.value;
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          this.Ajax(
+            "post",
+            "member/user/set_field",
+            {
+              session3rd: res0.data.session3rd,
+              field: "birthday",
+              data: this.user_info.birthday
+            },
+            res => {
+              if (res.data.code === "200") {
+                console.log("修改生日结果：", res);
+              }
+            }
+          );
+        }
+      });
     },
     // 获取基本信息
     getUserInfo() {
@@ -71,12 +98,26 @@ export default {
             { session3rd: res0.data.session3rd },
             res => {
               if (res.data.code === "200") {
-                that.user_info = res.data.data;
+                that.user_info = res.data.data.info;
+                console.log(
+                  "that.user_info.birthday:",
+                  that.user_info.birthday
+                );
+                if (!that.user_info.birthday) {
+                  that.user_info.birthday = "请选择生日";
+                }
                 console.log("user_info:", this.user_info);
               }
             }
           );
         }
+      });
+    },
+    Toast() {
+      uni.showToast({
+        title: "头像昵称性别不可修改",
+        duration: 1000,
+        icon:'none'
       });
     }
   }

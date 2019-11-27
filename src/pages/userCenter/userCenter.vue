@@ -131,7 +131,7 @@ export default {
             { session3rd: res0.data.session3rd },
             res => {
               if (res.data.code === "200") {
-                that.user_info = res.data.data;
+                that.user_info = res.data.data.info;
                 console.log("user_info:", this.user_info);
               }
             }
