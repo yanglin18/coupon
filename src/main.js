@@ -19,10 +19,9 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
       "content-type": "application/json"
     },
     success: (res) => {
-      console.log(res.data.code);
       if(res.data.code !== "200"){
         uni.showToast({
-          title:"网络异常，请稍后重试",
+          title:res.data.msg||"网络异常，请稍后重试",
           icon:"none"
         })
       }

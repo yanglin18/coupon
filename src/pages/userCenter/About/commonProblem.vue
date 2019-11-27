@@ -3,12 +3,12 @@
     <uniCollapse @change="change">
       <uniCollapseItem
         class="collapse_item"
-        :title="issue.question"
+        :title="issue.title"
         :name="index"
         v-for="(issue, index) in issues"
         :key="index"
       >
-        <view class="text">{{ issue.answer }}</view></uniCollapseItem
+        <view class="text">{{ issue.text }}</view></uniCollapseItem
       >
     </uniCollapse>
   </view>
@@ -36,14 +36,25 @@ export default {
         }
       ]
     };
+  },
+  onLoad() {
+    uni.getStorage({
+      key: "storage_key",
+      success: res0 => {
+        this.Ajax("post", "member/user/question", { session3rd: res0.data.session3rd, }, res => {
+          if (res.data.code === "200") {
+            this.issues = res.data.data.list
+          }
+        });
+      }
+    });
   }
 };
 </script>
 <style lang="scss" scoped>
 .collapse_item {
-  
 }
-.content{
+.content {
   font-size: 36rpx;
   color: #000000;
   letter-spacing: 0.45px;

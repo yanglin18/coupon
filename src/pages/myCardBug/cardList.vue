@@ -7,7 +7,7 @@
           <text>您的卡券包暂时为空 快去购买一张优惠券吧</text>
         </view>
       </view>
-      <button size="mini">去选购</button>
+      <button @click="NavToIndex" size="mini">去选购</button>
     </view>
     <view v-else class="not_empty">
       <scroll-view
@@ -24,26 +24,32 @@
           <view class="mouth">
             <text>{{ item.date }}</text>
           </view>
-          <view v-for="i in item.order" :key="i.id" class="lists">
+          <view v-for="(val, idx) in item.order" :key="idx" class="lists">
             <view class="card_left">00000</view>
-            <view class="listCard" @click="NavToDetail">
+            <view class="listCard" @click="NavToDetail(val)">
               <view class="row1">
-                <view class="order_name">{{ i.name }}X{{ item.length }}</view>
+                <view class="order_name"
+                  >{{ val.goods_name }}X{{ val.num }}</view
+                >
                 <view class="price">
                   <image src="../../static/assets/money.png" />
-                  {{ i.price }}</view
+                  {{ val.price }}</view
                 >
               </view>
               <view class="order_no"
-                ><text>订单编号：</text>{{ i.no }}
-                <text class="copy" @click.stop="copy_no(i.no)">复制</text></view
+                ><text>订单编号：</text>{{ val.order_number }}
+                <text class="copy" @click.stop="copy_no(val.order_number)"
+                  >复制</text
+                ></view
               >
-              <view class="buy_time"><text>购买时间：</text>{{ i.time }}</view>
+              <view class="buy_time"
+                ><text>购买时间：</text>{{ val.add_time }}</view
+              >
               <view class="row4">
                 <view class="useful_time">
-                  <text>有效期至：</text>{{ i.timeTO }}
+                  <text>有效期至：</text>{{ val.expire_time }}
                 </view>
-                <button v-if="i.isUsed === 'true'" class="isUsed" size="mini">
+                <button v-if="val.status === '2'" class="isUsed" size="mini">
                   已收货
                 </button>
                 <button v-else size="mini">确认收货</button>
@@ -62,70 +68,7 @@ export default {
       // list: [],
       scrollTop: 0,
       orderList: "",
-      list: [
-        {
-          date: "2019年11月",
-          length: 2,
-          order: [
-            {
-              id: 1,
-              num: 3,
-              name: "全国星巴克通用券码",
-              no: "DSDSDe324de423",
-              time: "2019.11.11 12:23:34",
-              timeTO: "2019.11.12 00:00:00",
-              price: "72.00",
-              isUsed: "flase"
-            },
-            {
-              id: 2,
-              num: 3,
-              name: "全国星巴克通用券码",
-              no: "DSDSDe324de423",
-              time: "2019.11.11 12:23:34",
-              timeTO: "2019.11.12 00:00:00",
-              price: "72.00",
-              isUsed: "flase"
-            }
-          ]
-        },
-        {
-          date: "2019年10月",
-          length: 3,
-          order: [
-            {
-              id: 3,
-              num: 3,
-              no: "DSDSDe324de423",
-              name: "全国星巴克通用券码",
-              time: "2019.11.11 12:23:34",
-              timeTO: "2019.11.12 00:00:00",
-              price: "72.00",
-              isUsed: "true"
-            },
-            {
-              id: 4,
-              num: 4,
-              no: "DSDSDe324de423",
-              name: "全国星巴克通用券码",
-              time: "2019.11.11 12:23:34",
-              timeTO: "2019.11.12 00:00:00",
-              price: "72.00",
-              isUsed: "true"
-            },
-            {
-              id: 5,
-              num: 3,
-              no: "DSDSDe324de423",
-              name: "全国星巴克通用券码",
-              time: "2019.11.11 12:23:34",
-              timeTO: "2019.11.12 00:00:00",
-              price: "72.00",
-              isUsed: "true"
-            }
-          ]
-        }
-      ]
+      list: []
     };
   },
   onLoad() {
@@ -151,6 +94,17 @@ export default {
                 this.orderList = res.data.data.list;
               }
               console.log("订单列表数据：", this.orderList);
+              let arr = [];
+              let item;
+              for (item in this.orderList) {
+                console.log(item);
+                let obj = {};
+                obj.date = item;
+                obj.order = this.orderList[item];
+                arr.push(obj);
+              }
+              console.log("arr", arr);
+              this.list = arr;
             }
           );
         }
@@ -175,9 +129,16 @@ export default {
       });
     },
     //   跳转到订单详情
-    NavToDetail() {
+    NavToDetail(er) {
+      console.log("e:", er);
       uni.navigateTo({
-        url: "./cards"
+        url: "./cards?order_id=" + er.order_id
+      });
+    },
+    // 跳转到首页
+    NavToIndex() {
+      uni.switchTab({
+        url: '../index/index'
       });
     },
     // 复制订单号

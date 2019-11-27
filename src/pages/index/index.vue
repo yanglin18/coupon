@@ -1,24 +1,14 @@
 <template>
-  <view class="content" :animation="animationData">
+  <view class="content">
     <view>
-      <view id="tips" style="height=0" class="tips">
+      <view id="tips" class="tips" :class="showTips ? '' : 'hodeTips'">
         <view class="title">
           <image src="../../static/assets/coffee.png" />
           <text>使用须知</text>
         </view>
         <view class="tip_content">
           <view class="texta">
-            <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
-          </view>
-          <view class="texta">
-            <text
-              >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
-            >
-          </view>
-          <view class="texta">
-            <text
-              >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
-            >
+            <text>{{ instructions_for_use }}</text>
           </view>
         </view>
       </view>
@@ -191,14 +181,24 @@ export default {
       sum_number: 66,
       animationData: {}, //动画
       user_info: {}, //用户信息,
-      is_getuserInfo: false
+      is_getuserInfo: false,
+      // 展示温馨提示
+      showTips: true
     };
   },
   onLoad() {
+    let isFir = uni.getStorageSync("isFirst");
+    if (isFir) {
+      console.log("不是第一次来的顾客");
+      this.userAgree=true;
+    } else {
+      console.log("是第一次来的顾客");
+      this.userAgree=false;
+    }
     this.getGoodsInfo();
     this.getInstructionsForUse();
     this.getBanner();
-    this.topAnimation(0);
+    this.showTips = false;
   },
   // 用户分享
   onShareAppMessage({ res }) {
@@ -212,11 +212,11 @@ export default {
     };
   },
   onPageScroll() {
-    this.topAnimation(0);
+    this.showTips = false;
   },
   onPullDownRefresh() {
     uni.stopPullDownRefresh();
-    this.topAnimation();
+    this.showTips = true;
   },
   methods: {
     // 顶部使用须知动画
@@ -254,7 +254,7 @@ export default {
         { brand_id: 1 },
         res => {
           if (res.data.code === "200") {
-            this.instructions_for_use = res.data.data;
+            this.instructions_for_use = res.data.data.instructions;
           }
         }
       );
@@ -365,66 +365,91 @@ export default {
     GetPhoneNumber(res0) {
       if (res0.detail) {
         console.log("点击了同意授权", res0.detail);
-
-        uni.login({
-          success: reslogin => {
-            console.log("登录返回：", reslogin);
-            if (reslogin.code) {
-              //发起网络请求
-              this.Ajax(
-                "post",
-                "member/Login/getLogin",
-                {
-                  brand_id: 1,
-                  channel: "wechat",
-                  code: reslogin.code,
-                  detail: this.user_info
-                },
-                res => {
-                  console.log("调登录接口返回：", res);
-                  if (res.data.code === "200") {
-                    // 获取手机号
+        // 判断登录态
+        uni.checkSession({
+          // 已登录状态
+          success: loginres => {
+            console.log("已登录：", loginres);
+            // 获取手机号
+            uni.getStorage({
+              key: "storage_key",
+              success: storageRes => {
+                console.log("storageRes:", storageRes);
+                uni.login({
+                  success: loginRes => {
                     this.Ajax(
                       "post",
                       "member/user/set_mobile",
                       {
-                        session3rd: res.data.data.session3rd,
-                        code:reslogin.code,
+                        session3rd: storageRes.data.session3rd,
+                        code: loginRes.code,
                         encryptedData: res0.detail.encryptedData,
                         iv: res0.detail.iv
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
-                          // this.instructions_for_use = res.data.data;
                         }
                       }
                     );
-                    uni.setStorage({
-                      key: "storage_key",
-                      data: res.data.data,
-                      success: function(e) {
-                        console.log("success", e);
-                      }
-                    });
                   }
-                }
-              );
-            } else {
-              console.log("登录失败！" + res.errMsg);
-            }
+                });
+              },
+              fail: errorStorage => {
+                console.log("获取session3rd的storage失败", errorStorage);
+              }
+            });
+          },
+          fail: error => {
+            this.loginIn();
           }
         });
       } else {
         console.log("点击了拒绝授权");
       }
     },
+    // 登录
+    loginIn() {
+      uni.login({
+        success: reslogin => {
+          console.log("登录返回：", reslogin);
+          if (reslogin.code) {
+            this.Ajax(
+              "post",
+              "member/Login/getLogin",
+              {
+                brand_id: 1,
+                channel: "wechat",
+                code: reslogin.code,
+                detail: this.user_info
+              },
+              res => {
+                console.log("调登录接口返回：", res);
+                if (res.data.code === "200") {
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data,
+                    success: function(e) {
+                      console.log("success", e);
+                    }
+                  });
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+    },
     // 获取基本信息
     GetUserInfo(res) {
       console.log(res);
       if (res.detail.userInfo) {
-        console.log("点击了同意授权");
+        console.log("点击了同意基本信息授权");
+        uni.setStorageSync("isFirst", res.detail.userInfo);
         this.user_info = res.detail;
         this.is_getuserInfo = true;
+        this.loginIn();
       } else {
         console.log("点击了拒绝授权");
       }
@@ -442,8 +467,11 @@ export default {
       if (!this.userOptions) {
         this.NotLearned();
       } else {
+        uni.checkSession({
+          success: loginRes => {}
+        });
         this.userAgree = true;
-        this.topAnimation();
+        this.showTips = true;
       }
     },
     // 用户同意协议
@@ -529,9 +557,18 @@ export default {
     color: #f8f8f8;
   }
 }
+.hodeTips {
+  position: absolute !important;
+  top: -1000px !important;
+  transition: all 0.5s;
+}
 .tips {
+  position: relative;
+  top: 0;
   font-size: 26rpx;
   padding: 50rpx 0 20rpx;
+  overflow: hidden;
+  transition: all 0.5s;
   .title {
     display: flex;
     align-items: center;

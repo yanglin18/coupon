@@ -2,22 +2,13 @@
   <view class="content">
     <view class="tips">
       <view class="title">
+        <image src="../../static/assets/coffee.png" />
         <text>使用须知</text>
       </view>
       <view class="tip_content">
         <view class="texta">
-          <text>{{instructionsForUse}}</text>
+          <text>{{ instructionsForUse }}</text>
         </view>
-        <!-- <view class="texta">
-          <text
-            >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
-          >
-        </view>
-        <view class="texta">
-          <text
-            >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
-          >
-        </view> -->
       </view>
     </view>
     <view class="goods_card">
@@ -89,7 +80,7 @@ export default {
       sum_number: 999,
       goodsId: "",
       goodsInfo: {},
-      instructionsForUse:''
+      instructionsForUse: ""
     };
   },
   onLoad(id) {
@@ -182,6 +173,13 @@ export default {
     font-size: 28rpx;
     letter-spacing: -0.68px;
     padding: 10rpx;
+    display: flex;
+    align-items: center;
+    image {
+      height: 48rpx;
+      width: 40rpx;
+      margin-right: 20rpx;
+    }
   }
   .tip_content {
     display: flex;

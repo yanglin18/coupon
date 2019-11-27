@@ -1,5 +1,8 @@
 <template>
   <view class="content">
+    <view v-if="!isLoginIn" class="notLoginIn">
+      <button>去登录</button>
+    </view>
     <view>
       <view class="top_card">
         <view class="title">
@@ -34,7 +37,9 @@
         </view>
       </view>
       <view @click="Share" class="share">分享海报 </view>
-      <botton class="logout">退出登录</botton>
+      <view class="logout">
+        <button @click="loginOutEvent">退出登录</button>
+      </view>
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
@@ -72,17 +77,19 @@ export default {
       share: false, //点击分享
       access_token: "",
       user_info: {},
-      src2: ""
+      src2: "",
+      isLoginIn:false //是否登录
     };
   },
   onLoad() {
-    // uni.login({
-    //   provider: "weixin",
-    //   success: function(loginRes) {
-    //     console.log(loginRes);
-    //     // 获取用户信息
-    //   }
-    // });
+    let isFir = uni.getStorageSync("isFirst");
+    if (isFir) {
+      console.log("不是第一次来的顾客");
+      this.isLoginIn=true
+    } else {
+      console.log("是第一次来的顾客");
+      this.isLoginIn=false
+    }
     this.getUserInfo();
     // 获取access_token
     uni.request({
@@ -94,8 +101,6 @@ export default {
         // console.log("access_token:", this.access_token);
       }
     });
-    // const scene = decodeURIComponent(query.scene);
-    // 生成页面的二维码
     uni.request({
       //注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
       url:
@@ -201,6 +206,34 @@ export default {
     close_share() {
       this.share = false;
     },
+    // 登出
+    loginOutEvent() {
+      uni.showModal({
+        title: "提示",
+        content: "您确定要退出登录吗？",
+        success: function(res) {
+          if (res.confirm) {
+            uni.getStorage({
+              key: "storage_key",
+              success: res0 => {
+                this.Ajax(
+                  "post",
+                  "member/Login/login_out",
+                  { session3rd: res0.data.session3rd },
+                  res => {
+                    if (res.data.code === "200") {
+                      console.log(res);
+                    }
+                  }
+                );
+              }
+            });
+          } else if (res.cancel) {
+            console.log("用户点击取消");
+          }
+        }
+      });
+    },
     // 长按保存图片
     saveImg() {
       console.log("长按图片");
@@ -235,6 +268,12 @@ export default {
   /deep/ .uni-button:after {
     border: 0 !important;
   }
+}
+.notLoginIn {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .shadowBox {
   position: absolute;
@@ -326,13 +365,17 @@ export default {
 }
 .logout {
   display: inline-block;
-  padding: 20rpx 203rpx;
-  margin: 50rpx 110rpx 0 !important;
-  border: 2rpx solid #00b360;
-  border-radius: 40rpx;
-  font-size: 30rpx;
-  color: #00b35f;
-  letter-spacing: 0;
+  margin: 50rpx auto 0;
+  display: flex;
+  justify-content: center;
+  button {
+    border: 2rpx solid #00b360;
+    border-radius: 40rpx;
+    font-size: 30rpx;
+    color: #00b35f;
+    height: 80rpx;
+    width: 530rpx;
+  }
 }
 .sharePopup {
   margin: 0 50rpx;

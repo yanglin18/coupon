@@ -44,18 +44,22 @@
             </view>
           </view>
         </swiper-item> -->
-        <swiper-item v-for="item in cards" :key="item" class="goods_card">
+        <swiper-item
+          v-for="(item, index) in cards"
+          :key="index"
+          class="goods_card"
+        >
           <view class="card_order">
-            <text>{{ item.id }}/{{ shuliang }}</text>
+            <text v-if="item.num !== 1">{{ index }}/{{ item.num }}</text>
           </view>
           <view class="name">
-            <text>全国星巴克中杯通兑券</text>
+            <text>{{ item.goods_name }}</text>
           </view>
           <view class="userful_time">
-            <text>有效期：{{ item.userful_time }}</text>
+            <text>有效期至：{{ item.expire_time }}</text>
           </view>
           <view class="QRcode">
-            <image src="../../static/ceshi.jpg" />
+            <image :src="item.ticket" />
           </view>
           <view class="bottom">
             <text>优惠码每30秒自动更新，当天24时前有效，过期不退换</text>
@@ -83,7 +87,9 @@
           <text>优惠码每30秒自动更新，当天24时前有效，过期不退换</text>
         </view>
       </view> -->
-      <button class="affirm" @click="HaveScan">确认星伙伴已扫码</button>
+      <view class="affirm">
+        <button @click="HaveScan">确认星伙伴已扫码</button>
+      </view>
     </view>
     <!-- 弹窗 -->
     <view class="Toast" v-if="clickScna">
@@ -113,6 +119,7 @@ export default {
       CardHeight: 0,
       TipsHeight: 0,
       shuliang: 6,
+      order_id: "",
       cards: [
         {
           image: "",
@@ -144,17 +151,19 @@ export default {
       scrollTop: 0
     };
   },
-  onLoad() {
-    var query = uni.createSelectorQuery();
-    //选择id
-    query.select(".goods_card").boundingClientRect();
-    query.select(".tips").boundingClientRect();
-    query.exec(function(res) {
-      console.log("res1", res);
-      var CardHeight = res[0].height; //每个卡片的高度
-      var TipsHeight = res[1].height;
-    });
+  onLoad(val) {
+    // var query = uni.createSelectorQuery();
+    // //选择id
+    // query.select(".goods_card").boundingClientRect();
+    // query.select(".tips").boundingClientRect();
+    // query.exec(function(res) {
+    //   console.log("res1", res);
+    //   var CardHeight = res[0].height; //每个卡片的高度
+    //   var TipsHeight = res[1].height;
+    // });
     // console.log(TipsHeight)
+    this.order_id = val.order_id;
+    this.getOrderInfo();
   },
   //监听屏幕滚动 判断上下滚动
   onPageScroll: function(ev) {
@@ -187,6 +196,36 @@ export default {
     }, 0);
   },
   methods: {
+    // 获取订单详情
+    getOrderInfo() {
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          this.Ajax(
+            "post",
+            "member/order/order_info",
+            { order_id: this.order_id, session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                let cardsdata = res.data.data;
+                console.log("carddata:", cardsdata);
+                let item = {};
+                let cardList = [];
+                for (let i = 0; i < cardsdata.ticket.length; i++) {
+                  item.expire_time = cardsdata.expire_time;
+                  item.goods_name = cardsdata.goods_name;
+                  item.num = cardsdata.num;
+                  item.ticket = cardsdata.ticket[i];
+                  cardList.push(item);
+                }
+                console.log("我想要的列表：", cardList);
+                this.cards = cardList;
+              }
+            }
+          );
+        }
+      });
+    },
     EventHandle(e) {
       // console.log(e);
       // let swp = document.getElementById(e.detail.current);
@@ -296,12 +335,17 @@ swiper.uni-swiper-slide-frame {
   }
 }
 .affirm {
-  background: #ffffff;
-  border-radius: 40rpx;
-  font-size: 30rpx;
-  color: #0d5a39;
-  letter-spacing: 0;
-  width: 530rpx;
+  margin: 60rpx auto 0;
+  display: flex;
+  justify-content: center;
+  button {
+    background: #ffffff;
+    border-radius: 40rpx;
+    font-size: 30rpx;
+    color: #0d5a39;
+    width: 530rpx;
+    height: 80rpx;
+  }
 }
 .Toast {
   opacity: 1;
