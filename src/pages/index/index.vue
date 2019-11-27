@@ -198,7 +198,7 @@ export default {
     this.getGoodsInfo();
     this.getInstructionsForUse();
     this.getBanner();
-    this.topAnimation([0, -175]);
+    this.topAnimation(0);
   },
   // 用户分享
   onShareAppMessage({ res }) {
@@ -212,22 +212,31 @@ export default {
     };
   },
   onPageScroll() {
-    this.topAnimation();
+    this.topAnimation(0);
   },
   onPullDownRefresh() {
     uni.stopPullDownRefresh();
-    this.topAnimation([0, 0]);
+    this.topAnimation();
   },
   methods: {
     // 顶部使用须知动画
-    topAnimation(arr = [0, -180]) {
-      let animation = uni.createAnimation({
-        duration: 1000
-      });
-      this.animation = animation;
+    topAnimation(myHeight, time = 1000) {
+      console.log("topAnimation");
+      let obj = wx.createSelectorQuery();
+      obj.selectAll("#tips").boundingClientRect(function(rect) {
+        console.log("boundingClientRect", rect);
+        let height = myHeight !== undefined ? myHeight : rect[0].height;
+        console.log("height", height);
 
-      animation.translate(...arr).step();
-      this.animationData = animation.export();
+        let animation = uni.createAnimation({
+          duration: time
+        });
+        this.animation = animation;
+
+        animation.height(height).step();
+        this.animationData = animation.export();
+      });
+      obj.exec();
     },
     // 获取商品信息
     getGoodsInfo() {
@@ -312,18 +321,43 @@ export default {
     },
     // 直接去购买
     To_buy() {
-      uni.requestPayment({
-        provider: "wxpay",
-        timeStamp: String(Date.now()),
-        nonceStr: "A1B2C3D4E5",
-        package: "prepay_id=wx20180101abcdefg",
-        signType: "MD5",
-        paySign: "",
-        success: function(res) {
-          console.log("success:" + JSON.stringify(res));
-        },
-        fail: function(err) {
-          console.log("fail:" + JSON.stringify(err));
+      let that = this;
+      // 先从storage拿到session3rd
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          console.log("storage参数：", res0);
+          // 调取后台接口，得到支付参数
+          this.Ajax(
+            "post",
+            "member/order/create_order",
+            {
+              session3rd: res0.data.session3rd,
+              goods_id: that.goodsInfo.goods_id,
+              num: that.buy_number
+            },
+            res => {
+              if (res.data.code === "200") {
+                console.log("去支付参数", res);
+                // 调起支付
+                console.log("签名:",res.data.data.paySign)
+                uni.requestPayment({
+                  provider: "wxpay",
+                  timeStamp: String(Date.now()),
+                  nonceStr: res.data.data.nonceStr,
+                  package: res.data.data.package,
+                  signType: res.data.data.signType,
+                  paySign: res.data.data.paySign,
+                  success: function(res) {
+                    console.log("支付成功" + JSON.stringify(res));
+                  },
+                  fail: function(err) {
+                    console.log("支付失败" + JSON.stringify(err));
+                  }
+                });
+              }
+            }
+          );
         }
       });
     },
@@ -393,7 +427,7 @@ export default {
         this.NotLearned();
       } else {
         this.userAgree = true;
-        this.topAnimation([0, 0]);
+        this.topAnimation();
       }
     },
     // 用户同意协议
@@ -431,9 +465,10 @@ export default {
   margin: 100rpx 50rpx;
   padding: 60rpx 60rpx 100rpx;
   position: fixed;
-  top: 556rpx;
+  top: 50%;
   left: 0;
   z-index: 100;
+  transform: translateY(-50%);
   background: #ffffff;
   color: #000000;
   border-radius: 24rpx;

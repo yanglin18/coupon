@@ -7,8 +7,8 @@
         </view>
         <view class="bottom">
           <view class="left">
-            <image src="../../static/images/user.jpg" />
-            <text>{{ user_name }}</text>
+            <image :src="user_info.head_img" />
+            <text>{{ user_info.user_name }}</text>
           </view>
           <view class="right" @click="NavToModify">
             <text>修改资料</text>
@@ -119,7 +119,6 @@ export default {
   },
   methods: {
     // 获取基本信息
-
     getUserInfo() {
       let that = this;
       let session3rd = "";

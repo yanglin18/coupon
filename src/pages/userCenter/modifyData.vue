@@ -43,20 +43,42 @@ export default {
       userData: {},
       startDate: "1900-00-00",
       endDate: "2019-00-00",
-      birthday:"请选择生日"
+      birthday: "请选择生日"
     };
   },
   onLoad(e) {
     this.userData = e;
     // this.birthday = "2000-01-01";
     this.userData.icon = "../../static/images/user.jpg";
+    this.getUserInfo();
   },
   methods: {
     bindDateChange(e) {
-        console.log("e:",e)
+      console.log("e:", e);
       this.birthday = e.detail.value;
-      console.log(this.birthday)
+      console.log(this.birthday);
     },
+    // 获取基本信息
+    getUserInfo() {
+      let that = this;
+      let session3rd = "";
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          that.Ajax(
+            "post",
+            "member/user/index",
+            { session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                that.user_info = res.data.data;
+                console.log("user_info:", this.user_info);
+              }
+            }
+          );
+        }
+      });
+    }
   }
 };
 </script>
