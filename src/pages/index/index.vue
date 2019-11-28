@@ -24,10 +24,8 @@
       >
         <view class="card_top">
           <view class="price">
-            <text class="price_now">&yen;{{ goodsInfo.price }}</text>
-            <text class="price_original"
-              >&yen;{{ goodsInfo.original_price }}</text
-            >
+            <text class="price_now">&yen;{{ producePrice }}</text>
+            <text class="price_original">&yen;{{ produceOriginalPrice }}</text>
           </view>
           <view class="name">
             <text>{{ goodsInfo.goods_name }}</text>
@@ -37,7 +35,7 @@
         <image  />v-if=
       </view> -->
         <view
-          v-if="sum_number === 0"
+          v-if="goodsInfo.inventory === 0"
           class="card_sell_out"
           @click.stop="Toast('该优惠券暂时没货哦')"
         >
@@ -186,14 +184,24 @@ export default {
       showTips: true
     };
   },
+  computed: {
+    // 优惠价格
+    producePrice() {
+      return this.goodsInfo.price * this.buy_number + ".00" || 0;
+    },
+    // 原价格
+    produceOriginalPrice() {
+      return this.goodsInfo.original_price * this.buy_number + ".00" || 0;
+    }
+  },
   onLoad() {
     let isFir = uni.getStorageSync("isFirst");
     if (isFir) {
       console.log("不是第一次来的顾客");
-      this.userAgree=true;
+      this.userAgree = true;
     } else {
       console.log("是第一次来的顾客");
-      this.userAgree=false;
+      this.userAgree = false;
     }
     this.getGoodsInfo();
     this.getInstructionsForUse();
@@ -219,25 +227,6 @@ export default {
     this.showTips = true;
   },
   methods: {
-    // 顶部使用须知动画
-    topAnimation(myHeight, time = 1000) {
-      console.log("topAnimation");
-      let obj = wx.createSelectorQuery();
-      obj.selectAll("#tips").boundingClientRect(function(rect) {
-        console.log("boundingClientRect", rect);
-        let height = myHeight !== undefined ? myHeight : rect[0].height;
-        console.log("height", height);
-
-        let animation = uni.createAnimation({
-          duration: time
-        });
-        this.animation = animation;
-
-        animation.height(height).step();
-        this.animationData = animation.export();
-      });
-      obj.exec();
-    },
     // 获取商品信息
     getGoodsInfo() {
       this.Ajax("post", "member/index/index", { brand_id: 1 }, res => {
@@ -284,19 +273,15 @@ export default {
     reduce_number() {
       if (this.buy_number <= 1) {
         return;
-      } else {
-        this.buy_number--;
-        this.NumChange();
       }
+      this.buy_number--;
     },
     // 增加购买数量
     add_number() {
       if (this.buy_number >= 10) {
         return;
-      } else {
-        this.buy_number++;
-        this.NumChange();
       }
+      this.buy_number++;
     },
     // 提示
     Toast(e) {
@@ -306,13 +291,7 @@ export default {
         icon: "none"
       });
     },
-    // 数量增减
-    NumChange() {
-      this.goodsInfo.price =
-        String(this.goodsInfo.price * this.buy_number) + ".00";
-      this.goodsInfo.original_price =
-        String(this.goodsInfo.original_price * this.buy_number) + ".00";
-    },
+    // 数量增减联动价格
     // 跳转到详情
     NavToDetial() {
       uni.navigateTo({
@@ -348,8 +327,12 @@ export default {
                   package: res.data.data.package,
                   signType: res.data.data.signType,
                   paySign: res.data.data.paySign,
-                  success: function(res) {
+                  success: function(res1) {
                     console.log("支付成功" + JSON.stringify(res));
+                    uni.navigateTo({
+                      url:
+                        "../myCardBug/cards?order_id=" + res.data.data.order_id
+                    });
                   },
                   fail: function(err) {
                     console.log("支付失败" + JSON.stringify(err));

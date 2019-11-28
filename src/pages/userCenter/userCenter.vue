@@ -1,8 +1,8 @@
 <template>
   <view class="content">
-    <view v-if="!isLoginIn" class="notLoginIn">
+    <!-- <view v-if="!isLoginIn" class="notLoginIn">
       <button>去登录</button>
-    </view>
+    </view> -->
     <view>
       <view class="top_card">
         <view class="title">
@@ -82,14 +82,14 @@ export default {
     };
   },
   onLoad() {
-    let isFir = uni.getStorageSync("isFirst");
-    if (isFir) {
-      console.log("不是第一次来的顾客");
-      this.isLoginIn=true
-    } else {
-      console.log("是第一次来的顾客");
-      this.isLoginIn=false
-    }
+    // let isFir = uni.getStorageSync("isFirst");
+    // if (isFir) {
+    //   console.log("不是第一次来的顾客");
+    //   this.isLoginIn=true
+    // } else {
+    //   console.log("是第一次来的顾客");
+    //   this.isLoginIn=false
+    // }
     this.getUserInfo();
     // 获取access_token
     uni.request({
