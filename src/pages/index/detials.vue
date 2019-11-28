@@ -14,9 +14,9 @@
     <view class="goods_card">
       <view class="card_top">
         <view class="price">
-          <text class="price_now">&yen;{{ goodsInfo.price }}</text>
+          <text class="price_now">&yen;{{ producePrice }}</text>
           <text class="price_original"
-            >&yen;{{ goodsInfo.original_price }}</text
+            >&yen;{{ produceOriginalPrice }}</text
           >
         </view>
         <view class="name">
@@ -64,7 +64,7 @@
           </view>
         </view>
         <view class="right">
-          <button size="mini">去支付</button>
+          <button size="mini" @click="To_buy">去支付</button>
         </view>
       </view>
     </view>
@@ -88,6 +88,16 @@ export default {
     this.getGoodInfo();
     this.getInstructionsForUse();
     console.log("id:", this.goodsId);
+  },
+  computed: {
+    // 优惠价格
+    producePrice() {
+      return this.goodsInfo.price * this.buy_number + ".00" || 0;
+    },
+    // 原价格
+    produceOriginalPrice() {
+      return this.goodsInfo.original_price * this.buy_number + ".00" || 0;
+    }
   },
   methods: {
     // 获取商品信息
@@ -120,13 +130,63 @@ export default {
         }
       );
     },
+    // 直接去购买
+    To_buy() {
+      let that = this;
+      // 先从storage拿到session3rd
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          console.log("storage参数：", res0);
+          // 调取后台接口，得到支付参数
+          this.Ajax(
+            "post",
+            "member/order/create_order",
+            {
+              session3rd: res0.data.session3rd,
+              goods_id: that.goodsInfo.goods_id,
+              num: that.buy_number
+            },
+            res => {
+              if (res.data.code === "200") {
+                console.log("去支付参数", res);
+                // 调起支付
+                console.log("签名:", res.data.data.paySign);
+                uni.requestPayment({
+                  provider: "wxpay",
+                  timeStamp: String(res.data.data.timeStamp),
+                  nonceStr: res.data.data.nonceStr,
+                  package: res.data.data.package,
+                  signType: res.data.data.signType,
+                  paySign: res.data.data.paySign,
+                  success: function(res1) {
+                    console.log("支付成功" + JSON.stringify(res));
+                    that.getGoodInfo()
+                    uni.navigateTo({
+                      url:
+                        "../myCardBug/cards?order_id=" + res.data.data.order_id
+                    });
+                  },
+                  fail: function(err) {
+                    console.log("支付失败" + JSON.stringify(err));
+                    uni.showToast({
+                      title: "确认不要优惠券了吗？",
+                      icon: "none"
+                    });
+                  }
+                });
+              }
+            }
+          );
+        }
+      });
+    },
     // 减少购买数量
     reduce_number() {
       if (this.buy_number <= 1) {
         return;
       } else {
         this.buy_number--;
-        this.NumChange();
       }
     },
     // 增加购买数量
@@ -135,12 +195,7 @@ export default {
         return;
       } else {
         this.buy_number++;
-        this.NumChange();
       }
-    },
-    NumChange() {
-      this.price = String(24 * this.buy_number) + ".00";
-      this.price_original = String(33 * this.buy_number) + ".00";
     },
     // 提示
     Toast(e) {

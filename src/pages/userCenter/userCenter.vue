@@ -92,15 +92,15 @@ export default {
     // }
     this.getUserInfo();
     // 获取access_token
-    uni.request({
-      url:
-        "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx57c616cdb4fe8bd7&secret=f9978d2f3071dc8ab2b500df05512b17",
-      success: res => {
-        // console.log("获取access_token", res);
-        this.access_token = res.data.access_token;
-        // console.log("access_token:", this.access_token);
-      }
-    });
+    // uni.request({
+    //   url:
+    //     "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx57c616cdb4fe8bd7&secret=f9978d2f3071dc8ab2b500df05512b17",
+    //   success: res => {
+    //     // console.log("获取access_token", res);
+    //     this.access_token = res.data.access_token;
+    //     // console.log("access_token:", this.access_token);
+    //   }
+    // });
     uni.request({
       //注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
       url:
@@ -194,11 +194,11 @@ export default {
           console.log("error:", error);
           uni.showToast({
             title: "请授权后再保存",
-            duration: 1000
+            duration: 1000,
+            icon:"none"
           });
         },
         complete() {
-          console.log("调起相册授权");
         }
       });
     },

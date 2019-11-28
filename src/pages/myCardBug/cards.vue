@@ -1,56 +1,34 @@
 <template>
   <view class="content">
-    <view :class="clickScna === false ? '' : 'contentOp'">
-      <view class="tips">
-        <view class="title">
-          <image src="../../static/assets/coffee.png" />
-          <text>使用须知</text>
+    <view class="tips">
+      <view class="title">
+        <image src="../../static/assets/coffee.png" />
+        <text>使用须知</text>
+      </view>
+      <view class="tip_content">
+        <view class="texta">
+          <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
         </view>
-        <view class="tip_content">
-          <view class="texta">
-            <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
-          </view>
-          <view class="texta">
-            <text
-              >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
-            >
-          </view>
-          <view class="texta">
-            <text
-              >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
-            >
-          </view>
+        <view class="texta">
+          <text
+            >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
+          >
+        </view>
+        <view class="texta">
+          <text
+            >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
+          >
         </view>
       </view>
-      <swiper class="card_swiper" vertical="true">
-        <!-- <swiper-item class="tips">
-          <view class="title">
-            <image src="../../static/assets/coffee.png" />
-            <text>使用须知</text>
-          </view>
-          <view class="tip_content">
-            <view class="texta">
-              <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
-            </view>
-            <view class="texta">
-              <text
-                >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
-              >
-            </view>
-            <view class="texta">
-              <text
-                >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
-              >
-            </view>
-          </view>
-        </swiper-item> -->
+    </view>
+    <!-- <swiper class="card_swiper" vertical="true">
         <swiper-item
           v-for="(item, index) in cards"
           :key="index"
           class="goods_card"
         >
           <view class="card_order">
-            <text v-if="item.num !== 1">{{ index }}/{{ item.num }}</text>
+            <text v-if="item.num !== 1">{{ index + 1 }}/{{ item.num }}</text>
           </view>
           <view class="name">
             <text>{{ item.goods_name }}</text>
@@ -59,37 +37,50 @@
             <text>有效期至：{{ item.expire_time }}</text>
           </view>
           <view class="QRcode">
-            <image :src="item.ticket" />
+            <canvas
+              style="width: 210px; height: 210px;"
+              canvas-id="myQrcode"
+            ></canvas>
           </view>
           <view class="bottom">
             <text>优惠码每30秒自动更新，当天24时前有效，过期不退换</text>
           </view>
         </swiper-item>
-        <!-- <swiper-item>
-          <button class="affirm" @click="HaveScan">确认星伙伴已扫码</button>
-        </swiper-item> -->
-      </swiper>
+      </swiper> -->
 
-      <!-- <view v-for="item in cards" :key="item" class="goods_card">
-        <view class="card_order">
-          <text>{{ item.id }}/{{ shuliang }}</text>
-        </view>
-        <view class="name">
-          <text>全国星巴克中杯通兑券</text>
-        </view>
-        <view class="userful_time">
-          <text>有效期：{{ item.userful_time }}</text>
-        </view>
-        <view class="QRcode">
-          <image src="../../static/ceshi.jpg" />
-        </view>
-        <view class="bottom">
-          <text>优惠码每30秒自动更新，当天24时前有效，过期不退换</text>
-        </view>
-      </view> -->
-      <view class="affirm">
-        <button @click="HaveScan">确认星伙伴已扫码</button>
+    <view
+      v-for="(item, index) in cards"
+      :key="index"
+      class="goods_card"
+      :class="{ showClass: item.show }"
+    >
+      <view class="card_order">
+        <text v-if="item.num !== 1">{{ index + 1 }}/{{ item.num }}</text>
       </view>
+      <view class="name">
+        <text>{{ item.goods_name }}</text>
+      </view>
+      <view class="userful_time">
+        <text>有效期至：{{ item.expire_time }}</text>
+      </view>
+      <view class="QRcode">
+        <!-- <canvas
+          style="width: 210px; height: 210px;"
+          canvas-id="myQrcode"
+        ></canvas> -->
+        <image
+          class="used"
+          v-if="item.status === '2'"
+          src="../../static/images/stamp_qrCode.png"
+        />
+        <image class="not_use" v-else :src="item.ticket" />
+      </view>
+      <view class="bottom">
+        <text>优惠码每30秒自动更新，当天24时前有效，过期不退换</text>
+      </view>
+    </view>
+    <view class="affirm">
+      <button @click="HaveScan">确认星伙伴已扫码</button>
     </view>
     <!-- 弹窗 -->
     <view class="Toast" v-if="clickScna">
@@ -103,10 +94,13 @@
         </button>
       </view>
     </view>
+    <!-- 遮罩 -->
+    <view class="shadowBox" v-show="clickScna"></view>
   </view>
 </template>
 
 <script>
+import drowQrcode from "@/components/weapp.qrcode.esm.js";
 export default {
   data() {
     return {
@@ -118,84 +112,28 @@ export default {
       sum_number: 999,
       CardHeight: 0,
       TipsHeight: 0,
-      shuliang: 6,
       order_id: "",
-      cards: [
-        {
-          image: "",
-          id: 1,
-          userful_time: "2019.11.09 23:00:02"
-        },
-        {
-          image: "",
-          id: 2,
-          userful_time: "2019.11.09 23:00:02"
-        },
-        {
-          image: "",
-          id: 3,
-          userful_time: "2019.11.09 23:00:02"
-        },
-        {
-          image: "",
-          id: 4,
-          userful_time: "2019.11.09 23:00:02"
-        },
-        {
-          image: "",
-          id: 5,
-          userful_time: "2019.11.09 23:00:02"
-        },
-        { image: "", id: 6, userful_time: "2019.11.09 23:00:02" }
-      ],
+      cards: [],
       scrollTop: 0
     };
   },
   onLoad(val) {
-    // var query = uni.createSelectorQuery();
-    // //选择id
-    // query.select(".goods_card").boundingClientRect();
-    // query.select(".tips").boundingClientRect();
-    // query.exec(function(res) {
-    //   console.log("res1", res);
-    //   var CardHeight = res[0].height; //每个卡片的高度
-    //   var TipsHeight = res[1].height;
-    // });
-    // console.log(TipsHeight)
     this.order_id = val.order_id;
     this.getOrderInfo();
   },
-  //监听屏幕滚动 判断上下滚动
-  onPageScroll: function(ev) {
-    //ev是当前屏幕向上滚动的距离
-    var _this = this;
-    //当滚动的top值最大或最小时，为什么要做这一步是因为在手机实测小程序的时候会发生滚动条回弹，所以为了处理回弹，设置默认最大最小值
-    console.log("TipsHeight", this.TipsHeight);
-    console.log("CardHeight", this.CardHeight);
-    if (ev.scrollTop <= 0) {
-      ev.scrollTop = 0;
-    } else if (ev.scrollTop > uni.getSystemInfoSync().windowHeight) {
-      ev.scrollTop = uni.getSystemInfoSync().windowHeight;
-    }
-    //判断浏览器滚动条上下滚动
-    if (
-      ev.scrollTop > this.data.scrollTop ||
-      ev.scrollTop == uni.getSystemInfoSync().windowHeight
-    ) {
-      console.log("下");
-      //向下滚动
-    } else {
-      console.log("上");
-      //向上滚动
-    }
-    //给scrollTop重新赋值
-    setTimeout(function() {
-      _this.setData({
-        scrollTop: ev.scrollTop
-      });
-    }, 0);
+  mounted() {
+    this.queryMultipleNodes();
+  },
+  onPageScroll() {
+    this.queryMultipleNodes();
   },
   methods: {
+    //声明节点查询的方法
+    queryMultipleNodes() {
+      [1, 2, 3].forEach((item, index) => {
+        this.cards[index].show = !this.cards[index].show;
+      });
+    },
     // 获取订单详情
     getOrderInfo() {
       uni.getStorage({
@@ -215,10 +153,11 @@ export default {
                   item.expire_time = cardsdata.expire_time;
                   item.goods_name = cardsdata.goods_name;
                   item.num = cardsdata.num;
+                  item.status = cardsdata.status;
                   item.ticket = cardsdata.ticket[i];
+                  item.show = false;
                   cardList.push(item);
                 }
-                console.log("我想要的列表：", cardList);
                 this.cards = cardList;
               }
             }
@@ -238,6 +177,16 @@ export default {
     },
     submit() {
       this.clickScna = false;
+      uni.showToast({
+        title: "扫码已完成"
+      });
+      // 改全局数据值
+      let app = getApp();
+      app.globalData.share = true;
+      console.log("app:", app);
+      uni.switchTab({
+        url: "./cardList"
+      });
     },
     cancel() {
       this.clickScna = false;
@@ -248,6 +197,7 @@ export default {
 
 <style lang="scss">
 .content {
+  position: relative;
   padding: 0 40rpx 160rpx;
   // height: 100vh;
   background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/69254200_1574076274.png")
@@ -257,8 +207,13 @@ export default {
   //   height: 476px !important;
   // }
 }
-.contentOp {
-  opacity: 0.4;
+.shadowBox {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
 }
 .card_swiper {
   height: 934rpx;
@@ -296,8 +251,6 @@ swiper.uni-swiper-slide-frame {
   }
 }
 .goods_card {
-  height: 786rpx !important;
-  width: calc(100% - 128rpx) !important;
   background: #ffffff;
   border-radius: 24rpx;
   display: flex;
@@ -320,10 +273,18 @@ swiper.uni-swiper-slide-frame {
     opacity: 0.6;
   }
   .QRcode {
-    margin: 36rpx auto 0;
-    image {
+    .not_use {
       height: 420rpx;
       width: 420rpx;
+      margin: 36rpx auto 0;
+    }
+    .used {
+      height: 495rpx;
+      width: 509rpx;
+      position: relative;
+      right: -60rpx;
+      top: 72rpx;
+      margin: 0;
     }
   }
   .bottom {
@@ -333,6 +294,9 @@ swiper.uni-swiper-slide-frame {
     opacity: 0.4;
     letter-spacing: 0;
   }
+}
+.showClass {
+  opacity: 0.4;
 }
 .affirm {
   margin: 60rpx auto 0;
@@ -353,9 +317,10 @@ swiper.uni-swiper-slide-frame {
   flex-direction: column;
   background: #ffffff;
   border-radius: 24px;
-  top: 520rpx;
   position: fixed;
+  top: 50%;
   left: 0;
+  transform: translateY(-50%);
   z-index: 100;
   margin: 0 60rpx;
   padding: 80rpx 40rpx 100rpx;

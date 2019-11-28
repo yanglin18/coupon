@@ -52,13 +52,37 @@
                 <button v-if="val.status === '2'" class="isUsed" size="mini">
                   已收货
                 </button>
-                <button v-else size="mini">确认收货</button>
+                <button @click.stop="affirmReceive(val)" v-else size="mini">
+                  确认收货
+                </button>
               </view>
             </view>
           </view>
         </view>
       </scroll-view>
     </view>
+    <!-- 分享弹窗 -->
+    <view v-if="share" class="sharePopup">
+      <view @longpress="saveImg" class="img">
+        <!-- <image src="data:image/png;base64,{{src2}}"></image> -->
+        <image :src="src2" />
+      </view>
+      <view class="weixinIcon">
+        <view class="image_share">
+          <button open-type="share">
+            <image src="../../static/assets/weixin.png" />
+          </button>
+          <view class="text_weixin">
+            微信好友
+          </view>
+        </view>
+      </view>
+      <view class="close" @click="close_share">
+        <image class="close_img" src="../../static/assets/close.png" />
+      </view>
+    </view>
+    <!-- 遮罩 -->
+    <view class="shadowBox" v-show="share"></view>
   </view>
 </template>
 <script>
@@ -68,8 +92,14 @@ export default {
       // list: [],
       scrollTop: 0,
       orderList: "",
-      list: []
+      list: [],
+      share: false
     };
+  },
+  onShow() {
+    let app = getApp();
+    this.share = app.globalData.share;
+    console.log("是支付完成进入的卡券页面", this.share);
   },
   onLoad() {
     this.getOrderList();
@@ -128,17 +158,44 @@ export default {
         }
       });
     },
+    // 关闭分享
+    close_share() {
+      this.share = false;
+    },
+        // 长按保存图片
+    saveImg() {
+      console.log("长按图片");
+      // 处理图片
+      uni.getImageInfo({
+        src: "../../static/images/share2.png",
+        success: function(image) {
+          let image_path = image.path;
+          uni.saveImageToPhotosAlbum({
+            filePath: image_path,
+            success: function(res) {
+              uni.showToast({
+                title: "保存成功",
+                duration: 1000
+              });
+            },
+            fail: function(error) {
+              console.log(error);
+            }
+          });
+        }
+      });
+    },
     //   跳转到订单详情
     NavToDetail(er) {
       console.log("e:", er);
       uni.navigateTo({
-        url: "./cards?order_id=" + er.order_id
+        url: "./cards?order_id=" + er.order_id + "status=" + er.status
       });
     },
     // 跳转到首页
     NavToIndex() {
       uni.switchTab({
-        url: '../index/index'
+        url: "../index/index"
       });
     },
     // 复制订单号
@@ -154,6 +211,28 @@ export default {
               });
             }
           });
+        }
+      });
+    },
+    // 确认收货
+    affirmReceive(val) {
+      console.log("val:", val);
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          this.Ajax(
+            "post",
+            "member/order/confirm_order",
+            { order_id: val.order_id, session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                uni.showToast({
+                  title: "收货成功"
+                });
+                this.getOrderList();
+              }
+            }
+          );
         }
       });
     },
@@ -175,6 +254,14 @@ export default {
 .content {
   background: #f3f4f3;
   padding-bottom: 40rpx;
+}
+.shadowBox {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
 }
 .empty {
   display: flex;
@@ -333,6 +420,73 @@ export default {
           }
         }
       }
+    }
+  }
+}
+.sharePopup {
+  margin: 0 50rpx;
+  display: flex;
+  flex-direction: column;
+  margin: 0 50rpx;
+  position: fixed;
+  top: 100rpx;
+  left: 0;
+  z-index: 100;
+  border-radius: 24rpx;
+  .img {
+    background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/17860300_1574677608.png")
+      no-repeat center;
+    background-size: cover;
+    height: 820rpx;
+    width: 650rpx;
+  }
+  .weixinIcon {
+    background: #ffffff;
+    padding: 42rpx 0;
+    border-bottom-right-radius: 24rpx;
+    border-bottom-left-radius: 24rpx;
+    .image_share {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      button {
+        line-height: inherit;
+        background: #ffffff;
+        &:after {
+          border: none;
+        }
+      }
+      image {
+        height: 72rpx;
+        margin: 0 auto;
+        width: 87rpx;
+      }
+    }
+    .text_weixin {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.6;
+      margin: 0 auto;
+      font-size: 26rpx;
+      color: #311b0e;
+      letter-spacing: 0.43px;
+    }
+  }
+  .close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70rpx;
+    width: 70rpx;
+    margin: 0 auto;
+    margin-top: 30rpx;
+    image {
+      height: 100%;
+      width: 100%;
+      transform: rotate(-270deg);
+      border-radius: 50%;
     }
   }
 }

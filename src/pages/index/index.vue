@@ -1,114 +1,112 @@
 <template>
   <view class="content">
-    <view>
-      <view id="tips" class="tips" :class="showTips ? '' : 'hodeTips'">
-        <view class="title">
-          <image src="../../static/assets/coffee.png" />
-          <text>使用须知</text>
-        </view>
-        <view class="tip_content">
-          <view class="texta">
-            <text>{{ instructions_for_use }}</text>
-          </view>
+    <view id="tips" :class="computedClassStr">
+      <view class="title">
+        <image src="../../static/assets/coffee.png" />
+        <text>使用须知</text>
+      </view>
+      <view class="tip_content">
+        <view class="texta">
+          <text>{{ instructions_for_use }}</text>
         </view>
       </view>
-      <view
-        class="goods_card"
-        @click="NavToDetial"
-        v-bind:style="{
-          background: 'url(' + goodsInfo.img + ')no-repeat center',
-          height: goodsInfo.height + 'rpx',
-          width: goodsInfo.width + 'rpx',
-          color: goodsInfo.color
-        }"
-      >
-        <view class="card_top">
-          <view class="price">
-            <text class="price_now">&yen;{{ producePrice }}</text>
-            <text class="price_original">&yen;{{ produceOriginalPrice }}</text>
-          </view>
-          <view class="name">
-            <text>{{ goodsInfo.goods_name }}</text>
-          </view>
+    </view>
+    <view
+      class="goods_card"
+      @click="NavToDetial"
+      v-bind:style="{
+        background: 'url(' + goodsInfo.img + ')no-repeat center',
+        height: goodsInfo.height + 'rpx',
+        width: goodsInfo.width + 'rpx',
+        color: goodsInfo.color
+      }"
+    >
+      <view class="card_top">
+        <view class="price">
+          <text class="price_now">&yen;{{ producePrice }}</text>
+          <text class="price_original">&yen;{{ produceOriginalPrice }}</text>
         </view>
-        <!-- <view class="QRcode">
+        <view class="name">
+          <text>{{ goodsInfo.goods_name }}</text>
+        </view>
+      </view>
+      <!-- <view class="QRcode">
         <image  />v-if=
       </view> -->
-        <view
-          v-if="goodsInfo.inventory === 0"
-          class="card_sell_out"
-          @click.stop="Toast('该优惠券暂时没货哦')"
-        >
-          <text>已售罄</text>
-        </view>
-        <view v-else class="card_bottom">
-          <view class="left">
-            <view class="number">
-              <view @click.stop="reduce_number" class="reduce">
-                <image
-                  v-show="buy_number === 1"
-                  src="../../static/images/no_reduce.png"
-                  @click="Toast('只有一张，不能再减少啦')"
-                />
-                <image
-                  v-show="buy_number !== 1"
-                  src="../../static/images/reduce.png"
-                />
-              </view>
-              <view class="num">{{ buy_number }}</view>
-              <view @click.stop="add_number" class="reduce">
-                <image
-                  v-show="buy_number === 10"
-                  src="../../static/images/no_add.png"
-                  @click="Toast('该优惠券最多只能买十张哦')"
-                />
-                <image
-                  v-show="buy_number !== 10"
-                  src="../../static/images/add.png"
-                />
-              </view>
-              <!-- <uni-number-box
+      <view
+        v-if="goodsInfo.inventory === 0"
+        class="card_sell_out"
+        @click.stop="Toast('该优惠券暂时没货哦')"
+      >
+        <text>已售罄</text>
+      </view>
+      <view v-else class="card_bottom">
+        <view class="left">
+          <view class="number">
+            <view @click.stop="reduce_number" class="reduce">
+              <image
+                v-show="buy_number === 1"
+                src="../../static/images/no_reduce.png"
+                @click="Toast('只有一张，不能再减少啦')"
+              />
+              <image
+                v-show="buy_number !== 1"
+                src="../../static/images/reduce.png"
+              />
+            </view>
+            <view class="num">{{ buy_number }}</view>
+            <view @click.stop="add_number" class="reduce">
+              <image
+                v-show="buy_number === 10"
+                src="../../static/images/no_add.png"
+                @click="Toast('该优惠券最多只能买十张哦')"
+              />
+              <image
+                v-show="buy_number !== 10"
+                src="../../static/images/add.png"
+              />
+            </view>
+            <!-- <uni-number-box
               :value="buy_number"
               :min="1"
               :max="10"
             ></uni-number-box> -->
-            </view>
-            <view class="purchase_limit">
-              <text>每日限购十张</text>
-              <text>库存：{{ goodsInfo.inventory }}</text>
-            </view>
           </view>
-          <view class="right">
-            <!-- <button size="mini">去支付</button> -->
-            <button
-              @click.stop="To_buy"
-              :open-type="is_getuserInfo ? 'getPhoneNumber' : 'getUserInfo'"
-              @getphonenumber="GetPhoneNumber"
-              @getuserinfo="GetUserInfo"
-            >
-              去购买
-            </button>
+          <view class="purchase_limit">
+            <text>每日限购十张</text>
+            <text>库存：{{ goodsInfo.inventory }}</text>
           </view>
         </view>
+        <view class="right">
+          <!-- <button size="mini">去支付</button> -->
+          <button
+            @click.stop="To_buy"
+            :open-type="is_getuserInfo ? 'getPhoneNumber' : 'getUserInfo'"
+            @getphonenumber="GetPhoneNumber"
+            @getuserinfo="GetUserInfo"
+          >
+            去购买
+          </button>
+        </view>
       </view>
-      <view
-        class="banner"
-        v-for="(item, index) in banners"
-        :key="index"
-        v-bind:style="{
-          background: 'url(' + item.img + ')no-repeat center',
-          height: item.height + 'rpx',
-          width: item.width + 'rpx',
-          color: item.color
-        }"
-      >
-        <view class="card_content">
-          <view class="text1">
-            <text>{{ item.title }}</text>
-          </view>
-          <view class="text2">
-            <text>{{ item.introduce }}</text>
-          </view>
+    </view>
+    <view
+      class="banner"
+      v-for="(item, index) in banners"
+      :key="index"
+      v-bind:style="{
+        background: 'url(' + item.img + ')no-repeat center',
+        height: item.height + 'rpx',
+        width: item.width + 'rpx',
+        color: item.color
+      }"
+    >
+      <view class="card_content">
+        <view class="text1">
+          <text>{{ item.title }}</text>
+        </view>
+        <view class="text2">
+          <text>{{ item.introduce }}</text>
         </view>
       </view>
     </view>
@@ -192,6 +190,9 @@ export default {
     // 原价格
     produceOriginalPrice() {
       return this.goodsInfo.original_price * this.buy_number + ".00" || 0;
+    },
+    computedClassStr() {
+      return this.showTips ? "tips" : "hideTips";
     }
   },
   onLoad() {
@@ -223,8 +224,10 @@ export default {
     this.showTips = false;
   },
   onPullDownRefresh() {
-    uni.stopPullDownRefresh();
+    console.log("下拉");
     this.showTips = true;
+    console.log(this.showTips);
+    uni.stopPullDownRefresh();
   },
   methods: {
     // 获取商品信息
@@ -256,17 +259,6 @@ export default {
           this.banners = res.data.data.list;
         }
         console.log("信息：", this.banners);
-      });
-    },
-    // 下拉出现提示
-    pullDown() {
-      var query = uni.createSelectorQuery();
-      // 选择id
-      query.select("#tips").boundingClientRect();
-      console.log("query", query);
-      query.exec(function(res) {
-        let height = res[0].height;
-        console.log("res:", res);
       });
     },
     // 减少购买数量
@@ -329,6 +321,7 @@ export default {
                   paySign: res.data.data.paySign,
                   success: function(res1) {
                     console.log("支付成功" + JSON.stringify(res));
+                    that.getGoodsInfo();
                     uni.navigateTo({
                       url:
                         "../myCardBug/cards?order_id=" + res.data.data.order_id
@@ -336,6 +329,10 @@ export default {
                   },
                   fail: function(err) {
                     console.log("支付失败" + JSON.stringify(err));
+                    uni.showToast({
+                      title: "确认不要优惠券了吗？",
+                      icon: "none"
+                    });
                   }
                 });
               }
@@ -540,18 +537,13 @@ export default {
     color: #f8f8f8;
   }
 }
-.hodeTips {
-  position: absolute !important;
-  top: -1000px !important;
-  transition: all 0.5s;
-}
 .tips {
-  position: relative;
-  top: 0;
+  height: auto;
   font-size: 26rpx;
   padding: 50rpx 0 20rpx;
   overflow: hidden;
   transition: all 0.5s;
+  box-sizing: border-box;
   .title {
     display: flex;
     align-items: center;
@@ -577,6 +569,16 @@ export default {
     .texta {
       margin-top: 8rpx;
     }
+  }
+}
+.hideTips {
+  height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  transition: all 0.5s;
+  box-sizing: border-box;
+  image {
+    height: 0;
   }
 }
 .goods_card {
