@@ -37,9 +37,7 @@
         </view>
       </view>
       <view @click="Share" class="share">分享海报 </view>
-      <view class="logout">
-        <button @click="loginOutEvent">退出登录</button>
-      </view>
+
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
@@ -82,14 +80,6 @@ export default {
     };
   },
   onLoad() {
-    // let isFir = uni.getStorageSync("isFirst");
-    // if (isFir) {
-    //   console.log("不是第一次来的顾客");
-    //   this.isLoginIn=true
-    // } else {
-    //   console.log("是第一次来的顾客");
-    //   this.isLoginIn=false
-    // }
     this.getUserInfo();
     // 获取access_token
     // uni.request({
@@ -362,20 +352,6 @@ export default {
   background: #ffffff;
   border-radius: 16rpx;
   color: #ffffff;
-}
-.logout {
-  display: inline-block;
-  margin: 50rpx auto 0;
-  display: flex;
-  justify-content: center;
-  button {
-    border: 2rpx solid #00b360;
-    border-radius: 40rpx;
-    font-size: 30rpx;
-    color: #00b35f;
-    height: 80rpx;
-    width: 530rpx;
-  }
 }
 .sharePopup {
   margin: 0 50rpx;

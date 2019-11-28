@@ -196,10 +196,14 @@ export default {
     }
   },
   onLoad() {
+    let obj = wx.getLaunchOptionsSync()
+    console.log("obj:",obj);
     let isFir = uni.getStorageSync("isFirst");
     if (isFir) {
       console.log("不是第一次来的顾客");
       this.userAgree = true;
+      this.loginWithoutInfo();
+      this.is_getuserInfo = true;  //不是新用户就不用登录
     } else {
       console.log("是第一次来的顾客");
       this.userAgree = false;
@@ -230,6 +234,23 @@ export default {
     uni.stopPullDownRefresh();
   },
   methods: {
+    // 不用基本信息的登录
+    loginWithoutInfo() {
+      uni.login({
+        success: LoginRes => {
+          this.Ajax(
+            "post",
+            "member/Login/getLogin",
+            { brand_id: 1, channel: "wechat", code: LoginRes.code },
+            res => {
+              console.log("登录测试000", res);
+              if (res.data.code === "200") {
+              }
+            }
+          );
+        }
+      });
+    },
     // 获取商品信息
     getGoodsInfo() {
       this.Ajax("post", "member/index/index", { brand_id: 1 }, res => {
@@ -330,8 +351,8 @@ export default {
                   fail: function(err) {
                     console.log("支付失败" + JSON.stringify(err));
                     uni.showToast({
-                      title: "确认不要优惠券了吗？",
-                      icon: "none"
+                      title: "取消支付",
+                      icon:"none"
                     });
                   }
                 });
@@ -368,6 +389,7 @@ export default {
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
+
                         }
                       }
                     );

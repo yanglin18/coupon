@@ -7,17 +7,7 @@
       </view>
       <view class="tip_content">
         <view class="texta">
-          <text>适用时段：购买后24小时内有效，过期后不支持退换；</text>
-        </view>
-        <view class="texta">
-          <text
-            >适用产品：可在中国大陆区的星巴克门店内兑换任意一款中杯饮品（冰激凌系列除外）；</text
-          >
-        </view>
-        <view class="texta">
-          <text
-            >不适用门店：瑧选上海烘培工坊、上海浦东机场店、上海世贸广场店、北京坊旗舰店、深圳万象城店、南京机场店</text
-          >
+          <text>{{ instructionsForUse }}</text>
         </view>
       </view>
     </view>
@@ -52,7 +42,7 @@
       v-for="(item, index) in cards"
       :key="index"
       class="goods_card"
-      :class="{ showClass: item.show }"
+      :class="{ showClass: !item.showF }"
     >
       <view class="card_order">
         <text v-if="item.num !== 1">{{ index + 1 }}/{{ item.num }}</text>
@@ -114,26 +104,71 @@ export default {
       TipsHeight: 0,
       order_id: "",
       cards: [],
-      scrollTop: 0
+      scrollTop: 0,
+      instructionsForUse: "", //使用须知
+      listIndex: 1
     };
   },
   onLoad(val) {
     this.order_id = val.order_id;
     this.getOrderInfo();
   },
-  mounted() {
-    this.queryMultipleNodes();
-  },
-  onPageScroll() {
-    this.queryMultipleNodes();
+  onPageScroll(ev) {
+    // //ev是当前屏幕向上滚动的距离
+    // var _this = this;
+    // if (ev.scrollTop <= 0) {
+    //   ev.scrollTop = 0;
+    // } else if (ev.scrollTop > uni.getSystemInfoSync().windowHeight) {
+    //   ev.scrollTop = uni.getSystemInfoSync().windowHeight;
+    // }
+    // //判断浏览器滚动条上下滚动
+    // if (
+    //   ev.scrollTop > this.scrollTop ||
+    //   ev.scrollTop == uni.getSystemInfoSync().windowHeight
+    // ) {
+    //   console.log("下");
+    //   //向下滚动
+    // } else {
+    //   console.log("上");
+    //   //向上滚动
+    // }
+    // //给scrollTop重新赋值
+    // setTimeout(() => {
+    //   this.scrollTop = ev.scrollTop;
+    // }, 0);
+
+    const query = wx.createSelectorQuery();
+    query.select(".goods_card").boundingClientRect();
+    query.selectViewport().scrollOffset();
+    query.exec(res => {
+      let height = res[0].height - 100;
+      if (ev.scrollTop >= this.listIndex * height) {
+        this.listIndex++;
+        // console.log(this.listIndex);
+        this.cards.forEach((item, index) => {
+          if (this.listIndex - 1 === index) {
+            item.showF = 1;
+            // console.log("下",index,ev.scrollTop);
+          } else {
+            item.showF = 0;
+          }
+        });
+      } else {
+        if (ev.scrollTop <= (this.listIndex -1 ) * (height)+80) {
+          this.listIndex--;
+          this.cards.forEach((item, index) => {
+            if (this.listIndex - 1 === index) {
+              item.showF = 1;
+              // console.log("上",index,ev.scrollTop);
+            } else {
+              item.showF = 0;
+            }
+          });
+        }
+      }
+    });
   },
   methods: {
-    //声明节点查询的方法
-    queryMultipleNodes() {
-      [1, 2, 3].forEach((item, index) => {
-        this.cards[index].show = !this.cards[index].show;
-      });
-    },
     // 获取订单详情
     getOrderInfo() {
       uni.getStorage({
@@ -147,15 +182,23 @@ export default {
               if (res.data.code === "200") {
                 let cardsdata = res.data.data;
                 console.log("carddata:", cardsdata);
-                let item = {};
                 let cardList = [];
+                this.instructionsForUse = cardsdata.instructions;
                 for (let i = 0; i < cardsdata.ticket.length; i++) {
+                  let item = {};
                   item.expire_time = cardsdata.expire_time;
                   item.goods_name = cardsdata.goods_name;
                   item.num = cardsdata.num;
                   item.status = cardsdata.status;
                   item.ticket = cardsdata.ticket[i];
-                  item.show = false;
+                  console.log(i);
+                  if (i === 0) {
+                    console.log("xxxxxxxx");
+                    item.showF = 1;
+                  } else {
+                    item.showF = 0;
+                  }
+                  console.log(item);
                   cardList.push(item);
                 }
                 this.cards = cardList;
@@ -199,7 +242,7 @@ export default {
 .content {
   position: relative;
   padding: 0 40rpx 160rpx;
-  // height: 100vh;
+  min-height: 100vh;
   background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/69254200_1574076274.png")
     no-repeat center;
   background-size: cover;
@@ -222,7 +265,7 @@ swiper.uni-swiper-slide-frame {
   height: 786rpx !important;
 }
 .tips {
-  height: 256rpx !important;
+  // height: 256rpx !important;
   display: flex;
   padding-top: 19rpx;
   flex-direction: column;
