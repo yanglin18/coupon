@@ -113,65 +113,51 @@ export default {
     this.order_id = val.order_id;
     this.getOrderInfo();
   },
-  onPageScroll(ev) {
-    // //ev是当前屏幕向上滚动的距离
-    // var _this = this;
-    // if (ev.scrollTop <= 0) {
-    //   ev.scrollTop = 0;
-    // } else if (ev.scrollTop > uni.getSystemInfoSync().windowHeight) {
-    //   ev.scrollTop = uni.getSystemInfoSync().windowHeight;
-    // }
-    // //判断浏览器滚动条上下滚动
-    // if (
-    //   ev.scrollTop > this.scrollTop ||
-    //   ev.scrollTop == uni.getSystemInfoSync().windowHeight
-    // ) {
-    //   console.log("下");
-    //   //向下滚动
-    // } else {
-    //   console.log("上");
-    //   //向上滚动
-    // }
-    // //给scrollTop重新赋值
-    // setTimeout(() => {
-    //   this.scrollTop = ev.scrollTop;
-    // }, 0);
-
-    const query = wx.createSelectorQuery();
-    query.select(".goods_card").boundingClientRect();
-    query.selectViewport().scrollOffset();
-    query.exec(res => {
-      let height = res[0].height;
-      if (ev.scrollTop >= this.listIndex * height - 80) {
-        if (this.listIndex >= this.cards.length) {
-          this.listIndex = this.cards.length;
-          return;
-        }
-        this.listIndex++;
-        this.cards.forEach((item, index) => {
-          if (this.listIndex - 1 === index) {
-            item.showF = 1;
-          } else {
-            item.showF = 0;
-          }
-        });
-      } else {
-        // console.log(this.listIndex);
-        // console.log(ev.scrollTop);
-        // if (ev.scrollTop <= (this.listIndex) * height - 300) {
-        //   this.listIndex--;
-        //   this.cards.forEach((item, index) => {
-        //     if (this.listIndex - 1 === index) {
-        //       item.showF = 1;
-        //       console.log("上",index,ev.scrollTop);
-        //     } else {
-        //       item.showF = 0;
-        //     }
-        //   });
-        // }
-      }
+onPageScroll(ev) {
+  //ev是当前屏幕向上滚动的距离
+  if (ev.scrollTop <= 0) {
+   ev.scrollTop = 0;
+  }
+  //判断浏览器滚动条上下滚动
+  if (ev.scrollTop > this.scrollTop || ev.scrollTop == uni.getSystemInfoSync().windowHeight) {
+   console.log('下');
+   let height = 430;
+   if (ev.scrollTop >= this.listIndex * height - 100) {
+    this.listIndex++;
+    if (this.listIndex >= this.cards.length) {
+     this.listIndex = this.cards.length;
+    }
+    this.cards.forEach((item, index) => {
+     if (this.listIndex - 1 === index) {
+      item.showF = 1;
+     } else {
+      item.showF = 0;
+     }
     });
-  },
+   }
+  } else {
+   console.log('上');
+   let height = 430;
+   console.log(ev.scrollTop, this.listIndex * height);
+   if (this.listIndex * height - ev.scrollTop >= 2 * height - 100) {
+    this.listIndex--;
+    if (this.listIndex <= 1) {
+     this.listIndex = 1;
+    }
+    this.cards.forEach((item, index) => {
+     if (this.listIndex - 1 === index) {
+      item.showF = 1;
+     } else {
+      item.showF = 0;
+     }
+    });
+   }
+  }
+  //给scrollTop重新赋值
+  setTimeout(() => {
+   this.scrollTop = ev.scrollTop;
+  }, 0);
+ },
   methods: {
     // 获取订单详情
     getOrderInfo() {
@@ -314,6 +300,7 @@ swiper.uni-swiper-slide-frame {
     opacity: 0.6;
   }
   .QRcode {
+    margin: 0 auto;
     .not_use {
       height: 420rpx;
       width: 420rpx;

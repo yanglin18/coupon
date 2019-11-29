@@ -102,7 +102,7 @@
         "pagePath": "pages/userCenter/userCenter",
         "iconPath": "static/tabs/userCenter_u.png",
         "selectedIconPath": "static/tabs/userCenter.png",
-        "text": "我的卡券"
+        "text": "星中心"
       }
     ]
   }

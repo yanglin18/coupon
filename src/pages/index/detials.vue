@@ -89,14 +89,17 @@ export default {
       sum_number: 999,
       goodsId: "",
       goodsInfo: {},
-      instructionsForUse: ""
+      instructionsForUse: "",
+      is_getuserInfo:false,
+      is_getNumber:false
     };
   },
   onLoad(val) {
-    console.log("val",val)
+    console.log("val", val);
     this.goodsId = val.id;
-    this.is_getuserInfo = val.is_getuserInfo;
-    this.is_getNumber = val.is_getNumber;
+    this.is_getuserInfo = val.is_getuserInfo === 'true'?true:false;
+    this.is_getNumber = val.is_getNumber === 'true'? true:false;
+    console.log("is_getNumber:",this.is_getNumber)
     this.getGoodInfo();
     this.getInstructionsForUse();
   },
@@ -191,6 +194,102 @@ export default {
           );
         }
       });
+    },
+    To_buy1(e) {},
+    // 获取手机号
+    GetPhoneNumber(res0) {
+      if (res0.detail) {
+        console.log("点击了同意授权", res0.detail);
+        this.is_getNumber = true;
+        // 判断登录态
+        uni.checkSession({
+          // 已登录状态
+          success: loginres => {
+            console.log("已登录：", loginres);
+            // 获取手机号
+            uni.getStorage({
+              key: "storage_key",
+              success: storageRes => {
+                console.log("storageRes:", storageRes);
+                uni.login({
+                  success: loginRes => {
+                    this.Ajax(
+                      "post",
+                      "member/user/set_mobile",
+                      {
+                        session3rd: storageRes.data.session3rd,
+                        code: loginRes.code,
+                        encryptedData: res0.detail.encryptedData,
+                        iv: res0.detail.iv
+                      },
+                      resMobile => {
+                        if (resMobile.data.code === "200") {
+                        }
+                      }
+                    );
+                  }
+                });
+              },
+              fail: errorStorage => {
+                console.log("获取session3rd的storage失败", errorStorage);
+              }
+            });
+          },
+          fail: error => {
+            this.loginIn();
+          }
+        });
+      } else {
+        console.log("点击了拒绝授权");
+      }
+    },
+    // 登录
+    loginIn() {
+      uni.login({
+        success: reslogin => {
+          console.log("登录返回：", reslogin);
+          if (reslogin.code) {
+            this.Ajax(
+              "post",
+              "member/Login/getLogin",
+              {
+                brand_id: 1,
+                channel: "wechat",
+                code: reslogin.code,
+                detail: this.user_info,
+                pid: 0
+              },
+              res => {
+                console.log("调登录接口返回：", res);
+                if (res.data.code === "200") {
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data,
+                    success: function(e) {
+                      console.log("success", e);
+                    }
+                  });
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+    },
+    // 获取基本信息
+    GetUserInfo(res) {
+      console.log(res);
+      if (res.detail.userInfo) {
+        console.log("点击了同意基本信息授权");
+        // uni.setStorageSync("isFirst", res.detail.userInfo);
+        this.user_info = res.detail;
+        this.is_getuserInfo = true;
+        this.loginIn();
+      } else {
+        console.log("点击了拒绝授权");
+      }
     },
     // 减少购买数量
     reduce_number() {
