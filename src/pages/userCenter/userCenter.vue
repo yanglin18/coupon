@@ -1,8 +1,5 @@
 <template>
   <view class="content">
-    <!-- <view v-if="!isLoginIn" class="notLoginIn">
-      <button>去登录</button>
-    </view> -->
     <view>
       <view class="top_card">
         <view class="title">
@@ -37,7 +34,6 @@
         </view>
       </view>
       <view @click="Share" class="share">分享海报 </view>
-
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
@@ -76,7 +72,7 @@ export default {
       access_token: "",
       user_info: {},
       src2: "",
-      isLoginIn:false //是否登录
+      isLoginIn: false //是否登录
     };
   },
   onLoad() {
@@ -149,17 +145,24 @@ export default {
         scope: "scope.writePhotosAlbum",
         success(res) {
           console.log("授权成功", res);
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "true"
+          });
         },
         fail(error) {
-          console.log("error:", error);
+          // console.log("error:", error);
           uni.showToast({
             title: "请授权后再保存",
             duration: 1000,
-            icon:"none"
+            icon: "none"
+          });
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "false"
           });
         },
-        complete() {
-        }
+        complete() {}
       });
     },
     // 关闭分享
@@ -197,23 +200,49 @@ export default {
     // 长按保存图片
     saveImg() {
       console.log("长按图片");
-      // 处理图片
-      uni.getImageInfo({
-        src: "../../static/images/share2.png",
-        success: function(image) {
-          let image_path = image.path;
-          uni.saveImageToPhotosAlbum({
-            filePath: image_path,
-            success: function(res) {
-              uni.showToast({
-                title: "保存成功",
-                duration: 1000
-              });
-            },
-            fail: function(error) {
-              console.log(error);
-            }
-          });
+      uni.getStorage({
+        key: "PhotoAlbum",
+        success: res0 => {
+          if (res0.data === true) {
+            // 处理图片
+            uni.getImageInfo({
+              src: "../../static/images/share2.png",
+              success: function(image) {
+                let image_path = image.path;
+                uni.saveImageToPhotosAlbum({
+                  filePath: image_path,
+                  success: function(res) {
+                    uni.showToast({
+                      title: "保存成功",
+                      duration: 1000
+                    });
+                  },
+                  fail: function(error) {
+                    console.log(error);
+                  }
+                });
+              }
+            });
+          } else {
+            console.log("进入false");
+            // 重新调起设置授权相册
+            uni.showModal({
+              title: "提示",
+              content: "必须要授权后才能保存哦",
+              confirmText: "去授权",
+              success: function(res) {
+                if (res.confirm) {
+                  uni.openSetting({
+                    success(dataAu) {
+                      console.log("设置信息：", dataAu);//
+                    }
+                  });
+                } else if (res.cancel) {
+                  console.log("用户点击取消");
+                }
+              }
+            });
+          }
         }
       });
     }

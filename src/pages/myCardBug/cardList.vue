@@ -63,8 +63,8 @@
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
+      <!-- 后台传递 -->
       <view @longpress="saveImg" class="img">
-        <!-- <image src="data:image/png;base64,{{src2}}"></image> -->
         <image :src="src2" />
       </view>
       <view class="weixinIcon">
@@ -162,7 +162,7 @@ export default {
     close_share() {
       this.share = false;
     },
-        // 长按保存图片
+    // 长按保存图片
     saveImg() {
       console.log("长按图片");
       // 处理图片
@@ -252,6 +252,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .content {
+  min-height: 100vh;
   background: #f3f4f3;
   padding-bottom: 40rpx;
 }

@@ -1,6 +1,5 @@
 {
   "pages": [
-
     { "path": "pages/loading/loading",
       "style": {
         "navigationBarTitleText": "摩卡星"

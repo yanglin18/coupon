@@ -158,17 +158,17 @@ export default {
       } else {
         // console.log(this.listIndex);
         // console.log(ev.scrollTop);
-        if (ev.scrollTop <= (this.listIndex) * height - 300) {
-          this.listIndex--;
-          this.cards.forEach((item, index) => {
-            if (this.listIndex - 1 === index) {
-              item.showF = 1;
-              console.log("上",index,ev.scrollTop);
-            } else {
-              item.showF = 0;
-            }
-          });
-        }
+        // if (ev.scrollTop <= (this.listIndex) * height - 300) {
+        //   this.listIndex--;
+        //   this.cards.forEach((item, index) => {
+        //     if (this.listIndex - 1 === index) {
+        //       item.showF = 1;
+        //       console.log("上",index,ev.scrollTop);
+        //     } else {
+        //       item.showF = 0;
+        //     }
+        //   });
+        // }
       }
     });
   },
@@ -211,12 +211,6 @@ export default {
           );
         }
       });
-    },
-    EventHandle(e) {
-      // console.log(e);
-      // let swp = document.getElementById(e.detail.current);
-      // swp.className = "card_order active";
-      // console.log("swp:", swp);
     },
     // 点击确认扫码
     HaveScan() {

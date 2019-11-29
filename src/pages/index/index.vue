@@ -13,25 +13,29 @@
     </view>
     <view
       class="goods_card"
-      @click="NavToDetial"
+      v-for="(item, index) in goodsInfo"
+      :key="index"
+      @click="NavToDetial(item)"
       v-bind:style="{
-        background: 'url(' + goodsInfo.img + ')no-repeat center',
-        height: goodsInfo.height + 'rpx',
-        width: goodsInfo.width + 'rpx',
-        color: goodsInfo.color
+        background: 'url(' + item.img + ')no-repeat center',
+        height: item.height + 'rpx',
+        width: item.width + 'rpx',
+        color: item.color
       }"
     >
       <view class="card_top">
         <view class="price">
-          <text class="price_now">&yen;{{ producePrice }}</text>
-          <text class="price_original">&yen;{{ produceOriginalPrice }}</text>
+          <text class="price_now">&yen;{{ producePrice(item) }}</text>
+          <text class="price_original"
+            >&yen;{{ produceOriginalPrice(item) }}</text
+          >
         </view>
         <view class="name">
-          <text>{{ goodsInfo.goods_name }}</text>
+          <text>{{ item.goods_name }}</text>
         </view>
       </view>
       <view
-        v-if="goodsInfo.inventory === 0"
+        v-if="item.inventory === 0"
         class="card_sell_out"
         @click.stop="Toast('该优惠券暂时没货哦')"
       >
@@ -40,46 +44,43 @@
       <view v-else class="card_bottom">
         <view class="left">
           <view class="number">
-            <view @click.stop="reduce_number" class="reduce">
+            <view @click.stop="reduce_number(item)" class="reduce">
               <image
-                v-show="buy_number === 1"
+                v-show="item.buy_number === 1"
                 src="../../static/images/no_reduce.png"
                 @click="Toast('只有一张，不能再减少啦')"
               />
               <image
-                v-show="buy_number !== 1"
+                v-show="item.buy_number !== 1"
                 src="../../static/images/reduce.png"
               />
             </view>
-            <view class="num">{{ buy_number }}</view>
-            <view @click.stop="add_number" class="reduce">
+            <view class="num">{{ item.buy_number }}</view>
+            <view @click.stop="add_number(item)" class="reduce">
               <image
-                v-show="buy_number === 10"
+                v-show="item.buy_number === 10"
                 src="../../static/images/no_add.png"
                 @click="Toast('该优惠券最多只能买十张哦')"
               />
               <image
-                v-show="buy_number !== 10"
+                v-show="item.buy_number !== 10"
                 src="../../static/images/add.png"
               />
             </view>
           </view>
           <view class="purchase_limit">
             <text>每日限购十张</text>
-            <text>库存：{{ goodsInfo.inventory }}</text>
+            <text>库存：{{ item.inventory }}</text>
           </view>
         </view>
         <view class="right">
           <!-- 已授权的话第一个button生效，直接去购买 -->
           <!-- 未授权的话第二个button生效，先逐渐授权 -->
-            <button
-            v-if="is_getNumber"
-            @click.stop="To_buy"
-          >
+          <button v-if="is_getNumber" @click.stop="To_buy(item)">
             去购买
           </button>
           <button
-          v-else
+            v-else
             :open-type="is_getuserInfo ? 'getPhoneNumber' : 'getUserInfo'"
             @getphonenumber="GetPhoneNumber"
             @getuserinfo="GetUserInfo"
@@ -169,50 +170,66 @@ export default {
   data() {
     return {
       userOptions: false, //用户是否勾选
-      userAgree: false, //用户是否点击“我已了解”
-      goodsInfo: {}, //商品信息
+      userAgree: true, //用户是否点击“我已了解”
+      goodsInfo: [], //商品信息
       instructions_for_use: "", //使用须知
       banners: {}, //banner
-      buy_number: 1,
       sum_number: 66,
       animationData: {}, //动画
       user_info: {}, //用户信息,
       is_getuserInfo: false,
-      is_getNumber:false,
+      is_getNumber: false,
       // 展示温馨提示
       showTips: true
     };
   },
   computed: {
-    // 优惠价格
-    producePrice() {
-      return this.goodsInfo.price * this.buy_number + ".00" || 0;
-    },
-    // 原价格
-    produceOriginalPrice() {
-      return this.goodsInfo.original_price * this.buy_number + ".00" || 0;
-    },
     computedClassStr() {
       return this.showTips ? "tips" : "hideTips";
     }
   },
   onLoad() {
-    let obj = wx.getLaunchOptionsSync()
-    console.log("obj:",obj);
-    let isFir = uni.getStorageSync("isFirst");
-    if (isFir) {
-      console.log("不是第一次来的顾客");
-      this.userAgree = true;
-      this.loginWithoutInfo();//不是新用户就直接登录，不需要授权
-      this.is_getuserInfo = true;  
-    } else {
-      console.log("是第一次来的顾客");
-      this.userAgree = false;
-    }
-    this.getGoodsInfo();
-    this.getInstructionsForUse();
-    this.getBanner();
-    this.showTips = false;
+    // 判断进来的用户是谁分享进来的
+    // let obj = wx.getLaunchOptionsSync()
+    // console.log("obj:",obj);
+    uni.login({
+      success: LoginRes => {
+        console.log("LoginRes", LoginRes);
+        this.Ajax(
+          "post",
+          "member/Login/getLogin",
+          { brand_id: 1, channel: "wechat", code: LoginRes.code },
+          res => {
+            console.log("登录测试000", res);
+            if (res.data.code === "200") {
+              uni.setStorageSync("isFirst", res.data.data);
+              console.log("不是第一次来的顾客");
+              this.userAgree = true;
+              this.is_getuserInfo = true;
+              uni.setStorage({
+                key: "storage_key",
+                data: res.data.data,
+                success: function(e) {
+                  console.log("success", e);
+                }
+              });
+            } else {
+              console.log("是第一次来的顾客");
+              this.userAgree = false;
+            }
+            this.getGoodsInfo();
+            this.getInstructionsForUse();
+            this.getBanner();
+            this.showTips = false;
+          }
+        );
+      },
+      fail: error => {
+        console.log("error", error);
+      }
+    });
+
+    //
   },
   // 用户分享
   onShareAppMessage({ res }) {
@@ -235,6 +252,14 @@ export default {
     uni.stopPullDownRefresh();
   },
   methods: {
+    // 优惠价格
+    producePrice(item) {
+      return item.price * item.buy_number + ".00" || 0;
+    },
+    // 原价格
+    produceOriginalPrice(item) {
+      return item.original_price * item.buy_number + ".00" || 0;
+    },
     // 不用基本信息的登录
     loginWithoutInfo() {
       uni.login({
@@ -246,6 +271,10 @@ export default {
             res => {
               console.log("登录测试000", res);
               if (res.data.code === "200") {
+                uni.setStorageSync("isFirst", res.data.data);
+                // if (typeof res === "function") {
+                //   res();
+                // }
               }
             }
           );
@@ -256,7 +285,10 @@ export default {
     getGoodsInfo() {
       this.Ajax("post", "member/index/index", { brand_id: 1 }, res => {
         if (res.data.code === "200") {
-          this.goodsInfo = res.data.data.list[0];
+          this.goodsInfo = res.data.data.list.map(item => {
+            item.buy_number = 1;
+            return item;
+          });
         }
       });
     },
@@ -284,18 +316,18 @@ export default {
       });
     },
     // 减少购买数量
-    reduce_number() {
-      if (this.buy_number <= 1) {
+    reduce_number(item) {
+      if (item.buy_number <= 1) {
         return;
       }
-      this.buy_number--;
+      item.buy_number--;
     },
     // 增加购买数量
-    add_number() {
-      if (this.buy_number >= 10) {
+    add_number(item) {
+      if (item.buy_number >= 10) {
         return;
       }
-      this.buy_number++;
+      item.buy_number++;
     },
     // 提示
     Toast(e) {
@@ -307,13 +339,13 @@ export default {
     },
     // 数量增减联动价格
     // 跳转到详情
-    NavToDetial() {
+    NavToDetial(item) {
       uni.navigateTo({
-        url: "./detials?id=" + this.goodsInfo.goods_id
+        url: "./detials?id=" + item.goods_id
       });
     },
     // 直接去购买
-    To_buy() {
+    To_buy(item) {
       let that = this;
       // 先从storage拿到session3rd
       uni.getStorage({
@@ -326,8 +358,8 @@ export default {
             "member/order/create_order",
             {
               session3rd: res0.data.session3rd,
-              goods_id: that.goodsInfo.goods_id,
-              num: that.buy_number
+              goods_id: item.goods_id,
+              num: item.buy_number
             },
             res => {
               if (res.data.code === "200") {
@@ -353,7 +385,7 @@ export default {
                     console.log("支付失败" + JSON.stringify(err));
                     uni.showToast({
                       title: "取消支付",
-                      icon:"none"
+                      icon: "none"
                     });
                   }
                 });
@@ -363,9 +395,7 @@ export default {
         }
       });
     },
-    To_buy1(e){
-
-    },
+    To_buy1(e) {},
     // 获取手机号
     GetPhoneNumber(res0) {
       if (res0.detail) {
@@ -394,7 +424,6 @@ export default {
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
-
                         }
                       }
                     );
@@ -453,7 +482,7 @@ export default {
       console.log(res);
       if (res.detail.userInfo) {
         console.log("点击了同意基本信息授权");
-        uni.setStorageSync("isFirst", res.detail.userInfo);
+        // uni.setStorageSync("isFirst", res.detail.userInfo);
         this.user_info = res.detail;
         this.is_getuserInfo = true;
         this.loginIn();
@@ -609,9 +638,7 @@ export default {
   }
 }
 .goods_card {
-  // background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/72823600_1574074898.png")
-  //   no-repeat center;
-  background-size: cover;
+  margin-bottom: 40rpx;
   border-radius: 15rpx;
   display: flex;
   flex-direction: column;

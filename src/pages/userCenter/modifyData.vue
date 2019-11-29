@@ -2,19 +2,19 @@
   <view class="content">
     <view class="title" id="title">修改资料</view>
     <view class="top">
-      <view class="row1" @click="Toast">
+      <view class="row1" @click="Toast(1)">
         <text>头像</text>
         <image :src="user_info.head_img" />
       </view>
-      <view class="row" @click="Toast">
+      <view class="row" @click="Toast(2)">
         <text>昵称</text>
         <text class="right">{{ user_info.user_name }}</text>
       </view>
-      <view class="row" @click="Toast">
+      <view class="row" @click="Toast(3)">
         <text>性别</text>
-        <text class="right">{{ user_info.gender }}</text>
+        <text class="right">{{ user_info.gender > 1 ? "女" : "男" }}</text>
       </view>
-      <view class="row" @click="Toast">
+      <view class="row" @click="Toast(4)">
         <text>绑定手机</text>
         <text class="right">{{ user_info.mobile }}</text>
       </view>
@@ -33,7 +33,7 @@
         >
           <view class="uni-input">{{ user_info.birthday }} </view>
         </picker>
-        <text  v-else class="right">{{
+        <text v-else class="right" @click="Toast(5)">{{
           user_info.birthday
         }}</text>
       </view>
@@ -58,11 +58,6 @@ export default {
   },
   methods: {
     bindDateChange(e) {
-      // uni.showToast({
-      //   title: "生日只能修改一次，请确认无误",
-      //   duration: 1000,
-            // icon:"none"
-      // });
       console.log("e:", e);
       this.user_info.birthday = e.detail.value;
       uni.getStorage({
@@ -113,11 +108,29 @@ export default {
         }
       });
     },
-    Toast() {
+    Toast(type) {
+      let title;
+      switch (type) {
+        case 1:
+          title = "头像不可修改";
+          break;
+        case 2:
+          title = "昵称不可修改";
+          break;
+        case 3:
+          title = "性别不可修改";
+          break;
+        case 4:
+          title = "绑定手机不可修改";
+          break;
+        case 5:
+          title = "生日只可修改1次";
+          break;
+      }
       uni.showToast({
-        title: "头像昵称性别不可修改",
+        title: title,
         duration: 1000,
-        icon:'none'
+        icon: "none"
       });
     }
   }
