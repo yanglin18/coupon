@@ -30,9 +30,6 @@
           <text>{{ goodsInfo.goods_name }}</text>
         </view>
       </view>
-      <!-- <view class="QRcode">
-        <image  />v-if=
-      </view> -->
       <view
         v-if="goodsInfo.inventory === 0"
         class="card_sell_out"
@@ -66,11 +63,6 @@
                 src="../../static/images/add.png"
               />
             </view>
-            <!-- <uni-number-box
-              :value="buy_number"
-              :min="1"
-              :max="10"
-            ></uni-number-box> -->
           </view>
           <view class="purchase_limit">
             <text>每日限购十张</text>
@@ -78,12 +70,20 @@
           </view>
         </view>
         <view class="right">
-          <!-- <button size="mini">去支付</button> -->
-          <button
+          <!-- 已授权的话第一个button生效，直接去购买 -->
+          <!-- 未授权的话第二个button生效，先逐渐授权 -->
+            <button
+            v-if="is_getNumber"
             @click.stop="To_buy"
+          >
+            去购买
+          </button>
+          <button
+          v-else
             :open-type="is_getuserInfo ? 'getPhoneNumber' : 'getUserInfo'"
             @getphonenumber="GetPhoneNumber"
             @getuserinfo="GetUserInfo"
+            @click.stop="To_buy1"
           >
             去购买
           </button>
@@ -178,6 +178,7 @@ export default {
       animationData: {}, //动画
       user_info: {}, //用户信息,
       is_getuserInfo: false,
+      is_getNumber:false,
       // 展示温馨提示
       showTips: true
     };
@@ -202,8 +203,8 @@ export default {
     if (isFir) {
       console.log("不是第一次来的顾客");
       this.userAgree = true;
-      this.loginWithoutInfo();
-      this.is_getuserInfo = true;  //不是新用户就不用登录
+      this.loginWithoutInfo();//不是新用户就直接登录，不需要授权
+      this.is_getuserInfo = true;  
     } else {
       console.log("是第一次来的顾客");
       this.userAgree = false;
@@ -362,10 +363,14 @@ export default {
         }
       });
     },
+    To_buy1(e){
+
+    },
     // 获取手机号
     GetPhoneNumber(res0) {
       if (res0.detail) {
         console.log("点击了同意授权", res0.detail);
+        this.is_getNumber = true;
         // 判断登录态
         uni.checkSession({
           // 已登录状态

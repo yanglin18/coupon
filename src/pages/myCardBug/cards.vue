@@ -141,25 +141,29 @@ export default {
     query.select(".goods_card").boundingClientRect();
     query.selectViewport().scrollOffset();
     query.exec(res => {
-      let height = res[0].height - 100;
-      if (ev.scrollTop >= this.listIndex * height) {
+      let height = res[0].height;
+      if (ev.scrollTop >= this.listIndex * height - 80) {
+        if (this.listIndex >= this.cards.length) {
+          this.listIndex = this.cards.length;
+          return;
+        }
         this.listIndex++;
-        // console.log(this.listIndex);
         this.cards.forEach((item, index) => {
           if (this.listIndex - 1 === index) {
             item.showF = 1;
-            // console.log("下",index,ev.scrollTop);
           } else {
             item.showF = 0;
           }
         });
       } else {
-        if (ev.scrollTop <= (this.listIndex -1 ) * (height)+80) {
+        // console.log(this.listIndex);
+        // console.log(ev.scrollTop);
+        if (ev.scrollTop <= (this.listIndex) * height - 300) {
           this.listIndex--;
           this.cards.forEach((item, index) => {
             if (this.listIndex - 1 === index) {
               item.showF = 1;
-              // console.log("上",index,ev.scrollTop);
+              console.log("上",index,ev.scrollTop);
             } else {
               item.showF = 0;
             }

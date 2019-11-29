@@ -1,13 +1,7 @@
 {
   "pages": [
-    {
-      "path": "pages/loading/loading",
-      "style": {
-        "navigationBarTitleText": "摩卡星"
-      }
-    },
-    {
-      "path": "pages/loading/no_network",
+
+    { "path": "pages/loading/loading",
       "style": {
         "navigationBarTitleText": "摩卡星"
       }
@@ -17,6 +11,12 @@
       "style": {
         "navigationBarTitleText": "摩卡星",
         "enablePullDownRefresh": true
+      }
+    },   
+     {
+      "path": "pages/loading/no_network",
+      "style": {
+        "navigationBarTitleText": "摩卡星"
       }
     },
     {

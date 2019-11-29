@@ -81,36 +81,6 @@ export default {
   },
   onLoad() {
     this.getUserInfo();
-    // 获取access_token
-    // uni.request({
-    //   url:
-    //     "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx57c616cdb4fe8bd7&secret=f9978d2f3071dc8ab2b500df05512b17",
-    //   success: res => {
-    //     // console.log("获取access_token", res);
-    //     this.access_token = res.data.access_token;
-    //     // console.log("access_token:", this.access_token);
-    //   }
-    // });
-    uni.request({
-      //注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
-      url:
-        "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" +
-        this.access_token,
-      data: {
-        scene: "1234",
-        page: "" //这里按照需求设置值和参数
-      },
-      method: "POST",
-      responseType: "arraybuffer", //设置响应类型
-      success: res => {
-        console.log("小程序码", res);
-        this.src2 =
-          "data:image/png;base64," + uni.arrayBufferToBase64(res.data); //对数据进行转换操作
-      },
-      fail: e => {
-        console.log("错误", e);
-      }
-    });
   },
   methods: {
     // 获取基本信息
