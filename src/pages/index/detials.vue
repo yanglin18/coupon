@@ -201,6 +201,13 @@ export default {
       if (res0.detail.iv) {
         console.log("点击了同意授权", res0.detail);
         this.is_getNumber = true;
+        uni.setStorage({
+          key: "userPhoneNumber",
+          data: this.is_getNumber,
+          success: userPhoneNumber => {
+            console.log("detail已经授权手机号");
+          }
+        });
         // 判断登录态
         uni.checkSession({
           // 已登录状态
@@ -286,6 +293,13 @@ export default {
         // uni.setStorageSync("isFirst", res.detail.userInfo);
         this.user_info = res.detail;
         this.is_getuserInfo = true;
+        uni.setStorage({
+          key: "userInfo",
+          data: this.is_getuserInfo,
+          success: userInfo => {
+            console.log("detail已经授权基本信息了");
+          }
+        });
         this.loginIn();
       } else {
         console.log("点击了拒绝授权");

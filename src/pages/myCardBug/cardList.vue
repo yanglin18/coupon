@@ -68,7 +68,7 @@
         <view class="weixinIcon">
           <view class="image_share">
             <button open-type="share">
-              <image src="../../static/assets/weixin.png" class="imgIcon"/>
+              <image src="../../static/assets/weixin.png" class="imgIcon" />
             </button>
             <view class="text_weixin">
               微信好友
@@ -97,7 +97,9 @@ export default {
       beautifulPhoto: ""
     };
   },
+  onLoad() {},
   onShow() {
+    this.getOrderList();
     let app = getApp();
     this.share = app.globalData.share;
     console.log("是支付完成进入的卡券页面", this.share);
@@ -145,9 +147,7 @@ export default {
       });
     }
   },
-  onLoad() {
-    this.getOrderList();
-  },
+
   onPageScroll(top) {
     this.scrollFun(top);
   },
@@ -205,6 +205,8 @@ export default {
     // 关闭分享
     close_share() {
       this.share = false;
+      let app = getApp();
+      app.globalData.share = false;
     },
     // 长按保存图片
     saveImg(src) {

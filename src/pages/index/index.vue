@@ -1,7 +1,5 @@
 <template>
   <view class="content">
-    <button @click="cleanEvent">清理</button>
-
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -20,6 +18,7 @@
       @click="NavToDetial(item)"
       v-bind:style="{
         background: 'url(' + item.img + ')no-repeat center',
+        backgroundSize:'cover',
         height: item.height + 'rpx',
         width: item.width + 'rpx',
         color: item.color
@@ -100,6 +99,7 @@
       :key="index"
       v-bind:style="{
         background: 'url(' + item.img + ')no-repeat center',
+        backgroundSize:'cover',
         height: item.height + 'rpx',
         width: item.width + 'rpx',
         color: item.color
@@ -192,19 +192,32 @@ export default {
       return this.showTips ? "tips" : "hideTips";
     }
   },
+  // 如果detail里面授权登录和手机号，标识返回到主页
+  onShow() {
+    uni.getStorage({
+      key: "userPhoneNumber",
+      success: userPhoneNumber => {
+        this.is_getNumber = userPhoneNumber.data;
+      }
+    });
+    uni.getStorage({
+      key: "userInfo",
+      success: userInfo => {
+        this.is_getuserInfo = userInfo.data;
+      }
+    });
+  },
   onLoad() {
     // 判断进来的用户是谁分享进来的
     // let obj = wx.getLaunchOptionsSync()
     // console.log("obj:",obj);
     uni.login({
       success: LoginRes => {
-        console.log("LoginRes", LoginRes);
         this.Ajax(
           "post",
           "member/Login/getLogin",
           { brand_id: 1, channel: "wechat", code: LoginRes.code },
           res => {
-            console.log("登录测试000", res);
             if (res.data.data.length !== 0) {
               uni.setStorageSync("isFirst", res.data.data);
               console.log("不是第一次来的顾客");
@@ -213,9 +226,7 @@ export default {
               uni.setStorage({
                 key: "storage_key",
                 data: res.data.data,
-                success: function(e) {
-                  console.log("success", e);
-                }
+                success: function(e) {}
               });
             } else {
               console.log("是第一次来的顾客");
@@ -228,9 +239,7 @@ export default {
           }
         );
       },
-      fail: error => {
-        console.log("error", error);
-      }
+      fail: error => {}
     });
 
     //
@@ -239,7 +248,6 @@ export default {
   onShareAppMessage({ res }) {
     if (res.from === "button") {
       // 来自页面内分享按钮
-      console.log(res.target);
     }
     return {
       title: "摩卡星",
@@ -260,7 +268,6 @@ export default {
       uni.getStorage({
         key: "storage_key",
         success: res0 => {
-          console.log("storage参数：", res0);
           // 调取后台接口，得到支付参数
           this.Ajax(
             "post",
@@ -385,7 +392,7 @@ export default {
       uni.getStorage({
         key: "storage_key",
         success: res0 => {
-          console.log("storage参数：", res0);
+          console.log("TO_Buy里面的storage参数：", res0);
           // 调取后台接口，得到支付参数
           this.Ajax(
             "post",
@@ -482,6 +489,7 @@ export default {
     },
     // 登录
     loginIn() {
+      let obj = wx.getLaunchOptionsSync();
       uni.login({
         success: reslogin => {
           console.log("登录返回：", reslogin);
@@ -494,7 +502,7 @@ export default {
                 channel: "wechat",
                 code: reslogin.code,
                 detail: this.user_info,
-                pid: 0
+                pid: obj.scene
               },
               res => {
                 console.log("调登录接口返回：", res);
@@ -634,7 +642,7 @@ export default {
 .tips {
   height: auto;
   font-size: 26rpx;
-  padding: 50rpx 0 20rpx;
+  padding: 28rpx 0 20rpx;
   overflow: hidden;
   transition: all 0.5s;
   box-sizing: border-box;

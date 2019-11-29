@@ -75,7 +75,7 @@
     <!-- 弹窗 -->
     <view class="Toast" v-if="clickScna">
       <view class="title">已扫码确认</view>
-      <view class="row1">10张“星巴克中杯通兑券“已完成扫码？</view>
+      <view class="row1">{{num}}张“星巴克中杯通兑券“已完成扫码？</view>
       <view class="row2"> （在“我的摩卡券”可查看已购买的券码）</view>
       <view class="button">
         <button size="mini" class="button1" @click="cancel">未完成</button>
@@ -106,14 +106,17 @@ export default {
       cards: [],
       scrollTop: 0,
       instructionsForUse: "", //使用须知
-      listIndex: 1
+      listIndex: 1,
+      num:0
     };
   },
   onLoad(val) {
     this.order_id = val.order_id;
+  },
+  onShow(){
     this.getOrderInfo();
   },
-onPageScroll(ev) {
+  onPageScroll(ev) {
   //ev是当前屏幕向上滚动的距离
   if (ev.scrollTop <= 0) {
    ev.scrollTop = 0;
@@ -175,6 +178,7 @@ onPageScroll(ev) {
                 let cardList = [];
                 this.instructionsForUse = cardsdata.instructions;
                 for (let i = 0; i < cardsdata.ticket.length; i++) {
+                  this.num = cardsdata.num;
                   let item = {};
                   item.expire_time = cardsdata.expire_time;
                   item.goods_name = cardsdata.goods_name;
@@ -183,7 +187,6 @@ onPageScroll(ev) {
                   item.ticket = cardsdata.ticket[i];
                   console.log(i);
                   if (i === 0) {
-                    console.log("xxxxxxxx");
                     item.showF = 1;
                   } else {
                     item.showF = 0;
