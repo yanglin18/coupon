@@ -201,7 +201,7 @@ export default {
           { brand_id: 1, channel: "wechat", code: LoginRes.code },
           res => {
             console.log("登录测试000", res);
-            if (res.data.code === "200") {
+            if (res.data.data.length !== 0) {
               uni.setStorageSync("isFirst", res.data.data);
               console.log("不是第一次来的顾客");
               this.userAgree = true;
@@ -341,7 +341,7 @@ export default {
     // 跳转到详情
     NavToDetial(item) {
       uni.navigateTo({
-        url: "./detials?id=" + item.goods_id
+        url: "./detials?id=" + item.goods_id + "&is_getNumber=" + this.is_getNumber + "&is_getuserInfo=" + this.is_getuserInfo
       });
     },
     // 直接去购买
@@ -456,7 +456,8 @@ export default {
                 brand_id: 1,
                 channel: "wechat",
                 code: reslogin.code,
-                detail: this.user_info
+                detail: this.user_info,
+                pid:0
               },
               res => {
                 console.log("调登录接口返回：", res);

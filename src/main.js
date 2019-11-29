@@ -1,14 +1,12 @@
-import Vue from 'vue'
-import App from './App'
-import {
-  callbackify
-} from 'util';
+import Vue from "vue";
+import App from "./App";
+import { callbackify } from "util";
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
-App.mpType = 'app'
+App.mpType = "app";
 
-let baseURL = 'https://coupon.houselai.com/public/index.php/';
+let baseURL = "https://coupon.houselai.com/public/index.php/";
 Vue.prototype.Ajax = (method, url, data, callback) => {
   let Url = baseURL + url;
   uni.request({
@@ -18,16 +16,17 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
     header: {
       "content-type": "application/json"
     },
-    success: (res) => {
-      if(res.data.code !== "200"){
-        uni.showToast({
-          title:res.data.msg||"网络异常，请稍后重试",
-          icon:"none"
-        })
+    success: res => {
+      if (res.data.code === 200) {
+      } else {
+        // uni.showToast({
+        //   title: res.data.msg || "网络异常，请稍后重试",
+        //   icon: "none"
+        // });
       }
       callback(res);
     },
-    fail: (error) => {
+    fail: error => {
       console.log(error);
     }
   });
@@ -35,5 +34,5 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
 
 const app = new Vue({
   ...App
-})
-app.$mount()
+});
+app.$mount();

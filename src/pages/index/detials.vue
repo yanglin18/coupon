@@ -15,9 +15,7 @@
       <view class="card_top">
         <view class="price">
           <text class="price_now">&yen;{{ producePrice }}</text>
-          <text class="price_original"
-            >&yen;{{ produceOriginalPrice }}</text
-          >
+          <text class="price_original">&yen;{{ produceOriginalPrice }}</text>
         </view>
         <view class="name">
           <text>{{ goodsInfo.goods_name }}</text>
@@ -64,7 +62,18 @@
           </view>
         </view>
         <view class="right">
-          <button size="mini" @click="To_buy">去支付</button>
+          <button v-if="is_getNumber" @click.stop="To_buy">
+            去支付
+          </button>
+          <button
+            v-else
+            :open-type="is_getuserInfo ? 'getPhoneNumber' : 'getUserInfo'"
+            @getphonenumber="GetPhoneNumber"
+            @getuserinfo="GetUserInfo"
+            @click.stop="To_buy1"
+          >
+            去支付
+          </button>
         </view>
       </view>
     </view>
@@ -83,11 +92,13 @@ export default {
       instructionsForUse: ""
     };
   },
-  onLoad(id) {
-    this.goodsId = id.id;
+  onLoad(val) {
+    console.log("val",val)
+    this.goodsId = val.id;
+    this.is_getuserInfo = val.is_getuserInfo;
+    this.is_getNumber = val.is_getNumber;
     this.getGoodInfo();
     this.getInstructionsForUse();
-    console.log("id:", this.goodsId);
   },
   computed: {
     // 优惠价格
@@ -161,7 +172,7 @@ export default {
                   paySign: res.data.data.paySign,
                   success: function(res1) {
                     console.log("支付成功" + JSON.stringify(res));
-                    that.getGoodInfo()
+                    that.getGoodInfo();
                     uni.navigateTo({
                       url:
                         "../myCardBug/cards?order_id=" + res.data.data.order_id
