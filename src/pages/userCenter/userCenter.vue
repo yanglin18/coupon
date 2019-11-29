@@ -37,7 +37,14 @@
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
-      <view @longpress="saveImg" class="img">
+      <view
+        @longpress="saveImg"
+        class="img"
+        v-bind:style="{
+          background: 'url(' + beautifulPhoto + ')no-repeat center',
+          backgroundSize:'cover'
+        }"
+      >
         <!-- <image src="data:image/png;base64,{{src2}}"></image> -->
         <image :src="src2" />
       </view>
@@ -72,7 +79,8 @@ export default {
       access_token: "",
       user_info: {},
       src2: "",
-      isLoginIn: false //是否登录
+      isLoginIn: false, //是否登录
+      beautifulPhoto: "" //美图保存地址
     };
   },
   onLoad() {
@@ -140,6 +148,23 @@ export default {
     // 分享
     Share() {
       this.share = true;
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          console.log("storage参数：", res0);
+          this.Ajax(
+            "post",
+            "member/user/my_qrcode",
+            { session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                console.log("我要的生成美图", res.data.data.list[0]);
+                this.beautifulPhoto = res.data.data.list[0];
+              }
+            }
+          );
+        }
+      });
       // 获取相册权限
       uni.authorize({
         scope: "scope.writePhotosAlbum",
@@ -203,7 +228,7 @@ export default {
       uni.getStorage({
         key: "PhotoAlbum",
         success: res0 => {
-          if (res0.data === true) {
+          if (res0.data === 'true') {
             // 处理图片
             uni.getImageInfo({
               src: "../../static/images/share2.png",
@@ -234,7 +259,7 @@ export default {
                 if (res.confirm) {
                   uni.openSetting({
                     success(dataAu) {
-                      console.log("设置信息：", dataAu);//
+                      console.log("设置信息：", dataAu); //
                     }
                   });
                 } else if (res.cancel) {
@@ -363,8 +388,6 @@ export default {
   z-index: 100;
   border-radius: 24rpx;
   .img {
-    background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/17860300_1574677608.png")
-      no-repeat center;
     background-size: cover;
     height: 820rpx;
     width: 650rpx;
