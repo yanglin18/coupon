@@ -91,6 +91,7 @@
         </view>
       </view>
     </view>
+    <!-- banner -->
     <view
       class="banner"
       v-for="(item, index) in banners"
@@ -111,6 +112,7 @@
         </view>
       </view>
     </view>
+    <!-- 温馨提示 -->
     <view v-if="userAgree === false" class="warmPrompt">
       <view class="Prompttitle">
         <text>温馨提示</text>
@@ -340,8 +342,17 @@ export default {
     // 数量增减联动价格
     // 跳转到详情
     NavToDetial(item) {
+      if (item.inventory === 0) {
+        return;
+      }
       uni.navigateTo({
-        url: "./detials?id=" + item.goods_id + "&is_getNumber=" + this.is_getNumber + "&is_getuserInfo=" + this.is_getuserInfo
+        url:
+          "./detials?id=" +
+          item.goods_id +
+          "&is_getNumber=" +
+          this.is_getNumber +
+          "&is_getuserInfo=" +
+          this.is_getuserInfo
       });
     },
     // 直接去购买
@@ -398,7 +409,8 @@ export default {
     To_buy1(e) {},
     // 获取手机号
     GetPhoneNumber(res0) {
-      if (res0.detail) {
+      console.log(res0);
+      if (res0.detail.iv) {
         console.log("点击了同意授权", res0.detail);
         this.is_getNumber = true;
         // 判断登录态
@@ -424,6 +436,7 @@ export default {
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
+                          console.log(resMobile)
                         }
                       }
                     );
@@ -441,6 +454,7 @@ export default {
         });
       } else {
         console.log("点击了拒绝授权");
+        this.is_getNumber = false;
       }
     },
     // 登录
@@ -457,7 +471,7 @@ export default {
                 channel: "wechat",
                 code: reslogin.code,
                 detail: this.user_info,
-                pid:0
+                pid: 0
               },
               res => {
                 console.log("调登录接口返回：", res);

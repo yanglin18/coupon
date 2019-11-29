@@ -37,27 +37,20 @@
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
-      <view
-        @longpress="saveImg"
-        class="img"
-        v-bind:style="{
-          background: 'url(' + beautifulPhoto + ')no-repeat center',
-          backgroundSize:'cover'
-        }"
-      >
-        <!-- <image src="data:image/png;base64,{{src2}}"></image> -->
-        <image :src="src2" />
-      </view>
-      <view class="weixinIcon">
-        <view class="image_share">
-          <button open-type="share">
-            <image src="../../static/assets/weixin.png" />
-          </button>
-          <view class="text_weixin">
-            微信好友
+      <view class="imgWrap" @longpress="saveImg(beautifulPhoto)">
+        <image :src="beautifulPhoto" class="bgImage"></image>
+        <view class="weixinIcon">
+          <view class="image_share">
+            <button open-type="share">
+              <image src="../../static/assets/weixin.png" class="imgIcon" />
+            </button>
+            <view class="text_weixin">
+              微信好友
+            </view>
           </view>
         </view>
       </view>
+      <!-- 关闭按钮 -->
       <view class="close" @click="close_share">
         <image class="close_img" src="../../static/assets/close.png" />
       </view>
@@ -223,15 +216,15 @@ export default {
       });
     },
     // 长按保存图片
-    saveImg() {
+    saveImg(src) {
       console.log("长按图片");
       uni.getStorage({
         key: "PhotoAlbum",
         success: res0 => {
-          if (res0.data === 'true') {
+          if (res0.data === "true") {
             // 处理图片
             uni.getImageInfo({
-              src: "../../static/images/share2.png",
+              src: src,
               success: function(image) {
                 let image_path = image.path;
                 uni.saveImageToPhotosAlbum({
@@ -387,16 +380,30 @@ export default {
   left: 0;
   z-index: 100;
   border-radius: 24rpx;
-  .img {
-    background-size: cover;
-    height: 820rpx;
+  .imgWrap {
+    display: flex;
+    align-items: flex-end;
+    height: 76vh;
     width: 650rpx;
-  }
-  .weixinIcon {
-    background: #ffffff;
-    padding: 42rpx 0;
     border-bottom-right-radius: 24rpx;
     border-bottom-left-radius: 24rpx;
+    overflow: hidden;
+    .bgImage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 76vh;
+      z-index: -1;
+      border-bottom-right-radius: 24rpx;
+      border-bottom-left-radius: 24rpx;
+      overflow: hidden;
+    }
+  }
+  .weixinIcon {
+    width: 100%;
+    background: #ffffff;
+    padding: 42rpx 0;
     .image_share {
       display: flex;
       flex-direction: column;
@@ -409,7 +416,8 @@ export default {
           border: none;
         }
       }
-      image {
+      .imgIcon {
+        position: relative;
         height: 72rpx;
         margin: 0 auto;
         width: 87rpx;

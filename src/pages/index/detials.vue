@@ -90,16 +90,16 @@ export default {
       goodsId: "",
       goodsInfo: {},
       instructionsForUse: "",
-      is_getuserInfo:false,
-      is_getNumber:false
+      is_getuserInfo: false,
+      is_getNumber: false
     };
   },
   onLoad(val) {
     console.log("val", val);
     this.goodsId = val.id;
-    this.is_getuserInfo = val.is_getuserInfo === 'true'?true:false;
-    this.is_getNumber = val.is_getNumber === 'true'? true:false;
-    console.log("is_getNumber:",this.is_getNumber)
+    this.is_getuserInfo = val.is_getuserInfo === "true" ? true : false;
+    this.is_getNumber = val.is_getNumber === "true" ? true : false;
+    console.log("is_getNumber:", this.is_getNumber);
     this.getGoodInfo();
     this.getInstructionsForUse();
   },
@@ -198,7 +198,7 @@ export default {
     To_buy1(e) {},
     // 获取手机号
     GetPhoneNumber(res0) {
-      if (res0.detail) {
+      if (res0.detail.iv) {
         console.log("点击了同意授权", res0.detail);
         this.is_getNumber = true;
         // 判断登录态
@@ -323,7 +323,7 @@ export default {
   background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/69254200_1574076274.png")
     no-repeat center;
   background-size: cover;
-  height: 100vh;
+  min-height: 100vh;
   padding: 0 40rpx 40rpx;
 }
 .tips {
@@ -417,7 +417,10 @@ export default {
         flex-direction: row;
         align-items: center;
         justify-content: space-around;
-        .reduce {
+        .reduce,
+        .add {
+          display: flex;
+          align-items: center;
           image {
             height: 40rpx;
             width: 40rpx;
@@ -426,12 +429,6 @@ export default {
         .num {
           color: #000000;
           font-size: 30rpx;
-        }
-        .add {
-          image {
-            height: 40rpx;
-            width: 40rpx;
-          }
         }
       }
       .purchase_limit {

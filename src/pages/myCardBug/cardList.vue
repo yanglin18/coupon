@@ -63,20 +63,20 @@
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
-      <!-- 后台传递 -->
-      <view @longpress="saveImg" class="img">
-        <image :src="src2" />
-      </view>
-      <view class="weixinIcon">
-        <view class="image_share">
-          <button open-type="share">
-            <image src="../../static/assets/weixin.png" />
-          </button>
-          <view class="text_weixin">
-            微信好友
+      <view class="imgWrap" @longpress="saveImg(beautifulPhoto)">
+        <image :src="beautifulPhoto" class="bgImage"></image>
+        <view class="weixinIcon">
+          <view class="image_share">
+            <button open-type="share">
+              <image src="../../static/assets/weixin.png" class="imgIcon"/>
+            </button>
+            <view class="text_weixin">
+              微信好友
+            </view>
           </view>
         </view>
       </view>
+      <!-- 关闭按钮 -->
       <view class="close" @click="close_share">
         <image class="close_img" src="../../static/assets/close.png" />
       </view>
@@ -93,13 +93,57 @@ export default {
       scrollTop: 0,
       orderList: "",
       list: [],
-      share: false
+      share: false,
+      beautifulPhoto: ""
     };
   },
   onShow() {
     let app = getApp();
     this.share = app.globalData.share;
     console.log("是支付完成进入的卡券页面", this.share);
+    if (this.share) {
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          console.log("storage参数：", res0);
+          this.Ajax(
+            "post",
+            "member/user/my_qrcode",
+            { session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                console.log("我要的生成美图", res.data.data.list[0]);
+                this.beautifulPhoto = res.data.data.list[0];
+              }
+            }
+          );
+        }
+      });
+      // 获取相册权限
+      uni.authorize({
+        scope: "scope.writePhotosAlbum",
+        success(res) {
+          console.log("授权成功", res);
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "true"
+          });
+        },
+        fail(error) {
+          // console.log("error:", error);
+          uni.showToast({
+            title: "请授权后再保存",
+            duration: 1000,
+            icon: "none"
+          });
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "false"
+          });
+        },
+        complete() {}
+      });
+    }
   },
   onLoad() {
     this.getOrderList();
@@ -163,25 +207,51 @@ export default {
       this.share = false;
     },
     // 长按保存图片
-    saveImg() {
+    saveImg(src) {
       console.log("长按图片");
-      // 处理图片
-      uni.getImageInfo({
-        src: "../../static/images/share2.png",
-        success: function(image) {
-          let image_path = image.path;
-          uni.saveImageToPhotosAlbum({
-            filePath: image_path,
-            success: function(res) {
-              uni.showToast({
-                title: "保存成功",
-                duration: 1000
-              });
-            },
-            fail: function(error) {
-              console.log(error);
-            }
-          });
+      uni.getStorage({
+        key: "PhotoAlbum",
+        success: res0 => {
+          if (res0.data === "true") {
+            // 处理图片
+            uni.getImageInfo({
+              src: src,
+              success: function(image) {
+                let image_path = image.path;
+                uni.saveImageToPhotosAlbum({
+                  filePath: image_path,
+                  success: function(res) {
+                    uni.showToast({
+                      title: "保存成功",
+                      duration: 1000
+                    });
+                  },
+                  fail: function(error) {
+                    console.log(error);
+                  }
+                });
+              }
+            });
+          } else {
+            console.log("进入false");
+            // 重新调起设置授权相册
+            uni.showModal({
+              title: "提示",
+              content: "必须要授权后才能保存哦",
+              confirmText: "去授权",
+              success: function(res) {
+                if (res.confirm) {
+                  uni.openSetting({
+                    success(dataAu) {
+                      console.log("设置信息：", dataAu); //
+                    }
+                  });
+                } else if (res.cancel) {
+                  console.log("用户点击取消");
+                }
+              }
+            });
+          }
         }
       });
     },
@@ -434,18 +504,30 @@ export default {
   left: 0;
   z-index: 100;
   border-radius: 24rpx;
-  .img {
-    background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/17860300_1574677608.png")
-      no-repeat center;
-    background-size: cover;
-    height: 820rpx;
+  .imgWrap {
+    display: flex;
+    align-items: flex-end;
+    height: 76vh;
     width: 650rpx;
-  }
-  .weixinIcon {
-    background: #ffffff;
-    padding: 42rpx 0;
     border-bottom-right-radius: 24rpx;
     border-bottom-left-radius: 24rpx;
+    overflow: hidden;
+    .bgImage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 76vh;
+      z-index: -1;
+      border-bottom-right-radius: 24rpx;
+      border-bottom-left-radius: 24rpx;
+      overflow: hidden;
+    }
+  }
+  .weixinIcon {
+    width: 100%;
+    background: #ffffff;
+    padding: 42rpx 0;
     .image_share {
       display: flex;
       flex-direction: column;
@@ -458,7 +540,8 @@ export default {
           border: none;
         }
       }
-      image {
+      .imgIcon {
+        position: relative;
         height: 72rpx;
         margin: 0 auto;
         width: 87rpx;
