@@ -1,5 +1,7 @@
 <template>
   <view class="content">
+    <button @click="cleanEvent">清理</button>
+
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -254,6 +256,27 @@ export default {
     uni.stopPullDownRefresh();
   },
   methods: {
+    cleanEvent() {
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          console.log("storage参数：", res0);
+          // 调取后台接口，得到支付参数
+          this.Ajax(
+            "post",
+            "member/User/del_user",
+            {
+              session3rd: res0.data.session3rd
+            },
+            res => {
+              if (res.data.code === "200") {
+                console.log("清理成功!");
+              }
+            }
+          );
+        }
+      });
+    },
     // 优惠价格
     producePrice(item) {
       return item.price * item.buy_number + ".00" || 0;
@@ -436,7 +459,7 @@ export default {
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
-                          console.log(resMobile)
+                          console.log(resMobile);
                         }
                       }
                     );
