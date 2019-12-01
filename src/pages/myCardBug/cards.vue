@@ -86,16 +86,16 @@ export default {
   onLoad(val) {
     this.order_id = val.order_id;
   },
-  onUnload() {
-    console.log("触发onhide!!!!!!!!!")
-    // 在C页面内 navigateBack，将返回A页面
-    wx.navigateBack({
-      delta: 1,
-      success:res=>{
-        clickScna=true;
-      }
-    });
-  },
+  // onUnload() {
+  //   console.log("触发onhide!!!!!!!!!")
+  //   // 在C页面内 navigateBack，将返回A页面
+  //   wx.navigateBack({
+  //     delta: 1,
+  //     success:res=>{
+  //       clickScna=true;
+  //     }
+  //   });
+  // },
   onShow() {
     this.getOrderInfo();
   },

@@ -36,11 +36,7 @@
           <text>{{ item.goods_name }}</text>
         </view>
       </view>
-      <view
-        v-if="item.inventory === 0"
-        class="card_sell_out"
-        @click.stop="Toast('该优惠券暂时没货哦')"
-      >
+      <view v-if="item.inventory === 0" class="card_sell_out">
         <text>已售罄</text>
       </view>
       <view v-else class="card_bottom">
@@ -72,14 +68,14 @@
           </view>
           <view class="purchase_limit">
             <text>每日限购十张</text>
-            <text>库存：{{ item.inventory }}</text>
+            <text class="inventory">库存：{{ item.inventory }}</text>
           </view>
         </view>
         <view class="right">
           <!-- 已授权的话第一个button生效，直接去购买 -->
           <!-- 未授权的话第二个button生效，先逐渐授权 -->
           <button v-if="is_getNumber" @click.stop="To_buy(item)">
-            去购买
+            去支付
           </button>
           <button
             v-else
@@ -88,7 +84,7 @@
             @getuserinfo="GetUserInfo"
             @click.stop="To_buy1"
           >
-            去购买
+            去支付
           </button>
         </view>
       </view>
@@ -143,7 +139,8 @@
           <text
             class="agreement"
             @click="NavToagreement('../userCenter/agreement/useAgreement')"
-            >《摩卡星用户使用协议》</text>
+            >《摩卡星用户使用协议》</text
+          >
           和
           <text
             class="agreement"
@@ -385,6 +382,11 @@ export default {
     // 跳转到详情
     NavToDetial(item) {
       if (item.inventory === 0) {
+        uni.showToast({
+          title: "该优惠券暂时没货哦~",
+          duration: 3000,
+          icon: "none"
+        });
         return;
       }
       uni.navigateTo({
@@ -663,10 +665,11 @@ export default {
 }
 .goods_card {
   margin-bottom: 40rpx;
-  border-radius: 15rpx;
+  border-radius: 45rpx;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  box-shadow: 1px 15px 20px -10px #000000;
   .card_top {
     padding: 43rpx 50rpx 0;
     display: flex;
@@ -691,17 +694,19 @@ export default {
       font-weight: 600;
       font-size: 36rpx;
       color: #ffffff;
-      letter-spacing: 0;
+      letter-spacing: 2px;
+      text-align: right;
     }
   }
   .card_sell_out {
-    border-bottom-left-radius: 10rpx;
-    border-bottom-right-radius: 10rpx;
-    background-color: rgba(121, 182, 160, 0.8);
+    border-bottom-left-radius: 15rpx;
+    border-bottom-right-radius: 15rpx;
+    background: rgba(121, 182, 160, 0.8);
     font-size: 36rpx;
     padding: 50rpx 0;
     color: #ffffff;
     text-align: center;
+    font-weight: bold;
   }
   .card_bottom {
     padding: 0 50rpx 64rpx;
@@ -741,6 +746,9 @@ export default {
           &:last-child {
             margin-right: 0;
           }
+        }
+        .inventory {
+          margin-left: 8rpx;
         }
       }
     }

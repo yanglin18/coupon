@@ -98,8 +98,9 @@ export default {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-between;
   .top {
+    padding-top: 424rpx;
     margin: 0 auto;
     text {
       opacity: 0.6;
@@ -110,6 +111,7 @@ export default {
     }
   }
   .bottom {
+    padding-bottom: 394rpx;
     .button1 {
       background: #42b069;
       border-radius: 44rpx;
@@ -118,6 +120,7 @@ export default {
       text-align: center;
       width: 630rpx;
       margin-bottom: 30rpx;
+      height: 88rpx;
     }
     .button2 {
       border: 2rpx solid #00b265;
@@ -126,6 +129,7 @@ export default {
       color: #42b069;
       letter-spacing: 0;
       width: 630rpx;
+      height: 80rpx;
     }
   }
 }

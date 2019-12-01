@@ -48,6 +48,7 @@ export default {
 .content {
   height: 100vh;
   display: flex;
+  margin-top: -150rpx;
   justify-content: center;
   align-items: center;
   flex-direction: column;

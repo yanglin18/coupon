@@ -63,8 +63,8 @@
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
-      <view class="imgWrap" @longpress="saveImg(beautifulPhoto)">
-        <image :src="beautifulPhoto" class="bgImage"></image>
+      <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
+        <image :src="beautifulPhoto.show_img" class="bgImage"></image>
         <view class="weixinIcon">
           <view class="image_share">
             <button open-type="share">
@@ -115,7 +115,7 @@ export default {
             res => {
               if (res.data.code === "200") {
                 console.log("我要的生成美图", res.data.data.list[0]);
-                this.beautifulPhoto = res.data.data.list[0];
+                this.beautifulPhoto = res.data.data.list;
               }
             }
           );
@@ -327,6 +327,7 @@ export default {
   min-height: 100vh;
   background: #f3f4f3;
   padding-bottom: 40rpx;
+  position: relative;
 }
 .shadowBox {
   position: absolute;
@@ -508,21 +509,13 @@ export default {
   border-radius: 24rpx;
   .imgWrap {
     display: flex;
-    align-items: flex-end;
-    height: 76vh;
+    flex-direction: column;
     width: 650rpx;
-    border-bottom-right-radius: 24rpx;
-    border-bottom-left-radius: 24rpx;
+    border-radius: 24rpx;
     overflow: hidden;
     .bgImage {
-      position: absolute;
-      left: 0;
-      top: 0;
       width: 100%;
-      height: 76vh;
-      z-index: -1;
-      border-bottom-right-radius: 24rpx;
-      border-bottom-left-radius: 24rpx;
+      height: 816rpx;
       overflow: hidden;
     }
   }
