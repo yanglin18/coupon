@@ -184,7 +184,7 @@ export default {
                   fail: function(err) {
                     console.log("支付失败" + JSON.stringify(err));
                     uni.showToast({
-                      title: "确认不要优惠券了吗？",
+                      title: "取消支付",
                       icon: "none"
                     });
                   }
@@ -201,13 +201,6 @@ export default {
       if (res0.detail.iv) {
         console.log("点击了同意授权", res0.detail);
         this.is_getNumber = true;
-        uni.setStorage({
-          key: "userPhoneNumber",
-          data: this.is_getNumber,
-          success: userPhoneNumber => {
-            console.log("detail已经授权手机号");
-          }
-        });
         // 判断登录态
         uni.checkSession({
           // 已登录状态
@@ -231,6 +224,10 @@ export default {
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
+                          uni.setStorage({
+                            key: "UserNumber",
+                            data: "已经获取手机号"
+                          });
                         }
                       }
                     );
@@ -268,6 +265,7 @@ export default {
               },
               res => {
                 console.log("调登录接口返回：", res);
+                uni.setStorageSync("hasLogin", true);
                 if (res.data.code === "200") {
                   uni.setStorage({
                     key: "storage_key",
@@ -275,6 +273,10 @@ export default {
                     success: function(e) {
                       console.log("success", e);
                     }
+                  });
+                  uni.setStorage({
+                    key: "UserNumber",
+                    data: res.data.data.mobile
                   });
                 }
               }
@@ -290,7 +292,6 @@ export default {
       console.log(res);
       if (res.detail.userInfo) {
         console.log("点击了同意基本信息授权");
-        // uni.setStorageSync("isFirst", res.detail.userInfo);
         this.user_info = res.detail;
         this.is_getuserInfo = true;
         uni.setStorage({

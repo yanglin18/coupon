@@ -37,8 +37,8 @@
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
-      <view class="imgWrap" @longpress="saveImg(beautifulPhoto)">
-        <image :src="beautifulPhoto" class="bgImage"></image>
+      <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
+        <image :src="beautifulPhoto.show_img" class="bgImage"></image>
         <view class="weixinIcon">
           <view class="image_share">
             <button open-type="share">
@@ -73,8 +73,31 @@ export default {
       user_info: {},
       src2: "",
       isLoginIn: false, //是否登录
-      beautifulPhoto: "" //美图保存地址
+      beautifulPhoto: "", //美图保存地址
+      hasNotLogin: false
     };
+  },
+  onShow() {
+    uni.login({
+      success: LoginRes => {
+        this.Ajax(
+          "post",
+          "member/Login/getLogin",
+          { brand_id: 1, channel: "wechat", code: LoginRes.code },
+          res => {
+            if (res.data.data.length !== 0) {
+              uni.setStorageSync("hasLogin", true);
+              console.log("不是第一次来的顾客");
+              this.hasNotLogin = false;
+            } else {
+              uni.setStorageSync("hasLogin", false);
+              this.hasNotLogin = true;
+            }
+          }
+        );
+      },
+      fail: error => {}
+    });
   },
   onLoad() {
     this.getUserInfo();
@@ -103,6 +126,12 @@ export default {
     },
     // 联系客服
     contactService() {
+      if (this.hasNotLogin) {
+        uni.navigateTo({
+          url: "../index/authorize"
+        });
+        return;
+      }
       uni.showModal({
         content: "星小孩（微信号：960411wsy）",
         confirmText: "我知道了",
@@ -113,12 +142,24 @@ export default {
     },
     // 跳转
     NavTo(e) {
+      if (this.hasNotLogin) {
+        uni.navigateTo({
+          url: "../index/authorize"
+        });
+        return;
+      }
       uni.navigateTo({
         url: e
       });
     },
     // 跳转到修改
     NavToModify() {
+      if (this.hasNotLogin) {
+        uni.navigateTo({
+          url: "../index/authorize"
+        });
+        return;
+      }
       let name = this.user_name;
       let icon = this.user_icon;
       let gender = this.gender;
@@ -140,6 +181,12 @@ export default {
     },
     // 分享
     Share() {
+      if (this.hasNotLogin) {
+        uni.navigateTo({
+          url: "../index/authorize"
+        });
+        return;
+      }
       this.share = true;
       uni.getStorage({
         key: "storage_key",
@@ -151,8 +198,8 @@ export default {
             { session3rd: res0.data.session3rd },
             res => {
               if (res.data.code === "200") {
-                console.log("我要的生成美图", res.data.data.list[0]);
-                this.beautifulPhoto = res.data.data.list[0];
+                console.log("我要的生成美图", res.data.data.list);
+                this.beautifulPhoto = res.data.data.list;
               }
             }
           );
@@ -216,29 +263,34 @@ export default {
       });
     },
     // 长按保存图片
-    saveImg(src) {
+    saveImg(url) {
       console.log("长按图片");
       uni.getStorage({
         key: "PhotoAlbum",
         success: res0 => {
           if (res0.data === "true") {
             // 处理图片
+            console.log("开始处理图片");
             uni.getImageInfo({
-              src: src,
+              src: url,
               success: function(image) {
                 let image_path = image.path;
+                console.log("处理后的图片路径", image);
                 uni.saveImageToPhotosAlbum({
                   filePath: image_path,
-                  success: function(res) {
+                  success: function(res0) {
                     uni.showToast({
                       title: "保存成功",
                       duration: 1000
                     });
                   },
                   fail: function(error) {
-                    console.log(error);
+                    console.log("保存到手机失败");
                   }
                 });
+              },
+              fail: error => {
+                console.log("获取图片信息失败");
               }
             });
           } else {
@@ -382,21 +434,13 @@ export default {
   border-radius: 24rpx;
   .imgWrap {
     display: flex;
-    align-items: flex-end;
-    height: 76vh;
+    flex-direction: column;
     width: 650rpx;
-    border-bottom-right-radius: 24rpx;
-    border-bottom-left-radius: 24rpx;
+    border-radius: 24rpx;
     overflow: hidden;
     .bgImage {
-      position: absolute;
-      left: 0;
-      top: 0;
       width: 100%;
-      height: 76vh;
-      z-index: -1;
-      border-bottom-right-radius: 24rpx;
-      border-bottom-left-radius: 24rpx;
+      height: 816rpx;
       overflow: hidden;
     }
   }

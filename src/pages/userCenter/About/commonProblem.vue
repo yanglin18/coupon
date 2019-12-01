@@ -1,16 +1,19 @@
 <template>
   <view class="content">
-    <uniCollapse @change="change">
-      <uniCollapseItem
-        class="collapse_item"
-        :title="issue.title"
-        :name="index"
-        v-for="(issue, index) in issues"
-        :key="index"
-      >
-        <view class="text">{{ issue.text }}</view></uniCollapseItem
-      >
-    </uniCollapse>
+    <view class="title" id="title">常见问题</view>
+    <view class="top">
+      <uniCollapse @change="change">
+        <uniCollapseItem
+          class="collapse_item"
+          :title="issue.title"
+          :name="index"
+          v-for="(issue, index) in issues"
+          :key="index"
+        >
+          <view class="text">{{ issue.text }}</view></uniCollapseItem
+        >
+      </uniCollapse>
+    </view>
   </view>
 </template>
 <script>
@@ -41,11 +44,16 @@ export default {
     uni.getStorage({
       key: "storage_key",
       success: res0 => {
-        this.Ajax("post", "member/user/question", { session3rd: res0.data.session3rd, }, res => {
-          if (res.data.code === "200") {
-            this.issues = res.data.data.list
+        this.Ajax(
+          "post",
+          "member/user/question",
+          { session3rd: res0.data.session3rd },
+          res => {
+            if (res.data.code === "200") {
+              this.issues = res.data.data.list;
+            }
           }
-        });
+        );
       }
     });
   }
@@ -58,6 +66,15 @@ export default {
   font-size: 36rpx;
   color: #000000;
   letter-spacing: 0.45px;
+}
+.title {
+  padding: 26rpx 40rpx 12rpx;
+  font-size: 50rpx;
+  letter-spacing: 0.62px;
+  background: #ffffff;
+}
+.top{
+   border-top: #f3f4f3 4px solid;
 }
 .text {
   padding: 16rpx 40rpx 40rpx;

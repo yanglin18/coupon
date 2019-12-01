@@ -11,33 +11,6 @@
         </view>
       </view>
     </view>
-    <!-- <swiper class="card_swiper" vertical="true">
-        <swiper-item
-          v-for="(item, index) in cards"
-          :key="index"
-          class="goods_card"
-        >
-          <view class="card_order">
-            <text v-if="item.num !== 1">{{ index + 1 }}/{{ item.num }}</text>
-          </view>
-          <view class="name">
-            <text>{{ item.goods_name }}</text>
-          </view>
-          <view class="userful_time">
-            <text>有效期至：{{ item.expire_time }}</text>
-          </view>
-          <view class="QRcode">
-            <canvas
-              style="width: 210px; height: 210px;"
-              canvas-id="myQrcode"
-            ></canvas>
-          </view>
-          <view class="bottom">
-            <text>优惠码每30秒自动更新，当天24时前有效，过期不退换</text>
-          </view>
-        </swiper-item>
-      </swiper> -->
-
     <view
       v-for="(item, index) in cards"
       :key="index"
@@ -75,7 +48,7 @@
     <!-- 弹窗 -->
     <view class="Toast" v-if="clickScna">
       <view class="title">已扫码确认</view>
-      <view class="row1">{{num}}张“星巴克中杯通兑券“已完成扫码？</view>
+      <view class="row1">{{ num }}张“星巴克中杯通兑券“已完成扫码？</view>
       <view class="row2"> （在“我的摩卡券”可查看已购买的券码）</view>
       <view class="button">
         <button size="mini" class="button1" @click="cancel">未完成</button>
@@ -107,60 +80,73 @@ export default {
       scrollTop: 0,
       instructionsForUse: "", //使用须知
       listIndex: 1,
-      num:0
+      num: 0
     };
   },
   onLoad(val) {
     this.order_id = val.order_id;
   },
-  onShow(){
+  onUnload() {
+    console.log("触发onhide!!!!!!!!!")
+    // 在C页面内 navigateBack，将返回A页面
+    wx.navigateBack({
+      delta: 1,
+      success:res=>{
+        clickScna=true;
+      }
+    });
+  },
+  onShow() {
     this.getOrderInfo();
   },
   onPageScroll(ev) {
-  //ev是当前屏幕向上滚动的距离
-  if (ev.scrollTop <= 0) {
-   ev.scrollTop = 0;
-  }
-  //判断浏览器滚动条上下滚动
-  if (ev.scrollTop > this.scrollTop || ev.scrollTop == uni.getSystemInfoSync().windowHeight) {
-   console.log('下');
-   let height = 430;
-   if (ev.scrollTop >= this.listIndex * height - 100) {
-    this.listIndex++;
-    if (this.listIndex >= this.cards.length) {
-     this.listIndex = this.cards.length;
+    //ev是当前屏幕向上滚动的距离
+    if (ev.scrollTop <= 0) {
+      ev.scrollTop = 0;
     }
-    this.cards.forEach((item, index) => {
-     if (this.listIndex - 1 === index) {
-      item.showF = 1;
-     } else {
-      item.showF = 0;
-     }
-    });
-   }
-  } else {
-   console.log('上');
-   let height = 430;
-   console.log(ev.scrollTop, this.listIndex * height);
-   if (this.listIndex * height - ev.scrollTop >= 2 * height - 100) {
-    this.listIndex--;
-    if (this.listIndex <= 1) {
-     this.listIndex = 1;
+    //判断浏览器滚动条上下滚动
+    if (
+      ev.scrollTop > this.scrollTop ||
+      ev.scrollTop == uni.getSystemInfoSync().windowHeight
+    ) {
+      console.log("下");
+      let height = 430;
+      if (ev.scrollTop >= this.listIndex * height - 100) {
+        this.listIndex++;
+        if (this.listIndex >= this.cards.length) {
+          this.listIndex = this.cards.length;
+        }
+        this.cards.forEach((item, index) => {
+          if (this.listIndex - 1 === index) {
+            item.showF = 1;
+          } else {
+            item.showF = 0;
+          }
+        });
+      }
+    } else {
+      console.log("上");
+      let height = 430;
+      console.log(ev.scrollTop, this.listIndex * height);
+      if (this.listIndex * height - ev.scrollTop >= 2 * height - 100) {
+        this.listIndex--;
+        if (this.listIndex <= 1) {
+          this.listIndex = 1;
+        }
+        this.cards.forEach((item, index) => {
+          if (this.listIndex - 1 === index) {
+            item.showF = 1;
+          } else {
+            item.showF = 0;
+          }
+        });
+      }
     }
-    this.cards.forEach((item, index) => {
-     if (this.listIndex - 1 === index) {
-      item.showF = 1;
-     } else {
-      item.showF = 0;
-     }
-    });
-   }
-  }
-  //给scrollTop重新赋值
-  setTimeout(() => {
-   this.scrollTop = ev.scrollTop;
-  }, 0);
- },
+    //给scrollTop重新赋值
+    setTimeout(() => {
+      this.scrollTop = ev.scrollTop;
+    }, 0);
+  },
   methods: {
     // 获取订单详情
     getOrderInfo() {

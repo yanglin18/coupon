@@ -12,6 +12,12 @@
         "enablePullDownRefresh": true
       }
     },   
+    {
+      "path": "pages/index/authorize",
+      "style": {
+        "navigationBarTitleText": "摩卡星"
+      }
+    },  
      {
       "path": "pages/loading/no_network",
       "style": {
@@ -61,6 +67,12 @@
       }
     },
     {
+      "path": "pages/userCenter/agreement/useAgreement",
+      "style": {
+        "navigationBarTitleText": ""
+      }
+    },
+    {
       "path": "pages/userCenter/About/aboutMKX",
       "style": {
         "navigationBarTitleText": ""
@@ -85,6 +97,7 @@
     "selectedColor": "#007AFF",
     "borderStyle": "black",
     "backgroundColor": "#F8F8F8",
+    "ext-class":"tabBarIcon",
     "list": [
       {
         "pagePath": "pages/index/index",

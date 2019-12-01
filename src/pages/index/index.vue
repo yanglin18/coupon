@@ -1,5 +1,6 @@
 <template>
   <view class="content">
+    <button @click="cleanEvent">清除</button>
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -18,7 +19,7 @@
       @click="NavToDetial(item)"
       v-bind:style="{
         background: 'url(' + item.img + ')no-repeat center',
-        backgroundSize:'cover',
+        backgroundSize: 'cover',
         height: item.height + 'rpx',
         width: item.width + 'rpx',
         color: item.color
@@ -99,7 +100,7 @@
       :key="index"
       v-bind:style="{
         background: 'url(' + item.img + ')no-repeat center',
-        backgroundSize:'cover',
+        backgroundSize: 'cover',
         height: item.height + 'rpx',
         width: item.width + 'rpx',
         color: item.color
@@ -138,29 +139,22 @@
           />
         </view>
         <view>
-          <text>
-            同意
-            <text
-              class="agreement"
-              @click="NavToagreement('/pages/userCenter/About/privacyPolicy')"
-              >《星冰乐小程序服务指南》</text
-            >
-            和
-            <text
-              class="agreement"
-              @click="NavToagreement('/pages/userCenter/About/privacyPolicy')"
-              >《用户隐私政策协议》</text
-            >
-          </text>
+          同意
+          <text
+            class="agreement"
+            @click="NavToagreement('../userCenter/agreement/useAgreement')"
+            >《摩卡星用户使用协议》</text>
+          和
+          <text
+            class="agreement"
+            @click="NavToagreement('../userCenter/agreement/useAgreement')"
+            >《摩卡星用户隐私保护政策》</text
+          >
         </view>
       </view>
       <!-- 因为此按钮绑定的事件有三个：1.已经勾选隐私协议。2.调起基本信息授权。3.控制页面下滑露出使用须知 -->
       <!-- 因为调起基本信息无法控制，所以用两个一模一样的按钮。控制这三件事 -->
-      <button
-        :open-type="userOptions ? 'getUserInfo' : ''"
-        @getuserinfo="GetUserInfo"
-        @click="IHaveLearned"
-      >
+      <button @click="IHaveLearned">
         我已了解
       </button>
     </view>
@@ -174,7 +168,7 @@ export default {
   data() {
     return {
       userOptions: false, //用户是否勾选
-      userAgree: true, //用户是否点击“我已了解”
+      userAgree: false, //用户是否点击“我已了解”
       goodsInfo: [], //商品信息
       instructions_for_use: "", //使用须知
       banners: {}, //banner
@@ -195,9 +189,13 @@ export default {
   // 如果detail里面授权登录和手机号，标识返回到主页
   onShow() {
     uni.getStorage({
-      key: "userPhoneNumber",
-      success: userPhoneNumber => {
-        this.is_getNumber = userPhoneNumber.data;
+      key: "UserNumber",
+      success: phoneNumber => {
+        if (phoneNumber.data) {
+          this.is_getNumber = true;
+        } else {
+          this.is_getNumber = false;
+        }
       }
     });
     uni.getStorage({
@@ -206,43 +204,22 @@ export default {
         this.is_getuserInfo = userInfo.data;
       }
     });
+    const hasLogin = uni.getStorageSync("hasLogin");
+    if (hasLogin) {
+      this.is_getuserInfo = true;
+    }
   },
   onLoad() {
-    // 判断进来的用户是谁分享进来的
-    // let obj = wx.getLaunchOptionsSync()
-    // console.log("obj:",obj);
-    uni.login({
-      success: LoginRes => {
-        this.Ajax(
-          "post",
-          "member/Login/getLogin",
-          { brand_id: 1, channel: "wechat", code: LoginRes.code },
-          res => {
-            if (res.data.data.length !== 0) {
-              uni.setStorageSync("isFirst", res.data.data);
-              console.log("不是第一次来的顾客");
-              this.userAgree = true;
-              this.is_getuserInfo = true;
-              uni.setStorage({
-                key: "storage_key",
-                data: res.data.data,
-                success: function(e) {}
-              });
-            } else {
-              console.log("是第一次来的顾客");
-              this.userAgree = false;
-            }
-            this.getGoodsInfo();
-            this.getInstructionsForUse();
-            this.getBanner();
-            this.showTips = false;
-          }
-        );
-      },
-      fail: error => {}
-    });
-
-    //
+    this.getGoodsInfo();
+    this.getInstructionsForUse();
+    this.getBanner();
+    this.showTips = false;
+    const hasLogin = uni.getStorageSync("hasLogin");
+    if (hasLogin) {
+      this.userAgree = true;
+    } else {
+      this.userAgree = false;
+    }
   },
   // 用户分享
   onShareAppMessage({ res }) {
@@ -264,6 +241,45 @@ export default {
     uni.stopPullDownRefresh();
   },
   methods: {
+    // 登录
+    loginIn() {
+      let obj = wx.getLaunchOptionsSync();
+      uni.login({
+        success: reslogin => {
+          if (reslogin.code) {
+            this.Ajax(
+              "post",
+              "member/Login/getLogin",
+              {
+                brand_id: 1,
+                channel: "wechat",
+                code: reslogin.code,
+                detail: this.user_info,
+                pid: obj.scene
+              },
+              res => {
+                if (res.data.code === "200") {
+                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data,
+                    success: function(e) {
+                      console.log("success", e);
+                    }
+                  });
+                  uni.setStorage({
+                    key: "UserNumber",
+                    data: res.data.data.mobile
+                  });
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+    },
     cleanEvent() {
       uni.getStorage({
         key: "storage_key",
@@ -301,12 +317,8 @@ export default {
             "member/Login/getLogin",
             { brand_id: 1, channel: "wechat", code: LoginRes.code },
             res => {
-              console.log("登录测试000", res);
               if (res.data.code === "200") {
                 uni.setStorageSync("isFirst", res.data.data);
-                // if (typeof res === "function") {
-                //   res();
-                // }
               }
             }
           );
@@ -392,7 +404,6 @@ export default {
       uni.getStorage({
         key: "storage_key",
         success: res0 => {
-          console.log("TO_Buy里面的storage参数：", res0);
           // 调取后台接口，得到支付参数
           this.Ajax(
             "post",
@@ -404,9 +415,7 @@ export default {
             },
             res => {
               if (res.data.code === "200") {
-                console.log("去支付参数", res);
                 // 调起支付
-                console.log("签名:", res.data.data.paySign);
                 uni.requestPayment({
                   provider: "wxpay",
                   timeStamp: String(res.data.data.timeStamp),
@@ -467,6 +476,10 @@ export default {
                       resMobile => {
                         if (resMobile.data.code === "200") {
                           console.log(resMobile);
+                          uni.setStorage({
+                            key: "UserNumber",
+                            data: "已经获取手机号"
+                          });
                         }
                       }
                     );
@@ -484,45 +497,9 @@ export default {
         });
       } else {
         console.log("点击了拒绝授权");
-        this.is_getNumber = false;
       }
     },
-    // 登录
-    loginIn() {
-      let obj = wx.getLaunchOptionsSync();
-      uni.login({
-        success: reslogin => {
-          console.log("登录返回：", reslogin);
-          if (reslogin.code) {
-            this.Ajax(
-              "post",
-              "member/Login/getLogin",
-              {
-                brand_id: 1,
-                channel: "wechat",
-                code: reslogin.code,
-                detail: this.user_info,
-                pid: obj.scene
-              },
-              res => {
-                console.log("调登录接口返回：", res);
-                if (res.data.code === "200") {
-                  uni.setStorage({
-                    key: "storage_key",
-                    data: res.data.data,
-                    success: function(e) {
-                      console.log("success", e);
-                    }
-                  });
-                }
-              }
-            );
-          } else {
-            console.log("登录失败！" + res.errMsg);
-          }
-        }
-      });
-    },
+
     // 获取基本信息
     GetUserInfo(res) {
       console.log(res);
@@ -561,10 +538,10 @@ export default {
       this.userOptions = !this.userOptions;
     },
     // 跳转到协议详情
-    NavToagreement(e) {
-      console.log(e);
+    NavToagreement(val) {
+      console.log(val);
       uni.navigateTo({
-        url: e
+        url: val
       });
     }
   }
@@ -576,6 +553,7 @@ export default {
   position: relative;
   background: #e8e8e8;
   padding: 24rpx 40rpx 40rpx;
+  min-height: 100vh;
 }
 .shadowBox {
   position: absolute;
