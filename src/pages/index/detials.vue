@@ -102,6 +102,10 @@ export default {
     console.log("is_getNumber:", this.is_getNumber);
     this.getGoodInfo();
     this.getInstructionsForUse();
+    uni.setNavigationBarColor({
+      backgroundColor: "#0D5A3A",
+      frontColor: "#ffffff",
+    });
   },
   computed: {
     // 优惠价格
@@ -339,7 +343,7 @@ export default {
     no-repeat center;
   background-size: cover;
   min-height: 100vh;
-  padding: 0 40rpx 40rpx;
+  padding: 40rpx;
 }
 .tips {
   display: none;
@@ -348,11 +352,9 @@ export default {
   font-size: 26rpx;
   color: #ffffff;
   .title {
-    opacity: 0.6;
-    font-family: PingFangSC-Semibold;
-    font-size: 28rpx;
+    font-size: 30rpx;
     letter-spacing: -0.68px;
-    padding: 10rpx;
+    padding-left: 6rpx;
     display: flex;
     align-items: center;
     image {
@@ -376,12 +378,14 @@ export default {
 }
 .goods_card {
   background-color: #ffffff;
-  border-radius: 15rpx;
-  height: 417px;
+  border-radius: 24rpx;
+  height: 834rpx;
   display: flex;
-  margin-top: 30rpx;
+  margin-top: 20rpx;
   flex-direction: column;
   justify-content: space-between;
+  box-shadow: 1px 15px 20px -10px #000000;
+  overflow: hidden;
   .card_top {
     display: flex;
     flex-direction: column;
@@ -411,27 +415,30 @@ export default {
       font-size: 36rpx;
       color: #000000;
       letter-spacing: 0;
-      margin: 10rpx;
+      margin-left: 12rpx;
     }
   }
   image {
-    height: 400rpx;
-    width: 400rpx;
+    height: 300rpx;
+    width: 300rpx;
     margin: 0 auto;
   }
   .card_bottom {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    padding-bottom: 64rpx;
+    align-items: center;
+
     .left {
       display: flex;
       flex-direction: column;
       .number {
         display: flex;
-        width: 200rpx;
+        width: 184rpx;
         flex-direction: row;
         align-items: center;
-        justify-content: space-around;
+        justify-content: space-between;
         .reduce,
         .add {
           display: flex;
@@ -451,7 +458,7 @@ export default {
         flex-direction: row;
         text {
           padding: 10rpx;
-          opacity: 0.6;
+          opacity: 0.4;
           font-family: PingFangSC-Semibold;
           font-size: 22rpx;
           color: #000000;
@@ -461,13 +468,14 @@ export default {
       }
     }
     button {
-      background-color: #005334;
+      opacity: 0.95;
+      background: #42b069;
       border-radius: 45rpx;
-      font-family: PingFangSC-Semibold;
-      padding: 0 80rpx;
       font-size: 30rpx;
       color: #ffffff;
-      font-weight: 600;
+      height: 60rpx;
+      width: 260rpx;
+      line-height: 60rpx;
     }
   }
 }

@@ -93,10 +93,10 @@
     "backgroundColor": "#F8F8F8"
   },
   "tabBar": {
-    "color": "#7A7E83",
-    "selectedColor": "#007AFF",
+    "color": "#000000",
+    "selectedColor": "#2C9543",
     "borderStyle": "black",
-    "backgroundColor": "#F8F8F8",
+    "backgroundColor": "#ffffff",
     "ext-class":"tabBarIcon",
     "list": [
       {

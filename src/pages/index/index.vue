@@ -16,7 +16,6 @@
       class="goods_card"
       v-for="(item, index) in goodsInfo"
       :key="index"
-      @click="NavToDetial(item)"
       v-bind:style="{
         background: 'url(' + item.img + ')no-repeat center',
         backgroundSize: 'cover',
@@ -25,7 +24,7 @@
         color: item.color
       }"
     >
-      <view class="card_top">
+      <view class="card_top" @click="NavToDetial(item)">
         <view class="price">
           <text class="price_now">&yen;{{ producePrice(item) }}</text>
           <text class="price_original"
@@ -665,15 +664,17 @@ export default {
 }
 .goods_card {
   margin-bottom: 40rpx;
-  border-radius: 45rpx;
+  border-radius: 24rpx;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   box-shadow: 1px 15px 20px -10px #000000;
+  overflow: hidden;
   .card_top {
     padding: 43rpx 50rpx 0;
     display: flex;
     flex-direction: column;
+    padding-bottom: 485rpx;
     .price {
       display: flex;
       align-items: baseline;
@@ -695,7 +696,6 @@ export default {
       font-size: 36rpx;
       color: #ffffff;
       letter-spacing: 2px;
-      text-align: right;
     }
   }
   .card_sell_out {

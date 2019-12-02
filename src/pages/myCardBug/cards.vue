@@ -18,7 +18,8 @@
       :class="{ showClass: !item.showF }"
     >
       <view class="card_order">
-        <text v-if="item.num !== 1">{{ index + 1 }}/{{ item.num }}</text>
+        <text class="order1" v-if="item.num !== 1">{{ index + 1 }}</text>
+        <text v-if="item.num !== 1">/{{ item.num }}</text>
       </view>
       <view class="name">
         <text>{{ item.goods_name }}</text>
@@ -43,7 +44,7 @@
       </view>
     </view>
     <view class="affirm">
-      <button @click="HaveScan">确认星伙伴已扫码</button>
+      <button v-if="status === '1'" @click="HaveScan">确认星伙伴已扫码</button>
     </view>
     <!-- 弹窗 -->
     <view class="Toast" v-if="clickScna">
@@ -80,22 +81,17 @@ export default {
       scrollTop: 0,
       instructionsForUse: "", //使用须知
       listIndex: 1,
-      num: 0
+      num: 0,
+      status: ""
     };
   },
   onLoad(val) {
     this.order_id = val.order_id;
+    uni.setNavigationBarColor({
+      backgroundColor: "#0D5A3A",
+      frontColor: "#ffffff"
+    });
   },
-  // onUnload() {
-  //   console.log("触发onhide!!!!!!!!!")
-  //   // 在C页面内 navigateBack，将返回A页面
-  //   wx.navigateBack({
-  //     delta: 1,
-  //     success:res=>{
-  //       clickScna=true;
-  //     }
-  //   });
-  // },
   onShow() {
     this.getOrderInfo();
   },
@@ -163,23 +159,24 @@ export default {
                 console.log("carddata:", cardsdata);
                 let cardList = [];
                 this.instructionsForUse = cardsdata.instructions;
+                this.num = cardsdata.num;
+                this.status = cardsdata.status;
                 for (let i = 0; i < cardsdata.ticket.length; i++) {
-                  this.num = cardsdata.num;
                   let item = {};
                   item.expire_time = cardsdata.expire_time;
                   item.goods_name = cardsdata.goods_name;
                   item.num = cardsdata.num;
                   item.status = cardsdata.status;
                   item.ticket = cardsdata.ticket[i];
-                  console.log(i);
+
                   if (i === 0) {
                     item.showF = 1;
                   } else {
                     item.showF = 0;
                   }
-                  console.log(item);
                   cardList.push(item);
                 }
+                console.log("status:", this.status);
                 this.cards = cardList;
               }
             }
@@ -271,11 +268,17 @@ swiper.uni-swiper-slide-frame {
   border-radius: 24rpx;
   display: flex;
   margin-bottom: 40rpx;
-  padding: 34rpx 64rpx 114rpx;
+  padding: 87rpx 66rpx 100rpx;
   color: #000000;
   flex-direction: column;
   .card_order {
     margin: 0 auto;
+    font-size: 26rpx;
+    opacity: 0.6;
+    .order1 {
+      opacity: 1;
+      font-size: 40rpx;
+    }
   }
   .name {
     margin: 14rpx auto 0;
@@ -284,7 +287,7 @@ swiper.uni-swiper-slide-frame {
   }
   .userful_time {
     font-size: 26rpx;
-    margin: 14rpx auto 0;
+    margin: 4rpx auto 0;
     letter-spacing: 0.43px;
     opacity: 0.6;
   }
@@ -299,14 +302,14 @@ swiper.uni-swiper-slide-frame {
       height: 495rpx;
       width: 509rpx;
       position: relative;
-      right: -60rpx;
-      top: 72rpx;
+      right: -50rpx;
+      top: 36rpx;
       margin: 0;
     }
   }
   .bottom {
     // opacity: 0.4;
-    margin: 40rpx auto 0;
+    margin: 0 auto;
     font-size: 22rpx;
     opacity: 0.4;
     letter-spacing: 0;
@@ -326,6 +329,8 @@ swiper.uni-swiper-slide-frame {
     color: #0d5a39;
     width: 530rpx;
     height: 80rpx;
+    line-height: 80rpx;
+    font-weight: bold;
   }
 }
 .Toast {
@@ -333,18 +338,20 @@ swiper.uni-swiper-slide-frame {
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: 24rpx;
+  height: 500rpx;
+  width: 630rpx;
   position: fixed;
   top: 50%;
   left: 0;
-  transform: translateY(-50%);
+  transform: translateY(-40%);
   z-index: 100;
   margin: 0 60rpx;
-  padding: 80rpx 40rpx 100rpx;
   color: #000000;
   .title {
     font-size: 40rpx;
-    margin: 0 auto;
+    margin: 80rpx auto 30rpx;
+    font-weight: bold;
   }
   .row1 {
     opacity: 0.6;
@@ -359,18 +366,25 @@ swiper.uni-swiper-slide-frame {
     margin: 0 auto 50rpx;
   }
   .button {
+    margin: 0 auto;
     .button1 {
       border: 2rpx solid #00b265;
       border-radius: 40rpx;
       font-size: 30rpx;
       color: #42b069;
       letter-spacing: 0;
+      width: 160rpx;
+      height: 80rpx;
+      line-height: 80rpx;
+      padding: 0;
     }
     .button2 {
       margin-left: 20rpx;
       border-radius: 40rpx;
       background: #42b069;
-
+      width: 350rpx;
+      height: 80rpx;
+      line-height: 80rpx;
       font-size: 30rpx;
       color: #f8f8f8;
       letter-spacing: 0;

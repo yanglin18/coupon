@@ -8,7 +8,7 @@
         <view class="bottom">
           <view class="left">
             <image :src="user_info.head_img" />
-            <text>{{ user_info.user_name }}</text>
+            <text class="name">{{ user_info.user_name }}</text>
           </view>
           <view class="right" @click="NavToModify">
             <text>修改资料</text>
@@ -101,6 +101,10 @@ export default {
   },
   onLoad() {
     this.getUserInfo();
+    uni.setNavigationBarColor({
+      backgroundColor: "#F3F4F3",
+      frontColor: "#ffffff"
+    });
   },
   methods: {
     // 获取基本信息
@@ -359,6 +363,9 @@ export default {
       display: flex;
       flex-direction: row;
       align-items: center;
+      .name{
+        font-weight: bold;
+      }
       image {
         height: 120rpx;
         width: 120rpx;
@@ -389,7 +396,7 @@ export default {
   }
 }
 .about {
-  margin-top: 20rpx;
+  margin-top: 16rpx;
   background: #ffffff;
   padding: 0 50rpx 0 40rpx;
   .service {

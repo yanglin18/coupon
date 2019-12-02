@@ -1,10 +1,16 @@
 <template>
   <view class="content">
     <view v-if="list.length === 0" class="empty">
+      <view id="title" class="title">
+        <text>我的卡券 </text>
+      </view>
       <view class="tips">
         <image src="../../static/images/empty.png" />
         <view class="text">
-          <text>您的卡券包暂时为空 快去购买一张优惠券吧</text>
+          <text>您的卡券包暂时为空</text>
+        </view>
+        <view class="text">
+          <text> 快去购买一张优惠券吧</text>
         </view>
       </view>
       <button @click="NavToIndex" size="mini">去选购</button>
@@ -97,7 +103,12 @@ export default {
       beautifulPhoto: ""
     };
   },
-  onLoad() {},
+  onLoad() {
+    uni.setNavigationBarColor({
+      backgroundColor: "#F3F4F3",
+      frontColor: "#ffffff"
+    });
+  },
   onShow() {
     this.getOrderList();
     let app = getApp();
@@ -288,23 +299,38 @@ export default {
     },
     // 确认收货
     affirmReceive(val) {
+      let that = this;
       console.log("val:", val);
-      uni.getStorage({
-        key: "storage_key",
-        success: res0 => {
-          this.Ajax(
-            "post",
-            "member/order/confirm_order",
-            { order_id: val.order_id, session3rd: res0.data.session3rd },
-            res => {
-              if (res.data.code === "200") {
-                uni.showToast({
-                  title: "收货成功"
-                });
-                this.getOrderList();
+      uni.showModal({
+        title: "",
+        content: "您确定已收到所有饮品吗？",
+        success: function(resShowModel) {
+          if (resShowModel.confirm) {
+            uni.getStorage({
+              key: "storage_key",
+              success: res0 => {
+                that.Ajax(
+                  "post",
+                  "member/order/confirm_order",
+                  { order_id: val.order_id, session3rd: res0.data.session3rd },
+                  res => {
+                    if (res.data.code === "200") {
+                      uni.showToast({
+                        title: "收货成功"
+                      });
+                      that.getOrderList();
+                    }
+                  }
+                );
               }
-            }
-          );
+            });
+          } else if (resShowModel.cancel) {
+            console.log("用户点击取消");
+            uni.showToast({
+              title: "取消收货",
+              icon: "none"
+            });
+          }
         }
       });
     },
@@ -341,8 +367,16 @@ export default {
   display: flex;
   height: 100vh;
   flex-direction: column;
+  .title {
+    font-family: PingFangSC-Semibold;
+    font-size: 50rpx;
+    color: #000000;
+    font-weight: 500;
+    line-height: 70rpx;
+    padding: 14rpx 40rpx 40rpx;
+  }
   .tips {
-    margin-top: 200rpx;
+    margin-top: 280rpx;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -365,14 +399,16 @@ export default {
     }
   }
   button {
-    margin-top: 400rpx;
+    margin-top: 256rpx;
     border: 2rpx solid #00b657;
     border-radius: 45rpx;
     font-family: PingFangSC-Semibold;
     font-size: 30rpx;
     color: #42b069;
-    padding: 0 80rpx;
     font-size: 500;
+    width: 300rpx;
+    height: 80rpx;
+    line-height: 80rpx;
   }
 }
 .not_empty {
@@ -400,8 +436,8 @@ export default {
       display: flex;
       font-size: 26rpx;
       flex-direction: column;
-      font-family: PingFangSC-Semibold;
       margin-bottom: 16rpx;
+      box-shadow: 1px 10px 20px -10px rgba(4, 32, 8, 0.2);
       display: flex;
       flex-direction: row;
       &:last-child {
