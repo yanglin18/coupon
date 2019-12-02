@@ -228,30 +228,6 @@ export default {
           );
         }
       });
-      // 获取相册权限
-      uni.authorize({
-        scope: "scope.writePhotosAlbum",
-        success(res) {
-          console.log("授权成功", res);
-          uni.setStorage({
-            key: "PhotoAlbum",
-            data: "true"
-          });
-        },
-        fail(error) {
-          // console.log("error:", error);
-          uni.showToast({
-            title: "请授权后再保存",
-            duration: 1000,
-            icon: "none"
-          });
-          uni.setStorage({
-            key: "PhotoAlbum",
-            data: "false"
-          });
-        },
-        complete() {}
-      });
     },
     // 关闭分享
     close_share() {
@@ -288,6 +264,31 @@ export default {
     // 长按保存图片
     saveImg(url) {
       console.log("长按图片");
+      // 先获取相册权限
+      uni.authorize({
+        scope: "scope.writePhotosAlbum",
+        success(res) {
+          console.log("授权成功", res);
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "true"
+          });
+        },
+        fail(error) {
+          // console.log("error:", error);
+          uni.showToast({
+            title: "请授权后再保存",
+            duration: 1000,
+            icon: "none"
+          });
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "false"
+          });
+        },
+        complete() {}
+      });
+      // 再保存
       uni.getStorage({
         key: "PhotoAlbum",
         success: res0 => {

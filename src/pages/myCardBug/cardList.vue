@@ -132,30 +132,6 @@ export default {
           );
         }
       });
-      // 获取相册权限
-      uni.authorize({
-        scope: "scope.writePhotosAlbum",
-        success(res) {
-          console.log("授权成功", res);
-          uni.setStorage({
-            key: "PhotoAlbum",
-            data: "true"
-          });
-        },
-        fail(error) {
-          // console.log("error:", error);
-          uni.showToast({
-            title: "请授权后再保存",
-            duration: 1000,
-            icon: "none"
-          });
-          uni.setStorage({
-            key: "PhotoAlbum",
-            data: "false"
-          });
-        },
-        complete() {}
-      });
     }
   },
 
@@ -222,6 +198,31 @@ export default {
     // 长按保存图片
     saveImg(src) {
       console.log("长按图片");
+      // 先获取相册权限
+      uni.authorize({
+        scope: "scope.writePhotosAlbum",
+        success(res) {
+          console.log("授权成功", res);
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "true"
+          });
+        },
+        fail(error) {
+          // console.log("error:", error);
+          uni.showToast({
+            title: "请授权后再保存",
+            duration: 1000,
+            icon: "none"
+          });
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "false"
+          });
+        },
+        complete() {}
+      });
+      // 再保存
       uni.getStorage({
         key: "PhotoAlbum",
         success: res0 => {
@@ -256,7 +257,12 @@ export default {
                 if (res.confirm) {
                   uni.openSetting({
                     success(dataAu) {
-                      console.log("设置信息：", dataAu); //
+                      if (dataAu.scope.writePhotosAlbum) {
+                        uni.setStorage({
+                          key: "PhotoAlbum",
+                          data: "true"
+                        });
+                      }
                     }
                   });
                 } else if (res.cancel) {
@@ -304,7 +310,7 @@ export default {
       uni.showModal({
         title: "",
         content: "您确定已收到所有饮品吗？",
-        confirmColor:'#42b069',
+        confirmColor: "#42b069",
         success: function(resShowModel) {
           if (resShowModel.confirm) {
             uni.getStorage({
