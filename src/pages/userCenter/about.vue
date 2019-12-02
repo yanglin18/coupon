@@ -25,7 +25,7 @@ export default {
   onLoad() {
     uni.setNavigationBarColor({
       backgroundColor: "#F3F4F3",
-      frontColor: "#ffffff"
+      frontColor: "#000000"
     });
   },
   methods: {
@@ -66,6 +66,7 @@ export default {
     image {
       height: 25rpx;
       width: 15rpx;
+      margin: auto 0;
     }
   }
 }

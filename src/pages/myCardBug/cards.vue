@@ -40,7 +40,7 @@
         <image class="not_use" v-else :src="item.ticket" />
       </view>
       <view class="bottom">
-        <text>优惠码每30秒自动更新，当天24时前有效，过期不退换</text>
+        <text>优惠码仅在当天24时前有效，过期不退换</text>
       </view>
     </view>
     <view class="affirm">
@@ -203,6 +203,9 @@ export default {
     },
     cancel() {
       this.clickScna = false;
+      uni.switchTab({
+        url: "./cardList"
+      });
     }
   }
 };
@@ -278,6 +281,7 @@ swiper.uni-swiper-slide-frame {
     .order1 {
       opacity: 1;
       font-size: 40rpx;
+      font-weight: bold;
     }
   }
   .name {
@@ -299,7 +303,7 @@ swiper.uni-swiper-slide-frame {
       margin: 36rpx auto 0;
     }
     .used {
-      height: 495rpx;
+      height: 446rpx;
       width: 509rpx;
       position: relative;
       right: -50rpx;
@@ -309,7 +313,7 @@ swiper.uni-swiper-slide-frame {
   }
   .bottom {
     // opacity: 0.4;
-    margin: 0 auto;
+    margin: 28rpx auto 0;
     font-size: 22rpx;
     opacity: 0.4;
     letter-spacing: 0;
@@ -358,6 +362,7 @@ swiper.uni-swiper-slide-frame {
     font-size: 30rpx;
     line-height: 52rpx;
     margin: 30rpx auto 0;
+    font-weight: bold;
   }
   .row2 {
     opacity: 0.6;
@@ -368,6 +373,7 @@ swiper.uni-swiper-slide-frame {
   .button {
     margin: 0 auto;
     .button1 {
+      background: #ffffff;
       border: 2rpx solid #00b265;
       border-radius: 40rpx;
       font-size: 30rpx;

@@ -31,6 +31,16 @@
     >
   </view>
 </template>
+<script>
+export default {
+  onLoad() {
+    uni.setNavigationBarColor({
+      backgroundColor: "#FFFFFF",
+      frontColor: "#000000"
+    });
+  }
+};
+</script>
 <style lang="scss" scoped>
 .content {
   border-top: #f3f4f3 4px solid;

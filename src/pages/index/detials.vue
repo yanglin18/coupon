@@ -58,7 +58,7 @@
           </view>
           <view class="purchase_limit">
             <text>每日限购十张</text>
-            <text>库存：{{ goodsInfo.inventory }}</text>
+            <text class="inventory">库存：{{ goodsInfo.inventory }}</text>
           </view>
         </view>
         <view class="right">
@@ -97,6 +97,7 @@ export default {
   onLoad(val) {
     console.log("val", val);
     this.goodsId = val.id;
+    this.buy_number = Number(val.buy_number) ;
     this.is_getuserInfo = val.is_getuserInfo === "true" ? true : false;
     this.is_getNumber = val.is_getNumber === "true" ? true : false;
     console.log("is_getNumber:", this.is_getNumber);
@@ -104,7 +105,7 @@ export default {
     this.getInstructionsForUse();
     uni.setNavigationBarColor({
       backgroundColor: "#0D5A3A",
-      frontColor: "#ffffff",
+      frontColor: "#ffffff"
     });
   },
   computed: {
@@ -193,6 +194,18 @@ export default {
                     });
                   }
                 });
+              } else {
+                if (res.data.code === "0032" || res.data.code === "0035") {
+                  uni.showToast({
+                    title: res.data.msg || "库存不足",
+                    icon: "none"
+                  });
+                } else {
+                  uni.showToast({
+                    title: "网络异常，请稍后重试",
+                    icon: "none"
+                  });
+                }
               }
             }
           );
@@ -369,8 +382,8 @@ export default {
     opacity: 0.6;
     font-family: PingFangSC-Regular;
     font-size: 24rpx;
-    letter-spacing: -0.58rpx;
-    line-height: 42rpx;
+    letter-spacing: 0rpx;
+    line-height: 33rpx;
     .texta {
       padding: 10rpx;
     }
@@ -384,7 +397,7 @@ export default {
   margin-top: 20rpx;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 1px 15px 20px -10px #000000;
+  box-shadow: 1px 15px 20px -10px rgba(4, 32, 8, 0.6);
   overflow: hidden;
   .card_top {
     display: flex;
@@ -419,17 +432,16 @@ export default {
     }
   }
   image {
-    height: 300rpx;
-    width: 300rpx;
+    height: 320rpx;
+    width: 320rpx;
     margin: 0 auto;
   }
   .card_bottom {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    padding-bottom: 64rpx;
+    padding: 0 50rpx 64rpx;
     align-items: center;
-
     .left {
       display: flex;
       flex-direction: column;
@@ -439,11 +451,19 @@ export default {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-        .reduce,
+        .reduce {
+          display: flex;
+          align-items: center;
+          image {
+            height: 40rpx;
+            width: 40rpx;
+          }
+        }
         .add {
           display: flex;
           align-items: center;
           image {
+            padding: 20rpx;
             height: 40rpx;
             width: 40rpx;
           }
@@ -454,10 +474,13 @@ export default {
         }
       }
       .purchase_limit {
+        margin-top: 14rpx;
         display: flex;
         flex-direction: row;
+        .inventory {
+          margin-left: 14rpx;
+        }
         text {
-          padding: 10rpx;
           opacity: 0.4;
           font-family: PingFangSC-Semibold;
           font-size: 22rpx;

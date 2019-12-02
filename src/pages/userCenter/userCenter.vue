@@ -5,13 +5,12 @@
         <view class="title">
           <text>个人中心 </text>
         </view>
-        <view class="bottom">
+        <view class="bottom" @click="NavToModify">
           <view class="left">
             <image :src="user_info.head_img" />
             <text class="name">{{ user_info.user_name }}</text>
           </view>
-          <view class="right" @click="NavToModify">
-            <text>修改资料</text>
+          <view class="right">
             <image class="arrow" src="../../static/assets/toRight.png" />
           </view>
         </view>
@@ -58,8 +57,13 @@
     <!-- 联系客服弹窗 -->
     <view v-if="contactUS" class="contactUS">
       <view class="contactTop">
-        <text>摩卡星(微信号：mokaxing001)</text>
-        <text @click="callUS">手机号：13570303413</text>
+        <view class="copy_weixin">
+          <text>微信号：mokaxing001</text>
+          <text @click="copy_no" class="copy">复制</text>
+        </view>
+        <view class="Phone_number">
+          <text @click="callUS">手机号：13570303413</text>
+        </view>
       </view>
       <view class="contactBottom">
         <text @click="Iknow">我知道了</text>
@@ -113,8 +117,8 @@ export default {
   onLoad() {
     this.getUserInfo();
     uni.setNavigationBarColor({
-      backgroundColor: "#F3F4F3",
-      frontColor: "#ffffff"
+      backgroundColor: "#FFFFFF",
+      frontColor: "#000000"
     });
   },
   methods: {
@@ -156,7 +160,7 @@ export default {
       });
     },
     // 我知道了
-    Iknow(){
+    Iknow() {
       this.contactUS = false;
     },
     // 跳转
@@ -334,6 +338,21 @@ export default {
           }
         }
       });
+    },
+    // 复制订单号
+    copy_no() {
+      uni.setClipboardData({
+        data: "mokaxing001",
+        success: function() {
+          uni.getClipboardData({
+            success: function() {
+              uni.showToast({
+                title: "复制成功"
+              });
+            }
+          });
+        }
+      });
     }
   }
 };
@@ -466,15 +485,34 @@ export default {
   .contactTop {
     padding-bottom: 37rpx;
     border-bottom: 2rpx solid #e5e5e5;
-    text {
-      display: block;
+    .copy_weixin {
       color: #353535;
       font-weight: bold;
       text-align: center;
       line-height: 47.6rpx;
+      .copy {
+        display: inline;
+        text-decoration: underline;
+        font-size: 24rpx;
+        font-weight: 500;
+        color: #141615;
+        padding-left: 20rpx;
+      }
+    }
+    .Phone_number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text {
+        color: #353535;
+        font-weight: bold;
+        text-align: center;
+        line-height: 47.6rpx;
+      }
     }
   }
   .contactBottom {
+    font-weight: bold;
     color: #42b069;
     letter-spacing: 2rpx;
     text-align: center;
@@ -491,7 +529,7 @@ export default {
   top: 100rpx;
   left: 0;
   z-index: 100;
-  border-radius: 24rpx;
+  border-radius: 28rpx;
   .imgWrap {
     display: flex;
     flex-direction: column;

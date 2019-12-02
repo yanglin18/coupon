@@ -106,7 +106,7 @@ export default {
   onLoad() {
     uni.setNavigationBarColor({
       backgroundColor: "#F3F4F3",
-      frontColor: "#ffffff"
+      frontColor: "#000000"
     });
   },
   onShow() {
@@ -304,6 +304,7 @@ export default {
       uni.showModal({
         title: "",
         content: "您确定已收到所有饮品吗？",
+        confirmColor:'#42b069',
         success: function(resShowModel) {
           if (resShowModel.confirm) {
             uni.getStorage({
@@ -367,6 +368,7 @@ export default {
   display: flex;
   height: 100vh;
   flex-direction: column;
+  background: #ffffff;
   .title {
     font-family: PingFangSC-Semibold;
     font-size: 50rpx;
@@ -476,6 +478,7 @@ export default {
               margin-right: 12rpx;
             }
             font-size: 40rpx;
+            font-weight: bold;
             letter-spacing: 0.5px;
             text-align: right;
           }
@@ -507,8 +510,10 @@ export default {
           align-items: center;
           .useful_time {
             color: #be9e54;
+            font-weight: bold;
             text {
               font-weight: 600;
+              font-weight: 500;
             }
           }
           .isUsed {
@@ -542,7 +547,7 @@ export default {
   top: 100rpx;
   left: 0;
   z-index: 100;
-  border-radius: 24rpx;
+  border-radius: 28rpx;
   .imgWrap {
     display: flex;
     flex-direction: column;

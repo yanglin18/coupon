@@ -15,7 +15,9 @@
     {
       "path": "pages/index/authorize",
       "style": {
-        "navigationBarTitleText": "摩卡星"
+        "navigationBarTitleText": "摩卡星",
+        "navigationStyle":"custom"
+        
       }
     },  
      {
@@ -27,7 +29,7 @@
     {
       "path": "pages/myCardBug/cards",
       "style": {
-        "navigationBarTitleText": "卡券详情"
+        "navigationBarTitleText": "向星伙伴展示优惠券码"
       }
     },
     {
@@ -95,7 +97,7 @@
   "tabBar": {
     "color": "#000000",
     "selectedColor": "#2C9543",
-    "borderStyle": "black",
+    "borderStyle": "white",
     "backgroundColor": "#ffffff",
     "ext-class":"tabBarIcon",
     "list": [

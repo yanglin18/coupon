@@ -1,6 +1,5 @@
 <template>
   <view class="content">
-    <button @click="cleanEvent">清除</button>
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -35,7 +34,7 @@
           <text>{{ item.goods_name }}</text>
         </view>
       </view>
-      <view v-if="item.inventory === 0" class="card_sell_out">
+      <view @click="sellOut" v-if="item.inventory === 0" class="card_sell_out">
         <text>已售罄</text>
       </view>
       <view v-else class="card_bottom">
@@ -53,7 +52,7 @@
               />
             </view>
             <view class="num">{{ item.buy_number }}</view>
-            <view @click.stop="add_number(item)" class="reduce">
+            <view @click.stop="add_number(item)" class="add">
               <image
                 v-show="item.buy_number === 10"
                 src="../../static/images/no_add.png"
@@ -174,7 +173,9 @@ export default {
       is_getuserInfo: false,
       is_getNumber: false,
       // 展示温馨提示
-      showTips: true
+      showTips: true,
+      // 购买开关（防多次点击）
+      buyFlag: true
     };
   },
   computed: {
@@ -184,6 +185,7 @@ export default {
   },
   // 如果detail里面授权登录和手机号，标识返回到主页
   onShow() {
+    this.getGoodsInfo();
     uni.getStorage({
       key: "UserNumber",
       success: phoneNumber => {
@@ -206,7 +208,6 @@ export default {
     }
   },
   onLoad() {
-    this.getGoodsInfo();
     this.getInstructionsForUse();
     this.getBanner();
     this.showTips = false;
@@ -383,7 +384,6 @@ export default {
       if (item.inventory === 0) {
         uni.showToast({
           title: "该优惠券暂时没货哦~",
-          duration: 3000,
           icon: "none"
         });
         return;
@@ -395,12 +395,23 @@ export default {
           "&is_getNumber=" +
           this.is_getNumber +
           "&is_getuserInfo=" +
-          this.is_getuserInfo
+          this.is_getuserInfo +
+          "&buy_number="+item.buy_number
+      });
+    },
+    sellOut() {
+      uni.showToast({
+        title: "该优惠券暂时没货哦~",
+        icon: "none"
       });
     },
     // 直接去购买
     To_buy(item) {
+      if (!this.buyFlag) {
+        return;
+      }
       let that = this;
+      this.buyFlag = false;
       // 先从storage拿到session3rd
       uni.getStorage({
         key: "storage_key",
@@ -416,6 +427,7 @@ export default {
             },
             res => {
               if (res.data.code === "200") {
+                that.buyFlag = true;
                 // 调起支付
                 uni.requestPayment({
                   provider: "wxpay",
@@ -425,7 +437,6 @@ export default {
                   signType: res.data.data.signType,
                   paySign: res.data.data.paySign,
                   success: function(res1) {
-                    console.log("支付成功" + JSON.stringify(res));
                     that.getGoodsInfo();
                     uni.navigateTo({
                       url:
@@ -440,6 +451,15 @@ export default {
                     });
                   }
                 });
+              } else {
+                that.buyFlag = true;
+                if (res.data.code === "0032" || res.data.code === "0035") {
+                  uni.showToast({
+                    title: res.data.msg || "库存不足",
+                    icon: "none"
+                  });
+                  that.getGoodsInfo();
+                }
               }
             }
           );
@@ -512,6 +532,21 @@ export default {
         this.loginIn();
       } else {
         console.log("点击了拒绝授权");
+        uni.getStorage({
+          key: "userID",
+          success: success => {
+            this.Record(
+              {
+                openId: success.data,
+                event_type: 1,
+                result: 0,
+                order_id: "",
+                msg: ""
+              },
+              record => {}
+            );
+          }
+        });
       }
     },
     // 未勾选情况下点我已了解
@@ -552,7 +587,7 @@ export default {
 <style lang="scss">
 .content {
   position: relative;
-  background: #e8e8e8;
+  background: #ffffff;
   padding: 24rpx 40rpx 40rpx;
   min-height: 100vh;
 }
@@ -607,6 +642,8 @@ export default {
     .agreement {
       color: #be9e54;
       opacity: 1;
+      text-decoration: underline;
+      font-weight: bold;
     }
   }
   button {
@@ -614,6 +651,8 @@ export default {
     border-radius: 40rpx;
     margin: 52rpx auto 0;
     width: 530rpx;
+    height: 80rpx;
+    line-height: 80rpx;
     font-size: 30rpx;
     color: #f8f8f8;
   }
@@ -668,13 +707,13 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 1px 15px 20px -10px #000000;
+  box-shadow: 1px 15px 20px -10px rgba(4, 32, 8, 0.6);
   overflow: hidden;
   .card_top {
     padding: 43rpx 50rpx 0;
     display: flex;
     flex-direction: column;
-    padding-bottom: 485rpx;
+    padding-bottom: 425rpx;
     .price {
       display: flex;
       align-items: baseline;
@@ -695,7 +734,7 @@ export default {
       font-weight: 600;
       font-size: 36rpx;
       color: #ffffff;
-      letter-spacing: 2px;
+      letter-spacing: 2rpx;
     }
   }
   .card_sell_out {
@@ -709,7 +748,7 @@ export default {
     font-weight: bold;
   }
   .card_bottom {
-    padding: 0 50rpx 64rpx;
+    padding: 60rpx 50rpx 64rpx;
     display: flex;
     justify-content: space-between;
     .left {
@@ -724,6 +763,15 @@ export default {
           display: flex;
           align-items: center;
           image {
+            height: 40rpx;
+            width: 40rpx;
+          }
+        }
+        .add {
+          display: flex;
+          align-items: center;
+          image {
+            padding: 20rpx;
             height: 40rpx;
             width: 40rpx;
           }
@@ -748,14 +796,17 @@ export default {
           }
         }
         .inventory {
-          margin-left: 8rpx;
+          margin-left: 14rpx;
         }
       }
     }
     button {
       background-color: #ffffff;
+      margin-top: 20rpx;
       border-radius: 45rpx;
       width: 260rpx;
+      height: 60rpx;
+      line-height: 60rpx;
       font-size: 30rpx;
       color: #005334;
       font-weight: 600;

@@ -1,6 +1,6 @@
 <template>
   <view class="content">
-    <view class="title" id="title">修改资料</view>
+    <view class="title" id="title">个人信息</view>
     <view class="top">
       <view class="row1" @click="Toast(1)">
         <text>头像</text>
@@ -49,7 +49,7 @@ export default {
       startDate: "1900-00-00",
       endDate: "2019-00-00",
       user_info: {},
-      birthday:'请选择生日'
+      birthday: "请选择生日"
     };
   },
   onLoad(e) {
@@ -58,8 +58,8 @@ export default {
     this.userData.icon = "../../static/images/user.jpg";
     this.getUserInfo();
     uni.setNavigationBarColor({
-      backgroundColor: "#F3F4F3",
-      frontColor: "#ffffff"
+      backgroundColor: "#ffffff",
+      frontColor: "#000000"
     });
   },
   methods: {
@@ -84,7 +84,7 @@ export default {
                   that.user_info.birthday = "请选择生日";
                 }
               }
-              console.log("用户数据：",that.user_info)
+              console.log("用户数据：", that.user_info);
             }
           );
         }
@@ -104,6 +104,13 @@ export default {
             },
             res => {
               if (res.data.code === "200") {
+                uni.showToast({
+                  title: "保存成功"
+                });
+              } else {
+                uni.showToast({
+                  title: "保存失败"
+                });
               }
             }
           );
@@ -164,16 +171,21 @@ export default {
     justify-content: space-between;
     padding: 21rpx 0;
     height: 60rpx;
-    border-bottom: 1px solid rgba(97, 97, 97, 0.2);
+    border-bottom: 1px solid #eaeaea;
     image {
+      border-radius: 50%;
       height: 60rpx;
       width: 60rpx;
+    }
+    text{
+      line-height: 30rpx;
+      padding-top: 12rpx;
     }
   }
   .row {
     padding: 30rpx 0;
     height: 42rpx;
-    border-bottom: 1px solid rgba(97, 97, 97, 0.2);
+    border-bottom: 1px solid #eaeaea;
     display: flex;
     justify-content: space-between;
     .right {

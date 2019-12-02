@@ -15,6 +15,16 @@
     >
   </view>
 </template>
+<script>
+export default {
+    onLoad() {
+    uni.setNavigationBarColor({
+      backgroundColor: "#FFFFFF",
+      frontColor: "#000000"
+    });
+  }
+}
+</script>
 <style lang="scss" scoped>
 .content {
   padding: 22rpx 40rpx 40rpx;

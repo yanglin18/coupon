@@ -7,6 +7,10 @@
 <script>
 export default {
   onLoad() {
+    uni.setNavigationBarColor({
+      backgroundColor: "#F3F4F3",
+      frontColor: "#000000"
+    });
     // 一个不用基本信息的登录判断是否是新用户
     uni.login({
       success: LoginRes => {
@@ -30,6 +34,13 @@ export default {
                 url: "../index/index"
               });
             } else {
+              if (res.data.code === "0021") {
+                // 将用户id或者游客id存到storage
+                uni.setStorage({
+                  key:"userID",
+                  data:res.data.data.openid
+                })
+              }
               uni.setStorageSync("hasLogin", false);
               console.log("是第一次来的顾客");
               uni.navigateTo({

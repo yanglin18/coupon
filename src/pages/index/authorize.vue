@@ -9,9 +9,9 @@
         open-type="getUserInfo"
         @getuserinfo="GetUserInfo"
       >
-        授权登录
+        授权基本信息
       </button>
-      <button class="button2" @click="backToIndex">返回首页</button>
+      <button class="button2" @click="backToIndex">跳过</button>
     </view>
   </view>
 </template>
@@ -21,6 +21,19 @@ export default {
     return {
       is_getuserInfo: false
     };
+  },
+  onShow() {
+    wx.hideHomeButton({
+      success: res => {
+        console.log("隐藏返回按钮");
+      }
+    });
+  },
+  onLoad() {
+    uni.setNavigationBarColor({
+      backgroundColor: "#F3F4F3",
+      frontColor: "#000000"
+    });
   },
   methods: {
     GetUserInfo(res) {

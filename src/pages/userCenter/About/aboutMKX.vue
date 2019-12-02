@@ -3,7 +3,10 @@
     <view class="title" id="title">关于摩卡星</view>
     <view class="top">
       <view class="p1">
-        <text>摩卡星星巴克优惠券小程序（以下简称“<text class="B">摩卡星</text>”）是一款提供星巴克专属优惠券的应用。</text>
+        <text
+          >摩卡星星巴克优惠券小程序（以下简称“<text class="B">摩卡星</text
+          >”）是一款提供星巴克专属优惠券的应用。</text
+        >
       </view>
       <view class="p1">
         <text
@@ -21,6 +24,12 @@ export default {
   onPageScroll(top) {
     this.scrollFun(top);
   },
+    onLoad() {
+    uni.setNavigationBarColor({
+      backgroundColor: "#FFFFFF",
+      frontColor: "#000000"
+    });
+  },
   methods: {
 
   }
@@ -37,11 +46,12 @@ export default {
   font-size: 50rpx;
   letter-spacing: 0.62px;
   background: #ffffff;
+  font-weight: bold;
 }
 .top {
   border-top: #f3f4f3 4px solid;
   background: #ffffff;
-  padding:0 40rpx;
+  padding: 40rpx;
   .row1 {
     font-size: 36rpx;
     letter-spacing: 0.45px;
@@ -54,12 +64,11 @@ export default {
     letter-spacing: 0.43px;
     text-align: justify;
     line-height: 48rpx;
-    .B{
-        font-weight: 600;
-        color: #333333;
-        letter-spacing: 0.38px;
+    .B {
+      font-weight: 600;
+      color: #333333;
+      letter-spacing: 0.38px;
     }
   }
-
 }
 </style>

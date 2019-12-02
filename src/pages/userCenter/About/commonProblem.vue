@@ -56,6 +56,11 @@ export default {
         );
       }
     });
+
+    uni.setNavigationBarColor({
+      backgroundColor: "#FFFFFF",
+      frontColor: "#000000"
+    });
   }
 };
 </script>
