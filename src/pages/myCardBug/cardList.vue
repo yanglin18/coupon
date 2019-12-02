@@ -257,12 +257,13 @@ export default {
                 if (res.confirm) {
                   uni.openSetting({
                     success(dataAu) {
-                      if (dataAu.scope.writePhotosAlbum) {
-                        uni.setStorage({
-                          key: "PhotoAlbum",
-                          data: "true"
-                        });
-                      }
+                      console.log("相机的授权：",dataAu.scope.writePhotosAlbum)
+                      // if (dataAu.authSetting.scope.writePhotosAlbum) {
+                      //   uni.setStorage({
+                      //     key: "PhotoAlbum",
+                      //     data: "true"
+                      //   });
+                      // }
                     }
                   });
                 } else if (res.cancel) {

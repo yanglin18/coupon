@@ -329,6 +329,12 @@ export default {
                   uni.openSetting({
                     success(dataAu) {
                       console.log("设置信息：", dataAu); //
+                      // if (dataAu.authSetting.scope.writePhotosAlbum === true) {
+                      //   uni.setStorage({
+                      //     key: "PhotoAlbum",
+                      //     data: "true"
+                      //   });
+                      // }
                     }
                   });
                 } else if (res.cancel) {
