@@ -19,17 +19,21 @@
 </template>
 <script>
 export default {
-
   data() {
     return {};
   },
+  onLoad() {
+    uni.setNavigationBarColor({
+      backgroundColor: "#F3F4F3",
+      frontColor: "#ffffff"
+    });
+  },
   methods: {
-
     NavTo(e) {
       uni.navigateTo({
         url: e
       });
-    },
+    }
   }
 };
 </script>
@@ -44,6 +48,7 @@ export default {
   font-size: 50rpx;
   letter-spacing: 0.62px;
   background: #ffffff;
+  font-weight: bold;
 }
 .top {
   margin-top: 10rpx;
@@ -60,7 +65,7 @@ export default {
     }
     image {
       height: 25rpx;
-      width: 25rpx;
+      width: 15rpx;
     }
   }
 }

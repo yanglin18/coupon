@@ -17,17 +17,26 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
       "content-type": "application/json"
     },
     success: res => {
-      if (res.data.code === 200) {
-      } else {
-        // uni.showToast({
-        //   title: res.data.msg || "网络异常，请稍后重试",
-        //   icon: "none"
-        // });
+      if (res.data.code !== "200" && res.data.code !== "0020") {
+        uni.showToast({
+          title: res.data.msg || "网络异常，请稍后重试",
+          icon: "none"
+        });
       }
       callback(res);
     },
-    fail: error => {
-      console.log(error);
+    fail: error => ({}),
+    complete: com => {
+      uni.getNetworkType({
+        success: network => {
+          console.log("网络le")
+          if (network.networkType === "none") {
+            uni.navigateTo({
+              url:'pages/loading/no_network'
+            })
+          }
+        }
+      });
     }
   });
 };

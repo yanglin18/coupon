@@ -15,7 +15,7 @@ export default {
           "member/Login/getLogin",
           { brand_id: 1, channel: "wechat", code: LoginRes.code },
           res => {
-            if (res.data.data.length !== 0) {
+            if (res.data.code === "200") {
               uni.setStorageSync("hasLogin", true);
               console.log("不是第一次来的顾客");
               uni.setStorage({

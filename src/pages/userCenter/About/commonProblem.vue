@@ -66,6 +66,11 @@ export default {
   font-size: 36rpx;
   color: #000000;
   letter-spacing: 0.45px;
+  /deep/.uni-collapse-cell__title-text {
+    font-size: 36rpx;
+    color: #000000;
+    letter-spacing: 0.45px;
+  }
 }
 .title {
   padding: 26rpx 40rpx 12rpx;
@@ -73,8 +78,8 @@ export default {
   letter-spacing: 0.62px;
   background: #ffffff;
 }
-.top{
-   border-top: #f3f4f3 4px solid;
+.top {
+  border-top: #f3f4f3 4px solid;
 }
 .text {
   padding: 16rpx 40rpx 40rpx;

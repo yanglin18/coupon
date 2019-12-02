@@ -121,6 +121,7 @@ export default {
       width: 630rpx;
       margin-bottom: 30rpx;
       height: 88rpx;
+      line-height: 88rpx;
     }
     .button2 {
       border: 2rpx solid #00b265;

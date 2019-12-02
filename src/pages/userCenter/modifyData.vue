@@ -26,18 +26,19 @@
         <picker
           v-if="user_info.birthday === '请选择生日'"
           mode="date"
-          :value="user_info.birthday"
+          :value="birthday"
           :start="startDate"
           :end="endDate"
           @change="bindDateChange"
         >
-          <view class="uni-input">{{ user_info.birthday }} </view>
+          <view class="uni-input">{{ birthday }} </view>
         </picker>
         <text v-else class="right" @click="Toast(5)">{{
           user_info.birthday
         }}</text>
       </view>
     </view>
+    <button @click="saveChange" class="save">保存</button>
   </view>
 </template>
 <script>
@@ -47,7 +48,8 @@ export default {
       userData: {},
       startDate: "1900-00-00",
       endDate: "2019-00-00",
-      user_info: {}
+      user_info: {},
+      birthday:'请选择生日'
     };
   },
   onLoad(e) {
@@ -55,30 +57,14 @@ export default {
     // this.birthday = "2000-01-01";
     this.userData.icon = "../../static/images/user.jpg";
     this.getUserInfo();
+    uni.setNavigationBarColor({
+      backgroundColor: "#F3F4F3",
+      frontColor: "#ffffff"
+    });
   },
   methods: {
     bindDateChange(e) {
-      console.log("e:", e);
-      this.user_info.birthday = e.detail.value;
-      uni.getStorage({
-        key: "storage_key",
-        success: res0 => {
-          this.Ajax(
-            "post",
-            "member/user/set_field",
-            {
-              session3rd: res0.data.session3rd,
-              field: "birthday",
-              data: this.user_info.birthday
-            },
-            res => {
-              if (res.data.code === "200") {
-                console.log("修改生日结果：", res);
-              }
-            }
-          );
-        }
-      });
+      this.birthday = e.detail.value;
     },
     // 获取基本信息
     getUserInfo() {
@@ -94,14 +80,30 @@ export default {
             res => {
               if (res.data.code === "200") {
                 that.user_info = res.data.data.info;
-                console.log(
-                  "that.user_info.birthday:",
-                  that.user_info.birthday
-                );
                 if (!that.user_info.birthday) {
                   that.user_info.birthday = "请选择生日";
                 }
-                console.log("user_info:", this.user_info);
+              }
+              console.log("用户数据：",that.user_info)
+            }
+          );
+        }
+      });
+    },
+    saveChange() {
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          this.Ajax(
+            "post",
+            "member/user/set_field",
+            {
+              session3rd: res0.data.session3rd,
+              field: "birthday",
+              data: this.birthday
+            },
+            res => {
+              if (res.data.code === "200") {
               }
             }
           );
@@ -139,7 +141,7 @@ export default {
 <style lang="scss" scoped>
 .content {
   background: #f3f4f3;
-  // height: 100vh;
+  min-height: 100vh;
   color: #000000;
 }
 .title {
@@ -147,6 +149,7 @@ export default {
   font-size: 50rpx;
   letter-spacing: 0.62px;
   background: #ffffff;
+  font-weight: bold;
 }
 .top {
   background: #ffffff;
@@ -155,10 +158,12 @@ export default {
   font-size: 30rpx;
   color: #000000;
   letter-spacing: 0.38px;
+
   .row1 {
     display: flex;
     justify-content: space-between;
     padding: 21rpx 0;
+    height: 60rpx;
     border-bottom: 1px solid rgba(97, 97, 97, 0.2);
     image {
       height: 60rpx;
@@ -167,6 +172,7 @@ export default {
   }
   .row {
     padding: 30rpx 0;
+    height: 42rpx;
     border-bottom: 1px solid rgba(97, 97, 97, 0.2);
     display: flex;
     justify-content: space-between;
@@ -175,6 +181,19 @@ export default {
       letter-spacing: 0.38px;
       text-align: right;
     }
+    &:last-child {
+      border-bottom: 0;
+    }
   }
+}
+.save {
+  height: 80rpx;
+  width: 530rpx;
+  line-height: 80rpx;
+  border: 2rpx solid #00b360;
+  border-radius: 40rpx;
+  font-size: 30rpx;
+  color: #00b35f;
+  margin-top: 60rpx;
 }
 </style>

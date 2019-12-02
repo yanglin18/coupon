@@ -12,7 +12,7 @@
           </view>
           <view class="right" @click="NavToModify">
             <text>修改资料</text>
-            <image src="../../static/assets/toRight.png" />
+            <image class="arrow" src="../../static/assets/toRight.png" />
           </view>
         </view>
       </view>
@@ -22,7 +22,7 @@
             <image src="../../static/assets/service.png" />
             <text>联系客服</text>
           </view>
-          <image src="../../static/assets/toRight.png" />
+          <image class="arrow" src="../../static/assets/toRight.png" />
         </view>
         <view class="service" @click="NavTo('./about')">
           <view class="left">
@@ -30,7 +30,7 @@
             <text>关于</text>
           </view>
 
-          <image src="../../static/assets/toRight.png" />
+          <image class="arrow" src="../../static/assets/toRight.png" />
         </view>
       </view>
       <view @click="Share" class="share">分享海报 </view>
@@ -55,8 +55,18 @@
         <image class="close_img" src="../../static/assets/close.png" />
       </view>
     </view>
+    <!-- 联系客服弹窗 -->
+    <view v-if="contactUS" class="contactUS">
+      <view class="contactTop">
+        <text>摩卡星(微信号：mokaxing001)</text>
+        <text @click="callUS">手机号：13570303413</text>
+      </view>
+      <view class="contactBottom">
+        <text @click="Iknow">我知道了</text>
+      </view>
+    </view>
     <!-- 遮罩 -->
-    <view class="shadowBox" v-show="share"></view>
+    <view class="shadowBox" v-show="share || contactUS"></view>
   </view>
 </template>
 <script>
@@ -74,7 +84,8 @@ export default {
       src2: "",
       isLoginIn: false, //是否登录
       beautifulPhoto: "", //美图保存地址
-      hasNotLogin: false
+      hasNotLogin: false,
+      contactUS: false
     };
   },
   onShow() {
@@ -136,13 +147,17 @@ export default {
         });
         return;
       }
-      uni.showModal({
-        content: "星小孩（微信号：960411wsy）",
-        confirmText: "我知道了",
-        showCancel: false,
-        confirmColor: "#42B069",
-        success(res) {}
+      this.contactUS = true;
+    },
+    // 拨打电话
+    callUS() {
+      uni.makePhoneCall({
+        phoneNumber: "13570303413" //仅为示例
       });
+    },
+    // 我知道了
+    Iknow(){
+      this.contactUS = false;
     },
     // 跳转
     NavTo(e) {
@@ -363,7 +378,7 @@ export default {
       display: flex;
       flex-direction: row;
       align-items: center;
-      .name{
+      .name {
         font-weight: bold;
       }
       image {
@@ -387,6 +402,9 @@ export default {
         color: #000000;
         letter-spacing: 0.32px;
       }
+      .arrow {
+        width: 15rpx;
+      }
       image {
         height: 25rpx;
         width: 25rpx;
@@ -404,17 +422,22 @@ export default {
     flex-direction: row;
     justify-content: space-between;
     padding: 30rpx 0;
+    height: 42rpx;
     font-size: 30rpx;
     color: #000000;
     letter-spacing: 0.38px;
+    .arrow {
+      width: 15rpx;
+      height: 25rpx;
+    }
     .left {
       display: flex;
       flex-direction: row;
       align-items: center;
     }
     image {
-      height: 26rpx;
-      width: 26rpx;
+      height: 32rpx;
+      width: 32rpx;
       margin-right: 12rpx;
     }
   }
@@ -428,6 +451,36 @@ export default {
   background: #ffffff;
   border-radius: 16rpx;
   color: #ffffff;
+}
+.contactUS {
+  position: fixed;
+  top: 500rpx;
+  width: 640rpx;
+  margin: 0 55rpx;
+  padding: 76rpx 0 32rpx;
+  z-index: 100;
+  background: #ffffff;
+  border-radius: 24rpx;
+  font-size: 34rpx;
+
+  .contactTop {
+    padding-bottom: 37rpx;
+    border-bottom: 2rpx solid #e5e5e5;
+    text {
+      display: block;
+      color: #353535;
+      font-weight: bold;
+      text-align: center;
+      line-height: 47.6rpx;
+    }
+  }
+  .contactBottom {
+    color: #42b069;
+    letter-spacing: 2rpx;
+    text-align: center;
+    line-height: 47.6rpx;
+    padding-top: 30rpx;
+  }
 }
 .sharePopup {
   margin: 0 50rpx;
