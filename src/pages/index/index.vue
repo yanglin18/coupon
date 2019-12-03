@@ -234,7 +234,7 @@ export default {
     }
     return {
       title: "摩卡星",
-      path: "/pages/index/index"
+      path: "/pages/loading/loading"
     };
   },
   onPageScroll() {
@@ -381,7 +381,8 @@ export default {
     add_number(item) {
       if (item.buy_number >= item.inventory) {
         uni.showToast({
-          title: "哎呀，库存不够了~"
+          title: "哎呀，库存不够了~",
+          icon:"none"
         });
         return;
       }

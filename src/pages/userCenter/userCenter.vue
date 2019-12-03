@@ -8,7 +8,6 @@
         <view class="bottom" @click="NavToModify">
           <view class="left">
             <image :src="user_info.head_img || default_avter" />
-
             <button
               size="mini"
               open-type="getUserInfo"
@@ -68,7 +67,9 @@
     <view v-if="contactUS" class="contactUS">
       <view class="contactTop">
         <view class="Phone_number">
-          <text @click="callUS">手机号：<text style="color: #0080ff;">13570303413</text></text>
+          <text @click="callUS"
+            >手机号：<text style="color: #0080ff;">13570303413</text></text
+          >
         </view>
         <view class="copy_weixin">
           <text>微信号：mokaxing001</text>
@@ -102,12 +103,13 @@ export default {
       contactUS: false,
       is_getuserInfo: false,
       UserInfo: {},
-      objQueryPid:'',
+      objQueryPid: "",
       default_avter: "../../static/assets/default_avter.png"
     };
   },
   onShow() {
-    this.getUserInfo();
+
+    this.getUser();
     const hasLogin = uni.getStorageSync("hasLogin");
     if (hasLogin) {
       this.hasNotLogin = false;
@@ -139,19 +141,20 @@ export default {
       frontColor: "#000000"
     });
   },
-    // 用户分享
+  // 用户分享
   onShareAppMessage({ res }) {
     if (res.from === "button") {
       // 来自页面内分享按钮
     }
     return {
       title: "摩卡星",
-      path: "/pages/index/index"
+      path: "/pages/loading/loading"
     };
   },
   methods: {
     // 获取基本信息
-    getUserInfo() {
+    getUser() {
+      console.log("qweqwwwe")
       let that = this;
       let session3rd = "";
       uni.getStorage({
@@ -164,7 +167,7 @@ export default {
             res => {
               if (res.data.code === "200") {
                 that.user_info = res.data.data.info;
-                console.log("user_info:", this.user_info);
+                console.log("user_info:", that.user_info);
               }
             }
           );
@@ -249,18 +252,18 @@ export default {
 
                 if (res.data.code === "200") {
                   uni.setStorageSync("hasLogin", true);
+                  this.hasNotLogin = false;
                   uni.setStorage({
                     key: "storage_key",
                     data: res.data.data,
-                    success: function(e) {
-                      console.log("success", e);
+                    success: (e) =>{
+                      this.getUser();
                     }
                   });
                   uni.setStorage({
                     key: "UserNumber",
                     data: res.data.data.mobile
                   });
-                  this.getUserInfo();
                 }
               }
             );
@@ -272,9 +275,6 @@ export default {
     },
     // 联系客服
     contactService() {
-      if (this.hasNotLogin) {
-        return;
-      }
       this.contactUS = true;
       uni.hideTabBar({
         animation: true
@@ -295,9 +295,6 @@ export default {
     },
     // 跳转
     NavTo(e) {
-      if (this.hasNotLogin) {
-        return;
-      }
       uni.navigateTo({
         url: e
       });
@@ -607,10 +604,10 @@ export default {
         margin-right: 12rpx;
       }
     }
-	image {
-	  height: 32rpx;
-	  width: 32rpx;
-	}
+    image {
+      height: 32rpx;
+      width: 32rpx;
+    }
   }
   .deline {
     border-bottom: 0.5px solid rgba(97, 97, 97, 0.2);
@@ -635,7 +632,7 @@ export default {
   font-size: 34rpx;
 
   .contactTop {
-	padding-left: 145rpx;
+    padding-left: 145rpx;
     padding-bottom: 37rpx;
     border-bottom: 2rpx solid #e5e5e5;
     .copy_weixin {

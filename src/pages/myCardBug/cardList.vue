@@ -151,7 +151,7 @@ export default {
     }
     return {
       title: "摩卡星",
-      path: "/pages/index/index"
+      path: "/pages/loading/loading"
     };
   },
   methods: {
