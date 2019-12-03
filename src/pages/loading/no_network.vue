@@ -3,7 +3,7 @@
     <image src="../../static/assets/no_notwork.png" />
     <text>网络连接不成功</text>
     <text>请稍后再试试吧</text>
-    <button>重新加载</button>
+    <button @click="reload">重新加载</button>
   </view>
 </template>
 <script>
@@ -15,6 +15,12 @@ export default {
     //     url: `../index/index`
     //   });
     // }, 3000);
+  },
+  methods:{
+    reload(){
+      uni.navigateBack({
+      })
+    }
   }
 };
 </script>

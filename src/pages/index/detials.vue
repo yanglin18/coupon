@@ -94,15 +94,17 @@ export default {
       is_getNumber: false
     };
   },
+  onShow() {
+    this.getGoodInfo();
+    this.getInstructionsForUse();
+  },
   onLoad(val) {
     console.log("val", val);
     this.goodsId = val.id;
-    this.buy_number = Number(val.buy_number) ;
+    this.buy_number = Number(val.buy_number);
     this.is_getuserInfo = val.is_getuserInfo === "true" ? true : false;
     this.is_getNumber = val.is_getNumber === "true" ? true : false;
     console.log("is_getNumber:", this.is_getNumber);
-    this.getGoodInfo();
-    this.getInstructionsForUse();
     uni.setNavigationBarColor({
       backgroundColor: "#0D5A3A",
       frontColor: "#ffffff"
@@ -312,6 +314,22 @@ export default {
         console.log("点击了同意基本信息授权");
         this.user_info = res.detail;
         this.is_getuserInfo = true;
+        // 记录同意授权的人
+        uni.getStorage({
+          key: "userID",
+          success: success => {
+            this.Record(
+              {
+                openId: success.data,
+                event_type: 1,
+                result: 1,
+                order_id: "",
+                msg: ""
+              },
+              record => {}
+            );
+          }
+        });
         uni.setStorage({
           key: "userInfo",
           data: this.is_getuserInfo,
@@ -322,6 +340,22 @@ export default {
         this.loginIn();
       } else {
         console.log("点击了拒绝授权");
+        // 记录拒绝授权的人
+        uni.getStorage({
+          key: "userID",
+          success: success => {
+            this.Record(
+              {
+                openId: success.data,
+                event_type: 1,
+                result: 0,
+                order_id: "",
+                msg: ""
+              },
+              record => {}
+            );
+          }
+        });
       }
     },
     // 减少购买数量
@@ -353,7 +387,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .content {
-  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/69254200_1574076274.png")
+  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appmTIXQdmp3575/image/ueditor/45537100_1575352285.png")
     no-repeat center;
   background-size: cover;
   min-height: 100vh;
@@ -440,7 +474,7 @@ export default {
   .card_bottom {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     padding: 0 50rpx 64rpx;
     align-items: center;
     .left {
@@ -458,6 +492,7 @@ export default {
           image {
             height: 40rpx;
             width: 40rpx;
+            margin-right: 20rpx;
           }
         }
         .add {
@@ -482,6 +517,7 @@ export default {
           margin-left: 14rpx;
         }
         text {
+          font-weight: bold;
           opacity: 0.4;
           font-family: PingFangSC-Semibold;
           font-size: 22rpx;

@@ -44,7 +44,7 @@ export default {
                 url: "../index/index"
               });
             } else {
-              if (res.data.code === "0021") {
+              if (res.data.code === "0020") {
                 // 将用户id或者游客id存到storage
                 uni.setStorage({
                   key: "userID",

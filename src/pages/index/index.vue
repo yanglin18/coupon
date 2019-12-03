@@ -142,7 +142,7 @@
           和
           <text
             class="agreement"
-            @click="NavToagreement('../userCenter/agreement/useAgreement')"
+            @click="NavToagreement('../userCenter/agreement/privacyAgreement')"
             >《摩卡星用户隐私保护政策》</text
           >
         </view>
@@ -248,7 +248,7 @@ export default {
     // 登录
     loginIn() {
       let obj = wx.getLaunchOptionsSync();
-      console.log("obj:",obj)
+      console.log("obj:", obj);
       uni.login({
         success: reslogin => {
           if (reslogin.code) {
@@ -307,7 +307,7 @@ export default {
     },
     // 优惠价格
     producePrice(item) {
-      return item.price * item.buy_number ;
+      return item.price * item.buy_number;
     },
     // 原价格
     produceOriginalPrice(item) {
@@ -373,6 +373,12 @@ export default {
     },
     // 增加购买数量
     add_number(item) {
+      if(item.buy_number===item.inventory){
+        uni.showToast({
+          title:"哎呀，库存不够了~"
+        })
+        return;
+      }
       if (item.buy_number >= 10) {
         return;
       }
@@ -445,8 +451,24 @@ export default {
                   package: res.data.data.package,
                   signType: res.data.data.signType,
                   paySign: res.data.data.paySign,
-                  success: function(res1) {
+                  success: (res1)=> {
                     that.getGoodsInfo();
+                    // 记录支付成功的人
+                    uni.getStorage({
+                      key: "userID",
+                      success: success => {
+                        this.Record(
+                          {
+                            openId: success.data,
+                            event_type: 3,
+                            result: 1,
+                            order_id: res.data.data.order_id,
+                            msg: ""
+                          },
+                          record => {}
+                        );
+                      }
+                    });
                     uni.navigateTo({
                       url:
                         "../myCardBug/cards?order_id=" + res.data.data.order_id
@@ -457,6 +479,22 @@ export default {
                     uni.showToast({
                       title: "取消支付",
                       icon: "none"
+                    });
+                    // 记录取消支付的人
+                    uni.getStorage({
+                      key: "userID",
+                      success: success => {
+                        this.Record(
+                          {
+                            openId: success.data,
+                            event_type: 3,
+                            result: 0,
+                            order_id: res.data.data.order_id,
+                            msg: ""
+                          },
+                          record => {}
+                        );
+                      }
                     });
                   }
                 });
@@ -538,6 +576,21 @@ export default {
         // uni.setStorageSync("isFirst", res.detail.userInfo);
         this.user_info = res.detail;
         this.is_getuserInfo = true;
+        uni.getStorage({
+          key: "userID",
+          success: success => {
+            this.Record(
+              {
+                openId: success.data,
+                event_type: 1,
+                result: 1,
+                order_id: "",
+                msg: ""
+              },
+              record => {}
+            );
+          }
+        });
         this.loginIn();
       } else {
         console.log("点击了拒绝授权");
@@ -579,6 +632,22 @@ export default {
         });
         this.userAgree = true;
         this.showTips = true;
+        // 记录同意协议的人
+        uni.getStorage({
+          key: "userID",
+          success: success => {
+            this.Record(
+              {
+                openId: success.data,
+                event_type: 2,
+                result: 1,
+                order_id: "",
+                msg: ""
+              },
+              record => {}
+            );
+          }
+        });
       }
     },
     // 用户同意协议
@@ -640,8 +709,8 @@ export default {
     display: flex;
     align-items: center;
     font-size: 22rpx;
-    color: #000000;
-    opacity: 0.4;
+    color: rgba($color: #000000, $alpha: 0.4);
+    
     margin: 38rpx auto 0;
     letter-spacing: 0.28px;
     text-align: justify;
@@ -777,6 +846,7 @@ export default {
           image {
             height: 40rpx;
             width: 40rpx;
+            margin-right: 20rpx;
           }
         }
         .add {
@@ -797,6 +867,7 @@ export default {
         display: flex;
         margin-top: 14rpx;
         text {
+          font-weight: bold;
           opacity: 0.6;
           font-size: 22rpx;
           color: #ffffff;

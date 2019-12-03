@@ -38,7 +38,7 @@
         }}</text>
       </view>
     </view>
-    <button @click="saveChange" class="save">保存</button>
+    <button v-show="user_info.birthday" @click="saveChange" class="save">保存</button>
   </view>
 </template>
 <script>
@@ -91,29 +91,42 @@ export default {
       });
     },
     saveChange() {
-      uni.getStorage({
-        key: "storage_key",
-        success: res0 => {
-          this.Ajax(
-            "post",
-            "member/user/set_field",
-            {
-              session3rd: res0.data.session3rd,
-              field: "birthday",
-              data: this.birthday
-            },
-            res => {
-              if (res.data.code === "200") {
-                uni.showToast({
-                  title: "保存成功"
-                });
-              } else {
-                uni.showToast({
-                  title: "保存失败"
-                });
+      uni.showModal({
+        title: "",
+        content: "生日信息保存后不可更改，您确定要保存吗？",
+        confirmColor: "#42b069",
+        success: resShowModel => {
+          if (resShowModel.confirm) {
+            uni.getStorage({
+              key: "storage_key",
+              success: res0 => {
+                this.Ajax(
+                  "post",
+                  "member/user/set_field",
+                  {
+                    session3rd: res0.data.session3rd,
+                    field: "birthday",
+                    data: this.birthday
+                  },
+                  res => {
+                    if (res.data.code === "200") {
+                      uni.showToast({
+                        title: "保存成功"
+                      });
+                      uni.navigateBack();
+                    } else {
+                      uni.showToast({
+                        title: "保存失败"
+                      });
+                    }
+                  }
+                );
               }
-            }
-          );
+            });
+          }
+          else{
+
+          }
         }
       });
     },
@@ -177,7 +190,7 @@ export default {
       height: 60rpx;
       width: 60rpx;
     }
-    text{
+    text {
       line-height: 30rpx;
       padding-top: 12rpx;
     }

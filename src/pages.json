@@ -71,7 +71,13 @@
     {
       "path": "pages/userCenter/agreement/useAgreement",
       "style": {
-        "navigationBarTitleText": ""
+        "navigationBarTitleText": "摩卡星用户使用协议"
+      }
+    },
+    {
+      "path": "pages/userCenter/agreement/privacyAgreement",
+      "style": {
+        "navigationBarTitleText": "用户隐私政策"
       }
     },
     {

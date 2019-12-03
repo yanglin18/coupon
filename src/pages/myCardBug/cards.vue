@@ -197,12 +197,44 @@ export default {
       let app = getApp();
       app.globalData.share = true;
       console.log("app:", app);
+      // 记录点击了确认星伙伴已扫码的人
+      uni.getStorage({
+        key: "userID",
+        success: success => {
+          this.Record(
+            {
+              openId: success.data,
+              event_type: 4,
+              result: 1,
+              order_id: '',
+              msg: ""
+            },
+            record => {}
+          );
+        }
+      });
       uni.switchTab({
         url: "./cardList"
       });
     },
     cancel() {
       this.clickScna = false;
+      // 记录未反馈是否扫码的人
+      uni.getStorage({
+        key: "userID",
+        success: success => {
+          this.Record(
+            {
+              openId: success.data,
+              event_type: 4,
+              result: 0,
+              order_id: '',
+              msg: ""
+            },
+            record => {}
+          );
+        }
+      });
     }
   }
 };
@@ -213,7 +245,7 @@ export default {
   position: relative;
   padding: 0 40rpx 160rpx;
   min-height: 100vh;
-  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appuaB1Y9Wy1245/image/ueditor/69254200_1574076274.png")
+  background: url("http://wechatapppro-1252524126.file.myqcloud.com/appmTIXQdmp3575/image/ueditor/45537100_1575352285.png")
     no-repeat center;
   background-size: cover;
   // /deep/ .uni-swiper-slide-frame{
@@ -269,13 +301,13 @@ swiper.uni-swiper-slide-frame {
   display: flex;
   margin-bottom: 40rpx;
   padding: 87rpx 66rpx 100rpx;
-  color: #000000;
+  color: rgba($color: #000000, $alpha: 0.6);
   flex-direction: column;
   .card_order {
     margin: 0 auto;
     font-size: 26rpx;
-    opacity: 0.6;
     .order1 {
+      color: #000000;
       opacity: 1;
       font-size: 40rpx;
       font-weight: bold;

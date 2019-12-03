@@ -41,6 +41,22 @@ export default {
       if (res.detail.userInfo) {
         console.log("点击了同意基本信息授权");
         this.is_getuserInfo = true;
+        // 记录同意授权的人
+        uni.getStorage({
+          key: "userID",
+          success: success => {
+            this.Record(
+              {
+                openId: success.data,
+                event_type: 1,
+                result: 1,
+                order_id: "",
+                msg: ""
+              },
+              record => {}
+            );
+          }
+        });
         this.loginIn(res.detail);
         uni.setStorage({
           key: "userInfo",
@@ -51,11 +67,27 @@ export default {
         });
       } else {
         console.log("点击了拒绝授权");
+        // record拒绝授权的人
+        uni.getStorage({
+          key: "userID",
+          success: success => {
+            this.Record(
+              {
+                openId: success.data,
+                event_type: 1,
+                result: 0,
+                order_id: "",
+                msg: ""
+              },
+              record => {}
+            );
+          }
+        });
       }
       //   不管是否授权都能进入首页
-      uni.switchTab({
-        url: "./index"
-      });
+      // uni.switchTab({
+      //   url: "./index"
+      // });
     },
     // 登录
     loginIn(user_info) {
@@ -144,6 +176,7 @@ export default {
       letter-spacing: 0;
       width: 630rpx;
       height: 80rpx;
+      line-height: 80rpx;
     }
   }
 }

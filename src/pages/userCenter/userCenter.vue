@@ -57,12 +57,12 @@
     <!-- 联系客服弹窗 -->
     <view v-if="contactUS" class="contactUS">
       <view class="contactTop">
+        <view class="Phone_number">
+          <text @click="callUS">手机号：13570303413</text>
+        </view>
         <view class="copy_weixin">
           <text>微信号：mokaxing001</text>
           <text @click="copy_no" class="copy">复制</text>
-        </view>
-        <view class="Phone_number">
-          <text @click="callUS">手机号：13570303413</text>
         </view>
       </view>
       <view class="contactBottom">
@@ -152,6 +152,9 @@ export default {
         return;
       }
       this.contactUS = true;
+      uni.hideTabBar({
+        animation: true
+      });
     },
     // 拨打电话
     callUS() {
@@ -162,6 +165,9 @@ export default {
     // 我知道了
     Iknow() {
       this.contactUS = false;
+      uni.showTabBar({
+        animation: true
+      });
     },
     // 跳转
     NavTo(e) {
@@ -396,7 +402,7 @@ export default {
 }
 .top_card {
   background: #ffffff;
-  padding: 26rpx 40rpx 50rpx;
+  padding: 26rpx 50rpx 50rpx 40rpx;
   .title {
     font-size: 50rpx;
     color: #000000;
@@ -471,7 +477,6 @@ export default {
     image {
       height: 32rpx;
       width: 32rpx;
-      margin-right: 12rpx;
     }
   }
   .deline {
@@ -490,7 +495,7 @@ export default {
   top: 500rpx;
   width: 640rpx;
   margin: 0 55rpx;
-  padding: 76rpx 0 32rpx;
+  padding: 76rpx 0 0;
   z-index: 100;
   background: #ffffff;
   border-radius: 24rpx;
@@ -532,6 +537,7 @@ export default {
     text-align: center;
     line-height: 47.6rpx;
     padding-top: 30rpx;
+    padding-bottom: 32rpx;
   }
 }
 .sharePopup {

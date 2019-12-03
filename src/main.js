@@ -25,7 +25,15 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
       }
       callback(res);
     },
-    fail: error => ({}),
+    fail: error => {
+        uni.showToast({
+          title: "网络异常，请稍后重试",
+          icon: "none"
+        });
+        uni.navigateTo({
+          url:'/pages/loading/no_network'
+        })
+    },
     complete: com => {
       uni.getNetworkType({
         success: network => {

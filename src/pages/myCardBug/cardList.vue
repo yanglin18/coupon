@@ -108,6 +108,9 @@ export default {
       backgroundColor: "#F3F4F3",
       frontColor: "#000000"
     });
+    wx.setTabBarStyle({
+      backgroundColor: "#F3F4F3",
+    });
   },
   onShow() {
     this.getOrderList();
@@ -546,6 +549,9 @@ export default {
             font-size: 28rpx;
             color: #42b069;
             font-weight: 600;
+            &:after{
+              border: none;
+            }
           }
         }
       }
