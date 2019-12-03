@@ -552,6 +552,7 @@ export default {
   margin: 0 50rpx;
   position: fixed;
   top: 100rpx;
+  height: 85vh;
   left: 0;
   z-index: 100;
   border-radius: 28rpx;

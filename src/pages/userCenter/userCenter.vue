@@ -368,7 +368,7 @@ export default {
 .content {
   position: relative;
   background: #f3f4f3;
-  height: 100vh;
+  min-height: 100vh;
   /deep/ .uni-button:after {
     border: 0 !important;
   }
@@ -533,6 +533,7 @@ export default {
   flex-direction: column;
   margin: 0 50rpx;
   position: fixed;
+  height: 85vh;
   top: 100rpx;
   left: 0;
   z-index: 100;
