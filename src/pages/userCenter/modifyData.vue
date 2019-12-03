@@ -98,6 +98,13 @@ export default {
       });
     },
     saveChange() {
+		if(this.birthday === '请选择生日'){
+			uni.showToast({
+			  title: '您还没修改生日呢',
+			  icon: 'none',
+			});
+			return;
+		}
       uni.showModal({
         title: "",
         content: "生日信息保存后不可更改，您确定要保存吗？",
@@ -123,7 +130,8 @@ export default {
                       uni.navigateBack();
                     } else {
                       uni.showToast({
-                        title: "保存失败"
+                        title: "保存失败",
+						icon: 'none',
                       });
                     }
                   }

@@ -40,7 +40,7 @@
         <image class="not_use" v-else :src="item.ticket" />
       </view>
       <view class="bottom">
-        <text>优惠码仅在当天24时前有效，过期不退换</text>
+        <text>优惠码仅在上述有效期内可用，过期不退换</text>
       </view>
     </view>
     <view class="affirm">
