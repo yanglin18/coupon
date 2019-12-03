@@ -64,6 +64,16 @@ export default {
       frontColor: "#000000"
     });
   },
+  // 用户分享
+  onShareAppMessage({ res }) {
+    if (res.from === "button") {
+      // 来自页面内分享按钮
+    }
+    return {
+      title: "摩卡星",
+      path: "/pages/index/index"
+    };
+  },
   methods: {
     showValEvent(item) {
       item.showAllVal = !item.showAllVal;

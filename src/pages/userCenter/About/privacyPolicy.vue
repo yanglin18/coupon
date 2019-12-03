@@ -49,6 +49,16 @@ export default {
   onPageScroll(top) {
     this.scrollFun(top);
   },
+  // 用户分享
+  onShareAppMessage({ res }) {
+    if (res.from === "button") {
+      // 来自页面内分享按钮
+    }
+    return {
+      title: "摩卡星",
+      path: "/pages/index/index"
+    };
+  },
   methods: {}
 };
 </script>

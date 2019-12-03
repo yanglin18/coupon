@@ -64,9 +64,9 @@ export default {
           data: this.is_getuserInfo,
           success: userInfo => {
             console.log("authorize已经授权基本信息并登录了");
-			uni.switchTab({
-			  url: "./index"
-			});
+            uni.switchTab({
+              url: "./index"
+            });
           }
         });
         uni.switchTab({
@@ -181,11 +181,13 @@ export default {
       line-height: 88rpx;
     }
     .button2 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border: 2rpx solid #00b265;
       border-radius: 40rpx;
       font-size: 30rpx;
       color: #42b069;
-      letter-spacing: 0;
       width: 630rpx;
       height: 80rpx;
       line-height: 80rpx;

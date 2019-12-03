@@ -139,6 +139,16 @@ export default {
       frontColor: "#000000"
     });
   },
+    // 用户分享
+  onShareAppMessage({ res }) {
+    if (res.from === "button") {
+      // 来自页面内分享按钮
+    }
+    return {
+      title: "摩卡星",
+      path: "/pages/index/index"
+    };
+  },
   methods: {
     // 获取基本信息
     getUserInfo() {
@@ -238,7 +248,6 @@ export default {
                 console.log("调登录接口返回：", res);
 
                 if (res.data.code === "200") {
-                  this.getUserInfo();
                   uni.setStorageSync("hasLogin", true);
                   uni.setStorage({
                     key: "storage_key",
@@ -251,6 +260,7 @@ export default {
                     key: "UserNumber",
                     data: res.data.data.mobile
                   });
+                  this.getUserInfo();
                 }
               }
             );

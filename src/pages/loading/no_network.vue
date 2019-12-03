@@ -16,10 +16,15 @@ export default {
     //   });
     // }, 3000);
   },
-  methods:{
-    reload(){
-      uni.navigateBack({
-      })
+  methods: {
+    reload() {
+      uni.getNetworkType({
+        success: network => {
+          if (network.networkType !== "none") {
+            uni.navigateBack({});
+          }
+        }
+      });
     }
   }
 };

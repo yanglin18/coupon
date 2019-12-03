@@ -24,15 +24,23 @@ export default {
   onPageScroll(top) {
     this.scrollFun(top);
   },
-    onLoad() {
+  onLoad() {
     uni.setNavigationBarColor({
       backgroundColor: "#FFFFFF",
       frontColor: "#000000"
     });
   },
-  methods: {
-
-  }
+  // 用户分享
+  onShareAppMessage({ res }) {
+    if (res.from === "button") {
+      // 来自页面内分享按钮
+    }
+    return {
+      title: "摩卡星",
+      path: "/pages/index/index"
+    };
+  },
+  methods: {}
 };
 </script>
 <style lang="scss" scoped>
@@ -59,7 +67,7 @@ export default {
   .p1 {
     margin: 8rpx 0;
     font-size: 26rpx;
-    color: rgba(0,0,0,.6);
+    color: rgba(0, 0, 0, 0.6);
     letter-spacing: 0.43px;
     text-align: justify;
     line-height: 48rpx;
