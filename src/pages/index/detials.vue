@@ -91,7 +91,8 @@ export default {
       goodsInfo: {},
       instructionsForUse: "",
       is_getuserInfo: false,
-      is_getNumber: false
+      is_getNumber: false,
+      objQueryPid:''
     };
   },
   onShow() {
@@ -268,7 +269,12 @@ export default {
     },
     // 登录
     loginIn() {
-      let obj = wx.getLaunchOptionsSync();
+      uni.getStorage({
+        key: "obj.query.pid",
+        success: pid => {
+          this.objQueryPid = pid.data;
+        }
+      });
       uni.login({
         success: reslogin => {
           console.log("登录返回：", reslogin);
@@ -281,7 +287,7 @@ export default {
                 channel: "wechat",
                 code: reslogin.code,
                 detail: this.user_info,
-                pid: obj.query.pid
+                pid: this.objQueryPid || 0
               },
               res => {
                 console.log("调登录接口返回：", res);

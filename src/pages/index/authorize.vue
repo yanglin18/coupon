@@ -19,7 +19,8 @@
 export default {
   data() {
     return {
-      is_getuserInfo: false
+      is_getuserInfo: false,
+      objQueryPid: ""
     };
   },
   onShow() {
@@ -65,6 +66,9 @@ export default {
             console.log("authorize已经授权基本信息并登录了");
           }
         });
+        uni.switchTab({
+          url: "./index"
+        });
       } else {
         console.log("点击了拒绝授权");
         // record拒绝授权的人
@@ -91,7 +95,12 @@ export default {
     },
     // 登录
     loginIn(user_info) {
-      let obj = wx.getLaunchOptionsSync();
+      uni.getStorage({
+        key: "obj.query.pid",
+        success: pid => {
+          this.objQueryPid = pid.data;
+        }
+      });
       uni.login({
         success: reslogin => {
           console.log("登录返回：", reslogin);
@@ -104,7 +113,7 @@ export default {
                 channel: "wechat",
                 code: reslogin.code,
                 detail: user_info,
-                pid: obj.query.pid
+                pid: this.objQueryPid || 0
               },
               res => {
                 console.log("调登录接口返回：", res);
