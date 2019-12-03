@@ -8,7 +8,9 @@
       </view>
       <view class="tip_content">
         <view class="texta">
-          <text>{{ instructions_for_use }}</text>
+          <text v-for="(item,index) in instructions_for_use" :key="index">
+			  {{item}}
+		  </text>
         </view>
       </view>
     </view>
@@ -692,7 +694,7 @@ export default {
   margin: 100rpx 50rpx;
   padding: 60rpx 60rpx 100rpx;
   position: fixed;
-  top: 50%;
+  top: 44%;
   left: 0;
   z-index: 100;
   transform: translateY(-50%);
@@ -778,7 +780,12 @@ export default {
     letter-spacing: -0.58rpx;
     line-height: 42rpx;
     .texta {
+	  display: flex;
+	  flex-direction: column;
       margin-top: 8rpx;
+	  text{
+		  margin-bottom: 8rpx;
+	  }
     }
   }
 }
@@ -808,8 +815,12 @@ export default {
     .price {
       display: flex;
       align-items: baseline;
+	  justify-content: space-between;
+	  height: 108rpx;
+	  margin-bottom: 10rpx;
       color: #ffffff;
       .price_now {
+		line-height: 108rpx;
         font-size: 90rpx;
         font-weight: 600;
       }
@@ -841,6 +852,7 @@ export default {
   .card_bottom {
     padding: 60rpx 50rpx 64rpx;
     display: flex;
+	align-items: center;
     justify-content: space-between;
     .left {
       display: flex;
@@ -856,14 +868,12 @@ export default {
           image {
             height: 40rpx;
             width: 40rpx;
-            margin-right: 20rpx;
           }
         }
         .add {
           display: flex;
           align-items: center;
           image {
-            padding: 20rpx;
             height: 40rpx;
             width: 40rpx;
           }
@@ -895,7 +905,6 @@ export default {
     }
     button {
       background-color: #ffffff;
-      margin-top: 20rpx;
       border-radius: 45rpx;
       width: 260rpx;
       height: 60rpx;

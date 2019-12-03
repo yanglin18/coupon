@@ -272,9 +272,9 @@ export default {
     },
     // 联系客服
     contactService() {
-      if (this.hasNotLogin) {
-        return;
-      }
+      // if (this.hasNotLogin) {
+      //   return;
+      // }
       this.contactUS = true;
       uni.hideTabBar({
         animation: true
@@ -625,7 +625,8 @@ export default {
 }
 .contactUS {
   position: fixed;
-  top: 500rpx;
+  top: 47%;
+  transform:translateY(-50%);
   width: 640rpx;
   margin: 0 55rpx;
   padding: 76rpx 0 0;
