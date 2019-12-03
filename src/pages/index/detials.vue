@@ -256,7 +256,7 @@ export default {
                         if (resMobile.data.code === "200") {
                           uni.setStorage({
                             key: "UserNumber",
-                            data: "已经获取手机号"
+                            data: resMobile.data.data.mobile
                           });
                         }
                       }

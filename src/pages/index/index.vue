@@ -703,7 +703,7 @@ export default {
                           console.log(resMobile);
                           uni.setStorage({
                             key: "UserNumber",
-                            data: "已经获取手机号"
+                            data: resMobile.data.data.mobile
                           });
                         }
                       }
