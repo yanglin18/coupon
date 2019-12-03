@@ -24,7 +24,7 @@ export default {
   },
   onLoad() {
     uni.setNavigationBarColor({
-      backgroundColor: "#F3F4F3",
+      backgroundColor: "#ffffff",
       frontColor: "#000000"
     });
   },

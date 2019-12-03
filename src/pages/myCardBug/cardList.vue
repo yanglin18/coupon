@@ -115,6 +115,9 @@ export default {
     this.share = app.globalData.share;
     console.log("是支付完成进入的卡券页面", this.share);
     if (this.share) {
+      uni.hideTabBar({
+        animation: true
+      });
       uni.getStorage({
         key: "storage_key",
         success: res0 => {
@@ -191,6 +194,9 @@ export default {
     },
     // 关闭分享
     close_share() {
+      uni.showTabBar({
+        animation: true
+      });
       this.share = false;
       let app = getApp();
       app.globalData.share = false;
@@ -257,13 +263,12 @@ export default {
                 if (res.confirm) {
                   uni.openSetting({
                     success(dataAu) {
-                      console.log("相机的授权：",dataAu.scope.writePhotosAlbum)
-                      // if (dataAu.authSetting.scope.writePhotosAlbum) {
-                      //   uni.setStorage({
-                      //     key: "PhotoAlbum",
-                      //     data: "true"
-                      //   });
-                      // }
+                      if (dataAu.authSetting["scope.writePhotosAlbum"]) {
+                        uni.setStorage({
+                          key: "PhotoAlbum",
+                          data: "true"
+                        });
+                      }
                     }
                   });
                 } else if (res.cancel) {
@@ -526,8 +531,10 @@ export default {
           .isUsed {
             color: #8f8f8f;
             border: 2rpx solid #dfdfdf;
+            background: #ffffff;
           }
           button {
+            background: #ffffff;
             display: inline-block;
             width: 160rpx;
             height: 60rpx;

@@ -210,6 +210,9 @@ export default {
         });
         return;
       }
+      uni.hideTabBar({
+        animation: true
+      });
       this.share = true;
       uni.getStorage({
         key: "storage_key",
@@ -232,6 +235,9 @@ export default {
     // 关闭分享
     close_share() {
       this.share = false;
+      uni.showTabBar({
+        animation: true
+      });
     },
     // 登出
     loginOutEvent() {
@@ -328,13 +334,12 @@ export default {
                 if (res.confirm) {
                   uni.openSetting({
                     success(dataAu) {
-                      console.log("设置信息：", dataAu); //
-                      // if (dataAu.authSetting.scope.writePhotosAlbum === true) {
-                      //   uni.setStorage({
-                      //     key: "PhotoAlbum",
-                      //     data: "true"
-                      //   });
-                      // }
+                      if (dataAu.authSetting["scope.writePhotosAlbum"]) {
+                        uni.setStorage({
+                          key: "PhotoAlbum",
+                          data: "true"
+                        });
+                      }
                     }
                   });
                 } else if (res.cancel) {
@@ -383,6 +388,8 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
+  bottom: 0;
+  right: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);

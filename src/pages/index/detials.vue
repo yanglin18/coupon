@@ -266,6 +266,7 @@ export default {
     },
     // 登录
     loginIn() {
+      let obj = wx.getLaunchOptionsSync();
       uni.login({
         success: reslogin => {
           console.log("登录返回：", reslogin);
@@ -278,7 +279,7 @@ export default {
                 channel: "wechat",
                 code: reslogin.code,
                 detail: this.user_info,
-                pid: 0
+                pid: obj.sence
               },
               res => {
                 console.log("调登录接口返回：", res);

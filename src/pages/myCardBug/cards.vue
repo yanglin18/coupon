@@ -203,9 +203,6 @@ export default {
     },
     cancel() {
       this.clickScna = false;
-      uni.switchTab({
-        url: "./cardList"
-      });
     }
   }
 };

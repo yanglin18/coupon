@@ -216,7 +216,14 @@ export default {
       this.userAgree = true;
     } else {
       this.userAgree = false;
+      uni.hideTabBar({
+        animation: true
+      });
     }
+    uni.setNavigationBarColor({
+      backgroundColor: "#FFFFFF",
+      frontColor: "#000000"
+    });
   },
   // 用户分享
   onShareAppMessage({ res }) {
@@ -241,6 +248,7 @@ export default {
     // 登录
     loginIn() {
       let obj = wx.getLaunchOptionsSync();
+      console.log("obj:",obj)
       uni.login({
         success: reslogin => {
           if (reslogin.code) {
@@ -299,7 +307,7 @@ export default {
     },
     // 优惠价格
     producePrice(item) {
-      return item.price * item.buy_number + ".00" || 0;
+      return item.price * item.buy_number ;
     },
     // 原价格
     produceOriginalPrice(item) {
@@ -396,7 +404,8 @@ export default {
           this.is_getNumber +
           "&is_getuserInfo=" +
           this.is_getuserInfo +
-          "&buy_number="+item.buy_number
+          "&buy_number=" +
+          item.buy_number
       });
     },
     sellOut() {
@@ -562,6 +571,9 @@ export default {
       if (!this.userOptions) {
         this.NotLearned();
       } else {
+        uni.showTabBar({
+          animation: true
+        });
         uni.checkSession({
           success: loginRes => {}
         });
