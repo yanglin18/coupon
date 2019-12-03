@@ -105,7 +105,6 @@
     "selectedColor": "#2C9543",
     "borderStyle": "white",
     "backgroundColor": "#ffffff",
-    "ext-class":"tabBarIcon",
     "list": [
       {
         "pagePath": "pages/index/index",

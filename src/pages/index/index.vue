@@ -8,9 +8,9 @@
       </view>
       <view class="tip_content">
         <view class="texta">
-          <text v-for="(item,index) in instructions_for_use" :key="index">
-			  {{item}}
-		  </text>
+          <text v-for="(item, index) in instructions_for_use" :key="index">
+            {{ item }}
+          </text>
         </view>
       </view>
     </view>
@@ -93,6 +93,7 @@
     <!-- banner -->
     <view
       class="banner"
+      @click="Share"
       v-for="(item, index) in banners"
       :key="index"
       v-bind:style="{
@@ -152,9 +153,32 @@
       </view>
       <!-- 因为此按钮绑定的事件有三个：1.已经勾选隐私协议。2.调起基本信息授权。3.控制页面下滑露出使用须知 -->
       <!-- 因为调起基本信息无法控制，所以用两个一模一样的按钮。控制这三件事 -->
-      <button :class="userOptions === true?'':'opacity1'" @click="IHaveLearned">
+      <button
+        :class="userOptions === true ? '' : 'opacity1'"
+        @click="IHaveLearned"
+      >
         我已了解
       </button>
+    </view>
+    <!-- 分享弹窗 -->
+    <view v-if="share" class="sharePopup">
+      <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
+        <image :src="beautifulPhoto.show_img" class="bgImage"></image>
+        <view class="weixinIcon">
+          <view class="image_share">
+            <button open-type="share">
+              <image src="../../static/assets/weixin.png" class="imgIcon" />
+            </button>
+            <view class="text_weixin">
+              微信好友
+            </view>
+          </view>
+        </view>
+      </view>
+      <!-- 关闭按钮 -->
+      <view class="close" @click="close_share">
+        <image class="close_img" src="../../static/assets/close.png" />
+      </view>
     </view>
     <!-- 遮罩 -->
     <view class="shadowBox" v-show="!userAgree"></view>
@@ -173,6 +197,7 @@ export default {
       sum_number: 66,
       animationData: {}, //动画
       user_info: {}, //用户信息,
+      share: false, //点击分享
       is_getuserInfo: false,
       is_getNumber: false,
       // 展示温馨提示
@@ -372,6 +397,127 @@ export default {
         console.log("信息：", this.banners);
       });
     },
+    // 分享
+    Share() {
+      if (this.hasNotLogin) {
+        uni.navigateTo({
+          url: "../index/authorize"
+        });
+        return;
+      }
+      uni.hideTabBar({
+        animation: true
+      });
+      this.share = true;
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          console.log("storage参数：", res0);
+          this.Ajax(
+            "post",
+            "member/user/my_qrcode",
+            { session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                console.log("我要的生成美图", res.data.data.list);
+                this.beautifulPhoto = res.data.data.list;
+              }
+            }
+          );
+        }
+      });
+    },
+    // 长按保存图片
+    saveImg(url) {
+      console.log("长按图片");
+      // 先获取相册权限
+      uni.authorize({
+        scope: "scope.writePhotosAlbum",
+        success(res) {
+          console.log("授权成功", res);
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "true"
+          });
+        },
+        fail(error) {
+          // console.log("error:", error);
+          uni.showToast({
+            title: "请授权后再保存",
+            duration: 1000,
+            icon: "none"
+          });
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "false"
+          });
+        },
+        complete() {}
+      });
+      // 再保存
+      uni.getStorage({
+        key: "PhotoAlbum",
+        success: res0 => {
+          if (res0.data === "true") {
+            // 处理图片
+            console.log("开始处理图片");
+            uni.getImageInfo({
+              src: url,
+              success: function(image) {
+                let image_path = image.path;
+                console.log("处理后的图片路径", image);
+                uni.saveImageToPhotosAlbum({
+                  filePath: image_path,
+                  success: function(res0) {
+                    uni.showToast({
+                      title: "保存成功",
+                      duration: 1000
+                    });
+                  },
+                  fail: function(error) {
+                    console.log("保存到手机失败");
+                  }
+                });
+              },
+              fail: error => {
+                console.log("获取图片信息失败");
+              }
+            });
+          } else {
+            console.log("进入false");
+            // 重新调起设置授权相册
+            uni.showModal({
+              title: "提示",
+              content: "必须要授权后才能保存哦",
+              confirmText: "去授权",
+              success: function(res) {
+                if (res.confirm) {
+                  uni.openSetting({
+                    success(dataAu) {
+                      if (dataAu.authSetting["scope.writePhotosAlbum"]) {
+                        uni.setStorage({
+                          key: "PhotoAlbum",
+                          data: "true"
+                        });
+                      }
+                    }
+                  });
+                } else if (res.cancel) {
+                  console.log("用户点击取消");
+                }
+              }
+            });
+          }
+        }
+      });
+    },
+    // 关闭分享
+    close_share() {
+      this.share = false;
+      uni.showTabBar({
+        animation: true
+      });
+    },
     // 减少购买数量
     reduce_number(item) {
       if (item.buy_number <= 1) {
@@ -384,7 +530,7 @@ export default {
       if (item.buy_number >= item.inventory) {
         uni.showToast({
           title: "哎呀，库存不够了~",
-          icon:"none"
+          icon: "none"
         });
         return;
       }
@@ -736,7 +882,7 @@ export default {
       font-weight: bold;
     }
   }
-  .opacity1{
+  .opacity1 {
     opacity: 0.6;
   }
   button {
@@ -781,12 +927,12 @@ export default {
     letter-spacing: -0.58rpx;
     line-height: 42rpx;
     .texta {
-	  display: flex;
-	  flex-direction: column;
+      display: flex;
+      flex-direction: column;
       margin-top: 8rpx;
-	  text{
-		  margin-bottom: 8rpx;
-	  }
+      text {
+        margin-bottom: 8rpx;
+      }
     }
   }
 }
@@ -816,12 +962,12 @@ export default {
     .price {
       display: flex;
       align-items: baseline;
-	  justify-content: space-between;
-	  height: 108rpx;
-	  margin-bottom: 10rpx;
+      justify-content: space-between;
+      height: 108rpx;
+      margin-bottom: 10rpx;
       color: #ffffff;
       .price_now {
-		line-height: 108rpx;
+        line-height: 108rpx;
         font-size: 90rpx;
         font-weight: 600;
       }
@@ -853,7 +999,7 @@ export default {
   .card_bottom {
     padding: 60rpx 50rpx 64rpx;
     display: flex;
-	align-items: center;
+    align-items: center;
     justify-content: space-between;
     .left {
       display: flex;
@@ -936,6 +1082,79 @@ export default {
       opacity: 0.6;
       font-size: 30rpx;
       color: #ffffff;
+    }
+  }
+}
+.sharePopup {
+  margin: 0 50rpx;
+  display: flex;
+  flex-direction: column;
+  margin: 0 50rpx;
+  position: fixed;
+  height: 85vh;
+  top: 100rpx;
+  left: 0;
+  z-index: 100;
+  border-radius: 28rpx;
+  .imgWrap {
+    display: flex;
+    flex-direction: column;
+    width: 650rpx;
+    border-radius: 24rpx;
+    overflow: hidden;
+    .bgImage {
+      width: 100%;
+      height: 816rpx;
+      overflow: hidden;
+    }
+  }
+  .weixinIcon {
+    width: 100%;
+    background: #ffffff;
+    padding: 42rpx 0;
+    .image_share {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      button {
+        line-height: inherit;
+        background: #ffffff;
+        &:after {
+          border: none;
+        }
+      }
+      .imgIcon {
+        position: relative;
+        height: 72rpx;
+        margin: 0 auto;
+        width: 87rpx;
+      }
+    }
+    .text_weixin {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.6;
+      margin: 0 auto;
+      font-size: 26rpx;
+      color: #311b0e;
+      letter-spacing: 0.43px;
+    }
+  }
+  .close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70rpx;
+    width: 70rpx;
+    margin: 0 auto;
+    margin-top: 30rpx;
+    image {
+      height: 100%;
+      width: 100%;
+      transform: rotate(-270deg);
+      border-radius: 50%;
     }
   }
 }
