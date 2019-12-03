@@ -92,7 +92,7 @@ export default {
       instructionsForUse: "",
       is_getuserInfo: false,
       is_getNumber: false,
-      objQueryPid:''
+      objQueryPid: ""
     };
   },
   onShow() {
@@ -111,20 +111,20 @@ export default {
       frontColor: "#ffffff"
     });
   },
-    // 用户分享
+  // 用户分享
   onShareAppMessage({ res }) {
     if (res.from === "button") {
       // 来自页面内分享按钮
     }
     return {
       title: "摩卡星",
-      path: "/pages/index/index"
+      path: "/pages/loading/loading"
     };
   },
   computed: {
     // 优惠价格
     producePrice() {
-      return this.goodsInfo.price * this.buy_number + ".00" || 0;
+      return this.goodsInfo.price * this.buy_number;
     },
     // 原价格
     produceOriginalPrice() {
@@ -143,7 +143,7 @@ export default {
           if (res.data.code === "200") {
             this.goodsInfo = res.data.data.info;
           }
-          console.log("信息：", this.goodsInfo);
+          console.log("信息喵喵：", this.goodsInfo);
         }
       );
     },
@@ -385,6 +385,13 @@ export default {
     },
     // 增加购买数量
     add_number() {
+      if (this.buy_number >= this.goodsInfo.inventory) {
+        uni.showToast({
+          title: "哎呀，库存不够了~",
+          icon:"none"
+        });
+        return;
+      }
       if (this.buy_number >= 10) {
         return;
       } else {
@@ -465,7 +472,7 @@ export default {
         font-size: 90rpx;
         font-weight: 600;
         font-family: HelveticaNeue-Bold;
-        margin-right:20rpx;
+        margin-right: 20rpx;
       }
       .price_original {
         font-size: 30rpx;
@@ -527,7 +534,7 @@ export default {
         display: flex;
         flex-direction: row;
         .inventory {
-		  font-weight: bold;
+          font-weight: bold;
           margin-left: 14rpx;
         }
         text {
