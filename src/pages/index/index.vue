@@ -1,6 +1,6 @@
 <template>
   <view class="content">
-    <button @click="cleanEvent">清理</button>
+    <!-- <button @click="cleanEvent">清理</button> -->
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -181,7 +181,7 @@
       </view>
     </view>
     <!-- 遮罩 -->
-    <view class="shadowBox" v-show="!userAgree"></view>
+    <view class="shadowBox" v-show="!userAgree || share"></view>
   </view>
 </template>
 
@@ -199,6 +199,7 @@ export default {
       user_info: {}, //用户信息,
       share: false, //点击分享
       is_getuserInfo: false,
+      beautifulPhoto: "", //美图保存地址
       is_getNumber: false,
       // 展示温馨提示
       showTips: true,
@@ -399,6 +400,7 @@ export default {
     },
     // 分享
     Share() {
+      const hasLogin = uni.getStorageSync("hasLogin");
       if (!hasLogin) {
         uni.navigateTo({
           url: "./authorize"
@@ -1071,6 +1073,7 @@ export default {
   display: flex;
   margin-top: 30rpx;
   flex-direction: column;
+  box-shadow: 1px 15px 20px -10px rgba(4, 32, 8, 0.6);
   .card_content {
     padding: 60rpx 50rpx 0;
     .text1 {
