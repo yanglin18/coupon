@@ -1,5 +1,6 @@
 <template>
   <view class="content">
+    <!-- <button @click="cleanEvent">清理</button> -->
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -175,7 +176,8 @@ export default {
       // 展示温馨提示
       showTips: true,
       // 购买开关（防多次点击）
-      buyFlag: true
+      buyFlag: true,
+      objQueryPid: "" //登录时需要的Pid
     };
   },
   computed: {
@@ -247,8 +249,12 @@ export default {
   methods: {
     // 登录
     loginIn() {
-      let obj = wx.getLaunchOptionsSync();
-      console.log("obj:", obj);
+      uni.getStorage({
+        key: "obj.query.pid",
+        success: pid => {
+          this.objQueryPid = pid.data;
+        }
+      });
       uni.login({
         success: reslogin => {
           if (reslogin.code) {
@@ -260,7 +266,7 @@ export default {
                 channel: "wechat",
                 code: reslogin.code,
                 detail: this.user_info,
-                pid: obj.scene
+                pid: this.objQueryPid || 0
               },
               res => {
                 if (res.data.code === "200") {
@@ -375,8 +381,8 @@ export default {
     add_number(item) {
       if(item.buy_number>=item.inventory){
         uni.showToast({
-          title:"哎呀，库存不够了~"
-        })
+          title: "哎呀，库存不够了~"
+        });
         return;
       }
       if (item.buy_number >= 10) {
@@ -451,7 +457,7 @@ export default {
                   package: res.data.data.package,
                   signType: res.data.data.signType,
                   paySign: res.data.data.paySign,
-                  success: (res1)=> {
+                  success: res1 => {
                     that.getGoodsInfo();
                     // 记录支付成功的人
                     uni.getStorage({
@@ -710,7 +716,7 @@ export default {
     align-items: center;
     font-size: 22rpx;
     color: rgba($color: #000000, $alpha: 0.4);
-    
+
     margin: 38rpx auto 0;
     letter-spacing: 0.28px;
     text-align: justify;

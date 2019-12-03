@@ -21,6 +21,11 @@ export default {
         }
       }
     });
+    let obj = wx.getLaunchOptionsSync();
+    uni.setStorage({
+      key:"obj.query.pid",
+      data:obj.query.pid
+    })
     // 一个不用基本信息的登录判断是否是新用户
     uni.login({
       success: LoginRes => {

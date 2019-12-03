@@ -7,8 +7,18 @@
         </view>
         <view class="bottom" @click="NavToModify">
           <view class="left">
-            <image :src="user_info.head_img" />
-            <text class="name">{{ user_info.user_name }}</text>
+            <image :src="user_info.head_img || default_avter" />
+
+            <button
+              size="mini"
+              open-type="getUserInfo"
+              @getuserinfo="GetUserInfo"
+              v-if="hasNotLogin"
+              class="Login_in"
+            >
+              登录
+            </button>
+            <text v-else class="name">{{ user_info.user_name }}</text>
           </view>
           <view class="right">
             <image class="arrow" src="../../static/assets/toRight.png" />
@@ -88,11 +98,20 @@ export default {
       src2: "",
       isLoginIn: false, //是否登录
       beautifulPhoto: "", //美图保存地址
-      hasNotLogin: false,
-      contactUS: false
+      hasNotLogin: false, //没有登录
+      contactUS: false,
+      is_getuserInfo: false,
+      UserInfo: {},
+      objQueryPid:'',
+      default_avter: "../../static/assets/default_avter.png"
     };
   },
   onShow() {
+    this.getUserInfo();
+    const hasLogin = uni.getStorageSync("hasLogin");
+    if (hasLogin) {
+      this.hasNotLogin = false;
+    }
     uni.login({
       success: LoginRes => {
         this.Ajax(
@@ -100,7 +119,7 @@ export default {
           "member/Login/getLogin",
           { brand_id: 1, channel: "wechat", code: LoginRes.code },
           res => {
-            if (res.data.data.length !== 0) {
+            if (res.data.code === "200") {
               uni.setStorageSync("hasLogin", true);
               console.log("不是第一次来的顾客");
               this.hasNotLogin = false;
@@ -115,7 +134,6 @@ export default {
     });
   },
   onLoad() {
-    this.getUserInfo();
     uni.setNavigationBarColor({
       backgroundColor: "#FFFFFF",
       frontColor: "#000000"
@@ -143,12 +161,108 @@ export default {
         }
       });
     },
+    // 获取基本信息授权
+    GetUserInfo(res) {
+      console.log(res);
+      if (res.detail.userInfo) {
+        console.log("点击了同意基本信息授权");
+        this.is_getuserInfo = true;
+        this.UserInfo = res.detail;
+        // 记录同意授权的人
+        uni.getStorage({
+          key: "userID",
+          success: success => {
+            this.Record(
+              {
+                openId: success.data,
+                event_type: 1,
+                result: 1,
+                order_id: "",
+                msg: ""
+              },
+              record => {}
+            );
+          }
+        });
+        uni.setStorage({
+          key: "userInfo",
+          data: this.is_getuserInfo,
+          success: userInfo => {
+            console.log("个人中心已经授权基本信息了");
+          }
+        });
+        this.loginIn();
+      } else {
+        console.log("点击了拒绝授权");
+        // 记录拒绝授权的人
+        uni.getStorage({
+          key: "userID",
+          success: success => {
+            this.Record(
+              {
+                openId: success.data,
+                event_type: 1,
+                result: 0,
+                order_id: "",
+                msg: ""
+              },
+              record => {}
+            );
+          }
+        });
+      }
+    },
+    // 登录
+    loginIn() {
+      uni.getStorage({
+        key: "obj.query.pid",
+        success: pid => {
+          this.objQueryPid = pid.data;
+        }
+      });
+      uni.login({
+        success: reslogin => {
+          console.log("登录返回：", reslogin);
+          if (reslogin.code) {
+            this.Ajax(
+              "post",
+              "member/Login/getLogin",
+              {
+                brand_id: 1,
+                channel: "wechat",
+                code: reslogin.code,
+                detail: this.UserInfo,
+                pid: this.objQueryPid || 0
+              },
+              res => {
+                console.log("调登录接口返回：", res);
+
+                if (res.data.code === "200") {
+                  this.getUserInfo();
+                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data,
+                    success: function(e) {
+                      console.log("success", e);
+                    }
+                  });
+                  uni.setStorage({
+                    key: "UserNumber",
+                    data: res.data.data.mobile
+                  });
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+    },
     // 联系客服
     contactService() {
       if (this.hasNotLogin) {
-        uni.navigateTo({
-          url: "../index/authorize"
-        });
         return;
       }
       this.contactUS = true;
@@ -172,9 +286,6 @@ export default {
     // 跳转
     NavTo(e) {
       if (this.hasNotLogin) {
-        uni.navigateTo({
-          url: "../index/authorize"
-        });
         return;
       }
       uni.navigateTo({
@@ -184,9 +295,6 @@ export default {
     // 跳转到修改
     NavToModify() {
       if (this.hasNotLogin) {
-        uni.navigateTo({
-          url: "../index/authorize"
-        });
         return;
       }
       let name = this.user_name;
@@ -420,6 +528,16 @@ export default {
       .name {
         font-weight: bold;
       }
+      .Login_in {
+        color: #999999;
+        background: #ffffff;
+        font-weight: bold;
+        font-size: 40rpx;
+        padding: 0 400rpx 0 0;
+        &:after {
+          border: none;
+        }
+      }
       image {
         height: 120rpx;
         width: 120rpx;
@@ -473,11 +591,11 @@ export default {
       display: flex;
       flex-direction: row;
       align-items: center;
-	  image {
-	    height: 32rpx;
-	    width: 32rpx;
-	    margin-right: 12rpx;
-	  }
+      image {
+        height: 32rpx;
+        width: 32rpx;
+        margin-right: 12rpx;
+      }
     }
 	image {
 	  height: 32rpx;
