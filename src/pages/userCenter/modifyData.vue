@@ -38,7 +38,7 @@
         }}</text>
       </view>
     </view>
-    <button v-show="user_info.birthday" @click="saveChange" class="save">保存</button>
+    <button v-show="!user_info.birthday && user_info.birthday !== '请选择生日'" @click="saveChange" class="save">保存</button>
   </view>
 </template>
 <script>

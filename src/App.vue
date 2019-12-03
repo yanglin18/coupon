@@ -27,4 +27,11 @@ export default {
     width: 46rpx;
   }
 }
+button{
+	background: transparent;
+	// 清除微信自带样式
+	&::after{
+		display: none;
+	}
+}
 </style>

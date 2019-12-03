@@ -58,9 +58,8 @@ export default {
   }
   .p1 {
     margin: 8rpx 0;
-    opacity: 0.6;
     font-size: 26rpx;
-    color: #000000;
+    color: rgba(0,0,0,.6);
     letter-spacing: 0.43px;
     text-align: justify;
     line-height: 48rpx;

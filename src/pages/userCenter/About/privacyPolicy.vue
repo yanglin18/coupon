@@ -62,6 +62,7 @@ export default {
   padding: 26rpx 40rpx 12rpx;
   font-size: 50rpx;
   letter-spacing: 0.62px;
+  font-weight: 600;
   background: #ffffff;
 }
 .top {

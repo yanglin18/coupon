@@ -432,7 +432,7 @@ export default {
   margin-top: 20rpx;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 1px 15px 20px -10px rgba(4, 32, 8, 0.6);
+  box-shadow: 1px 15px 35px -10px rgba(4, 32, 8, 0.6);
   overflow: hidden;
   .card_top {
     display: flex;
@@ -447,9 +447,8 @@ export default {
       .price_now {
         font-size: 90rpx;
         font-weight: 600;
-        margin-left: 40rpx;
         font-family: HelveticaNeue-Bold;
-        margin: 0 20rpx;
+        margin-right:20rpx;
       }
       .price_original {
         font-size: 30rpx;
@@ -463,7 +462,6 @@ export default {
       font-size: 36rpx;
       color: #000000;
       letter-spacing: 0;
-      margin-left: 12rpx;
     }
   }
   image {
@@ -492,14 +490,12 @@ export default {
           image {
             height: 40rpx;
             width: 40rpx;
-            margin-right: 20rpx;
           }
         }
         .add {
           display: flex;
           align-items: center;
           image {
-            padding: 20rpx;
             height: 40rpx;
             width: 40rpx;
           }
@@ -514,10 +510,10 @@ export default {
         display: flex;
         flex-direction: row;
         .inventory {
+		  font-weight: bold;
           margin-left: 14rpx;
         }
         text {
-          font-weight: bold;
           opacity: 0.4;
           font-family: PingFangSC-Semibold;
           font-size: 22rpx;

@@ -58,15 +58,15 @@
     <view v-if="contactUS" class="contactUS">
       <view class="contactTop">
         <view class="Phone_number">
-          <text @click="callUS">手机号：13570303413</text>
+          <text @click="callUS">手机号：<text style="color: #0080ff;">13570303413</text></text>
         </view>
         <view class="copy_weixin">
           <text>微信号：mokaxing001</text>
           <text @click="copy_no" class="copy">复制</text>
         </view>
       </view>
-      <view class="contactBottom">
-        <text @click="Iknow">我知道了</text>
+      <view class="contactBottom" @click="Iknow">
+        <text>我知道了</text>
       </view>
     </view>
     <!-- 遮罩 -->
@@ -473,11 +473,16 @@ export default {
       display: flex;
       flex-direction: row;
       align-items: center;
+	  image {
+	    height: 32rpx;
+	    width: 32rpx;
+	    margin-right: 12rpx;
+	  }
     }
-    image {
-      height: 32rpx;
-      width: 32rpx;
-    }
+	image {
+	  height: 32rpx;
+	  width: 32rpx;
+	}
   }
   .deline {
     border-bottom: 0.5px solid rgba(97, 97, 97, 0.2);
@@ -502,12 +507,13 @@ export default {
   font-size: 34rpx;
 
   .contactTop {
+	padding-left: 145rpx;
     padding-bottom: 37rpx;
     border-bottom: 2rpx solid #e5e5e5;
     .copy_weixin {
       color: #353535;
       font-weight: bold;
-      text-align: center;
+      text-align: left;
       line-height: 47.6rpx;
       .copy {
         display: inline;
@@ -521,7 +527,7 @@ export default {
     .Phone_number {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       text {
         color: #353535;
         font-weight: bold;

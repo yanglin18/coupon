@@ -63,6 +63,9 @@ export default {
           data: this.is_getuserInfo,
           success: userInfo => {
             console.log("authorize已经授权基本信息并登录了");
+			uni.switchTab({
+			  url: "./index"
+			});
           }
         });
       } else {

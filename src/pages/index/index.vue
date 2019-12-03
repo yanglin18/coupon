@@ -373,7 +373,7 @@ export default {
     },
     // 增加购买数量
     add_number(item) {
-      if(item.buy_number===item.inventory){
+      if(item.buy_number>=item.inventory){
         uni.showToast({
           title:"哎呀，库存不够了~"
         })
@@ -769,6 +769,11 @@ export default {
     line-height: 42rpx;
     .texta {
       margin-top: 8rpx;
+	  text{
+		display: inline-block;
+		line-height: 33rpx;
+		text-align: justify;
+	  }
     }
   }
 }
@@ -788,7 +793,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 1px 15px 20px -10px rgba(4, 32, 8, 0.6);
+  box-shadow: 1px 15px 35px -10px rgba(4, 32, 8, 0.6);
   overflow: hidden;
   .card_top {
     padding: 43rpx 50rpx 0;
@@ -846,14 +851,12 @@ export default {
           image {
             height: 40rpx;
             width: 40rpx;
-            margin-right: 20rpx;
           }
         }
         .add {
           display: flex;
           align-items: center;
           image {
-            padding: 20rpx;
             height: 40rpx;
             width: 40rpx;
           }
@@ -865,7 +868,7 @@ export default {
       }
       .purchase_limit {
         display: flex;
-        margin-top: 14rpx;
+        margin-top: 12rpx;
         text {
           font-weight: bold;
           opacity: 0.6;
@@ -880,6 +883,7 @@ export default {
         }
         .inventory {
           margin-left: 14rpx;
+		  font-weight: 600;
         }
       }
     }

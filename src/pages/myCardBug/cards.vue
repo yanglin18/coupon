@@ -300,7 +300,7 @@ swiper.uni-swiper-slide-frame {
   border-radius: 24rpx;
   display: flex;
   margin-bottom: 40rpx;
-  padding: 87rpx 66rpx 100rpx;
+  padding: 34rpx 66rpx 100rpx;
   color: rgba($color: #000000, $alpha: 0.6);
   flex-direction: column;
   .card_order {
