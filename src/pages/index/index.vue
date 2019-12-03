@@ -399,9 +399,9 @@ export default {
     },
     // 分享
     Share() {
-      if (this.hasNotLogin) {
+      if (!hasLogin) {
         uni.navigateTo({
-          url: "../index/authorize"
+          url: "./authorize"
         });
         return;
       }
