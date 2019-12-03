@@ -7,7 +7,7 @@
         <image src="../../static/assets/toRight.png" />
       </view>
       <view class="row" @click="NavTo('./About/privacyPolicy')">
-        <text>隐私权保护政策</text>
+        <text>隐私保护政策</text>
         <image src="../../static/assets/toRight.png" />
       </view>
       <view class="row" @click="NavTo('./About/commonProblem')">

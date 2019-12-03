@@ -7,7 +7,7 @@
       </view>
       <view class="tip_content">
         <view class="texta">
-          <text>{{ instructionsForUse }}</text>
+          <text v-for="(item,index) in instructionsForUse" :key="index">{{ item }}</text>
         </view>
       </view>
     </view>
@@ -301,7 +301,12 @@ swiper.uni-swiper-slide-frame {
     opacity: 0.6;
     font-size: 24rpx;
     .texta {
-      margin-top: 10rpx;
+      display: flex;
+      flex-direction: column;
+      margin-top: 8rpx;
+      text{
+    	  margin-bottom: 8rpx;
+      }
     }
   }
 }

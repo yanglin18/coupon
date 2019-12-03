@@ -68,7 +68,7 @@
       <view class="contactTop">
         <view class="Phone_number">
           <text @click="callUS"
-            >手机号：<text style="color: #0080ff;">13570303413</text></text
+            >手机号：<text style="color: #42B069;">13570303413</text></text
           >
         </view>
         <view class="copy_weixin">
@@ -738,8 +738,8 @@ export default {
     margin: 0 auto;
     margin-top: 30rpx;
     image {
-      height: 100%;
-      width: 100%;
+      height: 70rpx;
+      width: 70rpx;
       transform: rotate(-270deg);
       border-radius: 50%;
     }

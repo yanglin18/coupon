@@ -816,7 +816,7 @@ export default {
     .price {
       display: flex;
       align-items: baseline;
-	  justify-content: space-between;
+	  justify-content: flex-start;
 	  height: 108rpx;
 	  margin-bottom: 10rpx;
       color: #ffffff;
