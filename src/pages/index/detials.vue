@@ -281,12 +281,13 @@ export default {
                 channel: "wechat",
                 code: reslogin.code,
                 detail: this.user_info,
-                pid: obj.sence
+                pid: obj.query.pid
               },
               res => {
                 console.log("调登录接口返回：", res);
-                uni.setStorageSync("hasLogin", true);
+
                 if (res.data.code === "200") {
+                  uni.setStorageSync("hasLogin", true);
                   uni.setStorage({
                     key: "storage_key",
                     data: res.data.data,

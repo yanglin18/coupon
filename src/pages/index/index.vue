@@ -1,5 +1,6 @@
 <template>
   <view class="content">
+    <button @click="cleanEvent">清理</button>
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -260,7 +261,7 @@ export default {
                 channel: "wechat",
                 code: reslogin.code,
                 detail: this.user_info,
-                pid: obj.scene
+                pid: obj.query.pid
               },
               res => {
                 if (res.data.code === "200") {

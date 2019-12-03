@@ -104,7 +104,7 @@ export default {
                 channel: "wechat",
                 code: reslogin.code,
                 detail: user_info,
-                pid: obj.scene
+                pid: obj.query.pid
               },
               res => {
                 console.log("调登录接口返回：", res);
