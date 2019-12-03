@@ -18,6 +18,15 @@ export default {
   },
   onShow() {
     // 一个不用基本信息的登录判断是否是新用户
+    uni.getNetworkType({
+      success: network => {
+        if (network.networkType === "none") {
+          uni.redirectTo({
+            url: "/pages/loading/no_network"
+          });
+        }
+      }
+    });
     uni.login({
       success: LoginRes => {
         this.Ajax(

@@ -18,10 +18,6 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
     },
     success: res => {
       if (res.data.code !== "200" && res.data.code !== "0020") {
-        // uni.showToast({
-        //   title: res.data.msg || "网络异常，请稍后重试",
-        //   icon: "none"
-        // });
       }
       callback(res);
     },
@@ -30,20 +26,8 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
           title: "网络异常，请稍后重试",
           icon: "none"
         });
-        uni.navigateTo({
-          url:'/pages/loading/no_network'
-        })
     },
     complete: com => {
-      uni.getNetworkType({
-        success: network => {
-          if (network.networkType === "none") {
-            uni.navigateTo({
-              url:'pages/loading/no_network'
-            })
-          }
-        }
-      });
     }
   });
 };

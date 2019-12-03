@@ -1080,6 +1080,7 @@ export default {
       margin-bottom: 8rpx;
       font-size: 40rpx;
       color: #ffffff;
+      font-weight: bold;
     }
     .text2 {
       opacity: 0.6;

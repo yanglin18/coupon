@@ -41,7 +41,9 @@
           <image class="arrow" src="../../static/assets/toRight.png" />
         </view>
       </view>
-      <view @click="Share" class="share">分享海报 </view>
+      <view @click="Share" class="share">
+        <image src="../../static/images/share3.jpg" />
+      </view>
     </view>
     <!-- 分享弹窗 -->
     <view v-if="share" class="sharePopup">
@@ -148,7 +150,8 @@ export default {
     }
     return {
       title: "摩卡星",
-      path: "/pages/loading/loading"
+      path: "/pages/loading/loading",
+      imageUrl:'../../static/images/shareCard.jpg'
     };
   },
   methods: {
@@ -614,11 +617,15 @@ export default {
   }
 }
 .share {
-  height: 260rpx;
   margin: 16rpx 40rpx 0;
   background: #ffffff;
   border-radius: 16rpx;
   color: #ffffff;
+  image{
+    height: 240rpx;
+    width: 670rpx;
+    border-radius: 16rpx;
+  }
 }
 .contactUS {
   position: fixed;
