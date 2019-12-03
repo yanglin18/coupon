@@ -6,7 +6,7 @@
 </template>
 <script>
 export default {
-    // 用户分享
+  // 用户分享
   onShareAppMessage({ res }) {
     if (res.from === "button") {
       // 来自页面内分享按钮
@@ -16,26 +16,7 @@ export default {
       path: "/pages/index/index"
     };
   },
-  onLoad() {
-    uni.setNavigationBarColor({
-      backgroundColor: "#F3F4F3",
-      frontColor: "#000000"
-    });
-    uni.getSetting({
-      success: succ => {
-        if (succ.authSetting["scope.writePhotosAlbum"]) {
-          uni.setStorage({
-            key: "PhotoAlbum",
-            data: "true"
-          });
-        }
-      }
-    });
-    let obj = wx.getLaunchOptionsSync();
-    uni.setStorage({
-      key:"obj.query.pid",
-      data:obj.query.pid
-    })
+  onShow() {
     // 一个不用基本信息的登录判断是否是新用户
     uni.login({
       success: LoginRes => {
@@ -76,6 +57,27 @@ export default {
         );
       },
       fail: error => {}
+    });
+  },
+  onLoad() {
+    uni.setNavigationBarColor({
+      backgroundColor: "#F3F4F3",
+      frontColor: "#000000"
+    });
+    uni.getSetting({
+      success: succ => {
+        if (succ.authSetting["scope.writePhotosAlbum"]) {
+          uni.setStorage({
+            key: "PhotoAlbum",
+            data: "true"
+          });
+        }
+      }
+    });
+    let obj = wx.getLaunchOptionsSync();
+    uni.setStorage({
+      key: "obj.query.pid",
+      data: obj.query.pid
     });
   }
 };
