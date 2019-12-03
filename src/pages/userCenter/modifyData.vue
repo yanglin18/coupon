@@ -38,7 +38,13 @@
         }}</text>
       </view>
     </view>
-    <button v-show="user_info.birthday === '请选择生日'" @click="saveChange" class="save">保存</button>
+    <button
+      v-show="user_info.birthday === '请选择生日'"
+      @click="saveChange"
+      class="save"
+    >
+      保存
+    </button>
   </view>
 </template>
 <script>
@@ -49,7 +55,7 @@ export default {
       startDate: "1900-00-00",
       endDate: "2019-00-00",
       user_info: {},
-      birthday: "请选择生日",
+      birthday: "请选择生日"
     };
   },
   onLoad(e) {
@@ -62,11 +68,12 @@ export default {
       frontColor: "#000000"
     });
   },
-    // 用户分享
-  onShareAppMessage({ res }) {
+  // 用户分享
+  onShareAppMessage() {
     return {
-      title: "摩卡星",
-      path: "/pages/loading/loading"
+      title: "我告诉你，这是喝星巴克最优惠的方式",
+      path: "/pages/loading/loading",
+      imageUrl: "../../static/images/shareCard.jpg"
     };
   },
   methods: {
@@ -98,13 +105,13 @@ export default {
       });
     },
     saveChange() {
-		if(this.birthday === '请选择生日'){
-			uni.showToast({
-			  title: '您还没修改生日呢',
-			  icon: 'none',
-			});
-			return;
-		}
+      if (this.birthday === "请选择生日") {
+        uni.showToast({
+          title: "您还没修改生日呢",
+          icon: "none"
+        });
+        return;
+      }
       uni.showModal({
         title: "",
         content: "生日信息保存后不可更改，您确定要保存吗？",
@@ -131,16 +138,14 @@ export default {
                     } else {
                       uni.showToast({
                         title: "保存失败",
-						icon: 'none',
+                        icon: "none"
                       });
                     }
                   }
                 );
               }
             });
-          }
-          else{
-
+          } else {
           }
         }
       });

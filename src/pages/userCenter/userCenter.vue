@@ -144,10 +144,7 @@ export default {
     });
   },
   // 用户分享
-  onShareAppMessage({ res }) {
-    if (res.from === "button") {
-      // 来自页面内分享按钮
-    }
+  onShareAppMessage( ) {
     return {
       title: "摩卡星",
       path: "/pages/loading/loading",
@@ -621,6 +618,7 @@ export default {
   background: #ffffff;
   border-radius: 16rpx;
   color: #ffffff;
+  height: 240rpx;
   image{
     height: 240rpx;
     width: 670rpx;
@@ -633,15 +631,15 @@ export default {
   transform:translateY(-50%);
   width: 640rpx;
   margin: 0 55rpx;
-  padding: 76rpx 0 0;
+  padding: 50rpx 0 0;
   z-index: 100;
   background: #ffffff;
   border-radius: 24rpx;
   font-size: 34rpx;
 
   .contactTop {
-    padding-left: 145rpx;
-    padding-bottom: 37rpx;
+    padding-left: 110rpx;
+    padding-bottom: 50rpx;
     border-bottom: 2rpx solid #e5e5e5;
     .copy_weixin {
       color: #353535;

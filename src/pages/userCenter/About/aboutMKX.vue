@@ -31,13 +31,11 @@ export default {
     });
   },
   // 用户分享
-  onShareAppMessage({ res }) {
-    if (res.from === "button") {
-      // 来自页面内分享按钮
-    }
+  onShareAppMessage() {
     return {
-      title: "摩卡星",
-      path: "/pages/loading/loading"
+      title: "我告诉你，这是喝星巴克最优惠的方式",
+      path: "/pages/loading/loading",
+      imageUrl:'../../static/images/shareCard.jpg'
     };
   },
   methods: {}

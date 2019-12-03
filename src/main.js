@@ -1,6 +1,5 @@
 import Vue from "vue";
 import App from "./App";
-import { callbackify } from "util";
 
 Vue.config.productionTip = false;
 

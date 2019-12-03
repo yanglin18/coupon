@@ -256,13 +256,11 @@ export default {
     });
   },
   // 用户分享
-  onShareAppMessage({ res }) {
-    if (res.from === "button") {
-      // 来自页面内分享按钮
-    }
+  onShareAppMessage() {
     return {
-      title: "摩卡星",
-      path: "/pages/loading/loading"
+      title: "我告诉你，这是喝星巴克最优惠的方式",
+      path: "/pages/loading/loading",
+      imageUrl:'../../static/images/shareCard.jpg'
     };
   },
   onPageScroll() {
@@ -954,7 +952,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 1px 15px 20px -10px rgba(4, 32, 8, 0.6);
+  box-shadow: 1px 15px 40px -10px rgba(4, 32, 8, 0.6);
   overflow: hidden;
   .card_top {
     padding: 43rpx 50rpx 0;
@@ -1069,11 +1067,11 @@ export default {
   //   no-repeat center;
   background-size: cover;
   // margin-bottom: 40rpx;
-  border-radius: 15rpx;
+  border-radius: 24rpx;
   display: flex;
   margin-top: 30rpx;
   flex-direction: column;
-  box-shadow: 1px 15px 20px -10px rgba(4, 32, 8, 0.6);
+  box-shadow: 1px 15px 40px -10px rgba(4, 32, 8, 0.6);
   .card_content {
     padding: 60rpx 50rpx 0;
     .text1 {
