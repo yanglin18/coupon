@@ -962,9 +962,9 @@ export default {
     .price {
       display: flex;
       align-items: baseline;
-      justify-content: space-between;
-      height: 108rpx;
-      margin-bottom: 10rpx;
+	  justify-content: flex-start;
+	  height: 108rpx;
+	  margin-bottom: 10rpx;
       color: #ffffff;
       .price_now {
         line-height: 108rpx;

@@ -395,7 +395,6 @@ export default {
   flex-direction: column;
   background: #ffffff;
   .title {
-    font-family: PingFangSC-Semibold;
     font-size: 50rpx;
     color: #000000;
     font-weight: 500;
@@ -403,7 +402,10 @@ export default {
     padding: 14rpx 40rpx 40rpx;
   }
   .tips {
-    margin-top: 280rpx;
+    position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -420,16 +422,17 @@ export default {
         text-align: center;
       }
       opacity: 0.3;
-      font-family: PingFangSC-Regular;
       font-size: 28rpx;
       color: grey;
     }
   }
   button {
-    margin-top: 256rpx;
+	position: absolute;
+	left: 50%;
+	bottom: 200rpx;
+	transform: translateX(-50%);
     border: 2rpx solid #00b657;
     border-radius: 45rpx;
-    font-family: PingFangSC-Semibold;
     font-size: 30rpx;
     color: #42b069;
     font-size: 500;
@@ -440,7 +443,6 @@ export default {
 }
 .not_empty {
   .title {
-    font-family: PingFangSC-Semibold;
     font-size: 50rpx;
     color: #000000;
     font-weight: 500;
@@ -453,7 +455,6 @@ export default {
     margin-bottom: 40rpx;
     .mouth {
       opacity: 0.6;
-      font-family: PingFangSC-Regular;
       font-size: 30rpx;
       margin: 0 40rpx 16rpx;
       color: #000000;

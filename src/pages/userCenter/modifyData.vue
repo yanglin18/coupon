@@ -15,7 +15,7 @@
         <text class="right">{{ user_info.gender > 1 ? "女" : "男" }}</text>
       </view>
       <view class="row" @click="Toast(4)">
-        <text>绑定手机</text>
+        <text>手机</text>
         <text class="right">{{ user_info.mobile }}</text>
       </view>
       <view class="row">
@@ -38,7 +38,7 @@
         }}</text>
       </view>
     </view>
-    <button v-show="!user_info.birthday && user_info.birthday !== '请选择生日'" @click="saveChange" class="save">保存</button>
+    <button v-show="user_info.birthday === '请选择生日'" @click="saveChange" class="save">保存</button>
   </view>
 </template>
 <script>
@@ -49,7 +49,7 @@ export default {
       startDate: "1900-00-00",
       endDate: "2019-00-00",
       user_info: {},
-      birthday: "请选择生日"
+      birthday: "请选择生日",
     };
   },
   onLoad(e) {
