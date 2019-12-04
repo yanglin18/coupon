@@ -110,7 +110,6 @@ export default {
     };
   },
   onShow() {
-
     this.getUser();
     const hasLogin = uni.getStorageSync("hasLogin");
     if (hasLogin) {
@@ -142,19 +141,22 @@ export default {
       backgroundColor: "#FFFFFF",
       frontColor: "#000000"
     });
+    uni.showShareMenu({
+      withShareTicket: true
+    });
   },
   // 用户分享
-  onShareAppMessage( ) {
+  onShareAppMessage() {
     return {
       title: "我告诉你，这是喝星巴克最优惠的方式",
       path: "/pages/loading/loading",
-      imageUrl:'../../static/images/shareCard.jpg'
+      imageUrl: "../../static/images/shareCard.jpg"
     };
   },
   methods: {
     // 获取基本信息
     getUser() {
-      console.log("qweqwwwe")
+      console.log("qweqwwwe");
       let that = this;
       let session3rd = "";
       uni.getStorage({
@@ -256,7 +258,7 @@ export default {
                   uni.setStorage({
                     key: "storage_key",
                     data: res.data.data,
-                    success: (e) =>{
+                    success: e => {
                       this.getUser();
                     }
                   });
@@ -619,7 +621,7 @@ export default {
   border-radius: 16rpx;
   color: #ffffff;
   height: 240rpx;
-  image{
+  image {
     height: 240rpx;
     width: 670rpx;
     border-radius: 16rpx;
@@ -628,7 +630,7 @@ export default {
 .contactUS {
   position: fixed;
   top: 47%;
-  transform:translateY(-50%);
+  transform: translateY(-50%);
   width: 640rpx;
   margin: 0 55rpx;
   padding: 50rpx 0 0;

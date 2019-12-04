@@ -203,7 +203,7 @@ export default {
       // 展示温馨提示
       showTips: true,
       // 购买开关（防多次点击）
-      buyFlag: true,
+      buyFlag: null,
       objQueryPid: "" //登录时需要的Pid
     };
   },
@@ -257,9 +257,10 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
+
       title: "我告诉你，这是喝星巴克最优惠的方式",
       path: "/pages/loading/loading",
-      imageUrl:'../../static/images/shareCard.jpg'
+      imageUrl: "../../static/images/shareCard.jpg"
     };
   },
   onPageScroll() {
@@ -556,96 +557,95 @@ export default {
     },
     // 直接去购买
     To_buy(item) {
-      if (!this.buyFlag) {
-        return;
+      if (this.buyFlag) {
+        clearTimeout(this.buyFlag);
       }
-      let that = this;
-      this.buyFlag = false;
-      // 先从storage拿到session3rd
-      uni.getStorage({
-        key: "storage_key",
-        success: res0 => {
-          // 调取后台接口，得到支付参数
-          this.Ajax(
-            "post",
-            "member/order/create_order",
-            {
-              session3rd: res0.data.session3rd,
-              goods_id: item.goods_id,
-              num: item.buy_number
-            },
-            res => {
-              if (res.data.code === "200") {
-                that.buyFlag = true;
-                // 调起支付
-                uni.requestPayment({
-                  provider: "wxpay",
-                  timeStamp: String(res.data.data.timeStamp),
-                  nonceStr: res.data.data.nonceStr,
-                  package: res.data.data.package,
-                  signType: res.data.data.signType,
-                  paySign: res.data.data.paySign,
-                  success: res1 => {
-                    that.getGoodsInfo();
-                    // 记录支付成功的人
-                    uni.getStorage({
-                      key: "userID",
-                      success: success => {
-                        this.Record(
-                          {
-                            openId: success.data,
-                            event_type: 3,
-                            result: 1,
-                            order_id: res.data.data.order_id,
-                            msg: ""
-                          },
-                          record => {}
-                        );
-                      }
-                    });
-                    uni.navigateTo({
-                      url:
-                        "../myCardBug/cards?order_id=" + res.data.data.order_id
-                    });
-                  },
-                  fail: function(err) {
-                    console.log("支付失败" + JSON.stringify(err));
+      this.buyFlag = setTimeout(() => {
+        // 先从storage拿到session3rd
+        uni.getStorage({
+          key: "storage_key",
+          success: res0 => {
+            // 调取后台接口，得到支付参数
+            this.Ajax(
+              "post",
+              "member/order/create_order",
+              {
+                session3rd: res0.data.session3rd,
+                goods_id: item.goods_id,
+                num: item.buy_number
+              },
+              res => {
+                if (res.data.code === "200") {
+                  // 调起支付
+                  uni.requestPayment({
+                    provider: "wxpay",
+                    timeStamp: String(res.data.data.timeStamp),
+                    nonceStr: res.data.data.nonceStr,
+                    package: res.data.data.package,
+                    signType: res.data.data.signType,
+                    paySign: res.data.data.paySign,
+                    success: res1 => {
+                      this.getGoodsInfo();
+                      // 记录支付成功的人
+                      uni.getStorage({
+                        key: "userID",
+                        success: success => {
+                          this.Record(
+                            {
+                              openId: success.data,
+                              event_type: 3,
+                              result: 1,
+                              order_id: res.data.data.order_id,
+                              msg: ""
+                            },
+                            record => {}
+                          );
+                        }
+                      });
+                      uni.navigateTo({
+                        url:
+                          "../myCardBug/cards?order_id=" +
+                          res.data.data.order_id
+                      });
+                    },
+                    fail: err => {
+                      console.log("支付失败" + JSON.stringify(err));
+                      uni.showToast({
+                        title: "取消支付",
+                        icon: "none"
+                      });
+                      // 记录取消支付的人
+                      uni.getStorage({
+                        key: "userID",
+                        success: success => {
+                          this.Record(
+                            {
+                              openId: success.data,
+                              event_type: 3,
+                              result: 0,
+                              order_id: res.data.data.order_id,
+                              msg: ""
+                            },
+                            record => {}
+                          );
+                        }
+                      });
+                    }
+                  });
+                } else {
+                  if (res.data.code === "0032" || res.data.code === "0035") {
                     uni.showToast({
-                      title: "取消支付",
+                      title: res.data.msg || "库存不足",
                       icon: "none"
                     });
-                    // 记录取消支付的人
-                    uni.getStorage({
-                      key: "userID",
-                      success: success => {
-                        this.Record(
-                          {
-                            openId: success.data,
-                            event_type: 3,
-                            result: 0,
-                            order_id: res.data.data.order_id,
-                            msg: ""
-                          },
-                          record => {}
-                        );
-                      }
-                    });
+                    this.getGoodsInfo();
                   }
-                });
-              } else {
-                that.buyFlag = true;
-                if (res.data.code === "0032" || res.data.code === "0035") {
-                  uni.showToast({
-                    title: res.data.msg || "库存不足",
-                    icon: "none"
-                  });
-                  that.getGoodsInfo();
                 }
               }
-            }
-          );
-        }
-      });
+            );
+          }
+        });
+      }, 500);
     },
     To_buy1(e) {},
     // 获取手机号
@@ -941,9 +941,9 @@ export default {
     .price {
       display: flex;
       align-items: baseline;
-	  justify-content: flex-start;
-	  height: 108rpx;
-	  margin-bottom: 10rpx;
+      justify-content: flex-start;
+      height: 108rpx;
+      margin-bottom: 10rpx;
       color: #ffffff;
       .price_now {
         line-height: 108rpx;
