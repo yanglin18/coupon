@@ -146,7 +146,7 @@ export default {
   // 用户分享
   onShareAppMessage( ) {
     return {
-      title: "摩卡星",
+      title: "我告诉你，这是喝星巴克最优惠的方式",
       path: "/pages/loading/loading",
       imageUrl:'../../static/images/shareCard.jpg'
     };

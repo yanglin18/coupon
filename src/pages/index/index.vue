@@ -1,6 +1,5 @@
 <template>
   <view class="content">
-    <!-- <button @click="cleanEvent">清理</button> -->
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -68,7 +67,7 @@
             </view>
           </view>
           <view class="purchase_limit">
-            <text>每日限购十张</text>
+            <text>每次限购十张</text>
             <text class="inventory">库存：{{ item.inventory }}</text>
           </view>
         </view>
@@ -314,26 +313,6 @@ export default {
           } else {
             console.log("登录失败！" + res.errMsg);
           }
-        }
-      });
-    },
-    cleanEvent() {
-      uni.getStorage({
-        key: "storage_key",
-        success: res0 => {
-          // 调取后台接口，得到支付参数
-          this.Ajax(
-            "post",
-            "member/User/del_user",
-            {
-              session3rd: res0.data.session3rd
-            },
-            res => {
-              if (res.data.code === "200") {
-                console.log("清理成功!");
-              }
-            }
-          );
         }
       });
     },

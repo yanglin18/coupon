@@ -57,7 +57,7 @@
             ></uni-number-box> -->
           </view>
           <view class="purchase_limit">
-            <text>每日限购十张</text>
+            <text>每次限购十张</text>
             <text class="inventory">库存：{{ goodsInfo.inventory }}</text>
           </view>
         </view>
