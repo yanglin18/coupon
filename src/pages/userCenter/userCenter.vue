@@ -12,7 +12,7 @@
               size="mini"
               open-type="getUserInfo"
               @getuserinfo="GetUserInfo"
-              v-if="hasNotLogin"
+              v-if="!hasLogin1"
               class="Login_in"
             >
               登录
@@ -101,7 +101,7 @@ export default {
       src2: "",
       isLoginIn: false, //是否登录
       beautifulPhoto: "", //美图保存地址
-      hasNotLogin: false, //没有登录
+      hasLogin1: false, //是否登录
       contactUS: false,
       is_getuserInfo: false,
       UserInfo: {},
@@ -113,28 +113,8 @@ export default {
     this.getUser();
     const hasLogin = uni.getStorageSync("hasLogin");
     if (hasLogin) {
-      this.hasNotLogin = false;
+      this.hasLogin1 = true;
     }
-    uni.login({
-      success: LoginRes => {
-        this.Ajax(
-          "post",
-          "member/Login/getLogin",
-          { brand_id: 1, channel: "wechat", code: LoginRes.code },
-          res => {
-            if (res.data.code === "200") {
-              uni.setStorageSync("hasLogin", true);
-              console.log("不是第一次来的顾客");
-              this.hasNotLogin = false;
-            } else {
-              uni.setStorageSync("hasLogin", false);
-              this.hasNotLogin = true;
-            }
-          }
-        );
-      },
-      fail: error => {}
-    });
   },
   onLoad() {
     uni.setNavigationBarColor({
@@ -199,13 +179,6 @@ export default {
             );
           }
         });
-        uni.setStorage({
-          key: "userInfo",
-          data: this.is_getuserInfo,
-          success: userInfo => {
-            console.log("个人中心已经授权基本信息了");
-          }
-        });
         this.loginIn();
       } else {
         console.log("点击了拒绝授权");
@@ -254,7 +227,7 @@ export default {
 
                 if (res.data.code === "200") {
                   uni.setStorageSync("hasLogin", true);
-                  this.hasNotLogin = false;
+                  this.hasLogin1 = true;
                   uni.setStorage({
                     key: "storage_key",
                     data: res.data.data,
@@ -262,10 +235,9 @@ export default {
                       this.getUser();
                     }
                   });
-                  uni.setStorage({
-                    key: "UserNumber",
-                    data: res.data.data.mobile
-                  });
+                  if(res.data.data.mobile){
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
                 }
               }
             );
@@ -303,7 +275,7 @@ export default {
     },
     // 跳转到修改
     NavToModify() {
-      if (this.hasNotLogin) {
+      if (!this.hasLogin1) {
         return;
       }
       let name = this.user_name;
@@ -327,7 +299,7 @@ export default {
     },
     // 分享
     Share() {
-      if (this.hasNotLogin) {
+      if (!this.hasLogin1) {
         uni.navigateTo({
           url: "../index/authorize"
         });

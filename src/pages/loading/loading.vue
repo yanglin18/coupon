@@ -11,11 +11,11 @@ export default {
     return {
       title: "我告诉你，这是喝星巴克最优惠的方式",
       path: "/pages/loading/loading",
-      imageUrl:'../../static/images/shareCard.jpg'
+      imageUrl: "../../static/images/shareCard.jpg"
     };
   },
   onShow() {
-    // 一个不用基本信息的登录判断是否是新用户
+    // 无网络状态下进小程序跳转到无网络页面
     uni.getNetworkType({
       success: network => {
         if (network.networkType === "none") {
@@ -25,6 +25,7 @@ export default {
         }
       }
     });
+    // 一个不用基本信息的登录判断是否是新用户
     uni.login({
       success: LoginRes => {
         this.Ajax(
@@ -39,10 +40,9 @@ export default {
                 key: "storage_key",
                 data: res.data.data
               });
-              uni.setStorage({
-                key: "UserNumber",
-                data: res.data.data.mobile
-              });
+              if (res.data.data.mobile) {
+                uni.setStorageSync("UserNumber", res.data.data.mobile);
+              }
               uni.switchTab({
                 url: "../index/index"
               });

@@ -26,7 +26,7 @@ export default {
   onShow() {
     wx.hideHomeButton({
       success: res => {
-        console.log("隐藏返回按钮");
+        
       }
     });
   },
@@ -38,9 +38,8 @@ export default {
   },
   methods: {
     GetUserInfo(res) {
-      console.log(res);
       if (res.detail.userInfo) {
-        console.log("点击了同意基本信息授权");
+        console.log("点击了同意基本信息授权",res);
         this.is_getuserInfo = true;
         // 记录同意授权的人
         uni.getStorage({
@@ -59,16 +58,6 @@ export default {
           }
         });
         this.loginIn(res.detail);
-        uni.setStorage({
-          key: "userInfo",
-          data: this.is_getuserInfo,
-          success: userInfo => {
-            console.log("authorize已经授权基本信息并登录了");
-            uni.switchTab({
-              url: "./index"
-            });
-          }
-        });
         uni.switchTab({
           url: "./index"
         });
@@ -91,10 +80,6 @@ export default {
           }
         });
       }
-      //   不管是否授权都能进入首页
-      // uni.switchTab({
-      //   url: "./index"
-      // });
     },
     // 登录
     loginIn(user_info) {
@@ -106,7 +91,6 @@ export default {
       });
       uni.login({
         success: reslogin => {
-          console.log("登录返回：", reslogin);
           if (reslogin.code) {
             this.Ajax(
               "post",
@@ -126,13 +110,11 @@ export default {
                     key: "storage_key",
                     data: res.data.data,
                     success: function(e) {
-                      console.log("success", e);
                     }
                   });
-                  uni.setStorage({
-                    key: "UserNumber",
-                    data: res.data.data.mobile
-                  });
+                  if(res.data.data.mobile){
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
                 }
               }
             );

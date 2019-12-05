@@ -1,8 +1,6 @@
 <template>
   <view class="content">
-    <button @click="NavToagreement('../userCenter/agreement/privacyAgreement')">
-      协议
-    </button>
+    <!-- <button @click="cleanEvent">清理</button> -->
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -216,22 +214,10 @@ export default {
   // 如果detail里面授权登录和手机号，标识返回到主页
   onShow() {
     this.getGoodsInfo();
-    uni.getStorage({
-      key: "UserNumber",
-      success: phoneNumber => {
-        if (phoneNumber.data) {
-          this.is_getNumber = true;
-        } else {
-          this.is_getNumber = false;
-        }
-      }
-    });
-    uni.getStorage({
-      key: "userInfo",
-      success: userInfo => {
-        this.is_getuserInfo = userInfo.data;
-      }
-    });
+    const UserNumber = uni.getStorageSync("UserNumber");
+    if (UserNumber) {
+      this.is_getNumber = true;
+    }
     const hasLogin = uni.getStorageSync("hasLogin");
     if (hasLogin) {
       this.is_getuserInfo = true;
@@ -273,6 +259,23 @@ export default {
     uni.stopPullDownRefresh();
   },
   methods: {
+    cleanEvent() {
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          this.Ajax(
+            "post",
+            "member/User/del_user",
+            { session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                console.log("清理成功!");
+              }
+            }
+          );
+        }
+      });
+    },
     // 登录
     loginIn() {
       uni.getStorage({
@@ -304,10 +307,9 @@ export default {
                       console.log("success", e);
                     }
                   });
-                  uni.setStorage({
-                    key: "UserNumber",
-                    data: res.data.data.mobile
-                  });
+                  if (res.data.data.mobile) {
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
                 }
               }
             );
@@ -516,7 +518,7 @@ export default {
           title: "一次只能购买10张哦",
           icon: "none"
         });
-        return
+        return;
       }
       if (item.buy_number >= item.inventory) {
         uni.showToast({
@@ -540,7 +542,7 @@ export default {
     NavToDetial(item) {
       if (item.inventory === 0) {
         uni.showToast({
-          title: "该优惠券暂时没货哦~",
+          title: "全力补货中，请稍等...",
           icon: "none"
         });
         return;
@@ -686,10 +688,12 @@ export default {
                       resMobile => {
                         if (resMobile.data.code === "200") {
                           console.log(resMobile);
-                          uni.setStorage({
-                            key: "UserNumber",
-                            data: resMobile.data.data.mobile
-                          });
+                          if (resMobile.data.data.mobile) {
+                            uni.setStorageSync(
+                              "UserNumber",
+                              resMobile.data.data.mobile
+                            );
+                          }
                         }
                       }
                     );
@@ -715,7 +719,6 @@ export default {
       console.log(res);
       if (res.detail.userInfo) {
         console.log("点击了同意基本信息授权");
-        // uni.setStorageSync("isFirst", res.detail.userInfo);
         this.user_info = res.detail;
         this.is_getuserInfo = true;
         uni.getStorage({

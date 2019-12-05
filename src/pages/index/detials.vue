@@ -100,14 +100,18 @@ export default {
   onShow() {
     this.getGoodInfo();
     this.getInstructionsForUse();
+    const hasLogin = uni.getStorageSync("hasLogin");
+    if (hasLogin) {
+      this.is_getuserInfo = true;
+    }
+    const UserNumber = uni.getStorageSync("UserNumber")
+    if(UserNumber){
+      this.is_getNumber = true;
+    }
   },
   onLoad(val) {
-    console.log("val", val);
     this.goodsId = val.id;
     this.buy_number = Number(val.buy_number);
-    this.is_getuserInfo = val.is_getuserInfo === "true" ? true : false;
-    this.is_getNumber = val.is_getNumber === "true" ? true : false;
-    console.log("is_getNumber:", this.is_getNumber);
     uni.setNavigationBarColor({
       backgroundColor: "#0D5A3A",
       frontColor: "#ffffff"
@@ -139,11 +143,9 @@ export default {
         "member/index/goods_info",
         { goods_id: this.goodsId },
         res => {
-          console.log(res);
           if (res.data.code === "200") {
             this.goodsInfo = res.data.data.info;
           }
-          console.log("信息喵喵：", this.goodsInfo);
         }
       );
     },
@@ -154,11 +156,9 @@ export default {
         "member/index/instructions_for_use",
         { brand_id: 1 },
         res => {
-          console.log(res);
           if (res.data.code === "200") {
             this.instructionsForUse = res.data.data.instructions;
           }
-          console.log("信息：", this.instructionsForUse);
         }
       );
     },
@@ -169,7 +169,6 @@ export default {
       uni.getStorage({
         key: "storage_key",
         success: res0 => {
-          console.log("storage参数：", res0);
           // 调取后台接口，得到支付参数
           this.Ajax(
             "post",
@@ -183,7 +182,6 @@ export default {
               if (res.data.code === "200") {
                 console.log("去支付参数", res);
                 // 调起支付
-                console.log("签名:", res.data.data.paySign);
                 uni.requestPayment({
                   provider: "wxpay",
                   timeStamp: String(res.data.data.timeStamp),
@@ -229,18 +227,17 @@ export default {
     // 获取手机号
     GetPhoneNumber(res0) {
       if (res0.detail.iv) {
-        console.log("点击了同意授权", res0.detail);
+        console.log("点击了同意手机号授权", res0.detail);
         this.is_getNumber = true;
         // 判断登录态
         uni.checkSession({
           // 已登录状态
           success: loginres => {
-            console.log("已登录：", loginres);
+            console.log("已登录状态：", loginres);
             // 获取手机号
             uni.getStorage({
               key: "storage_key",
               success: storageRes => {
-                console.log("storageRes:", storageRes);
                 uni.login({
                   success: loginRes => {
                     this.Ajax(
@@ -254,10 +251,10 @@ export default {
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
-                          uni.setStorage({
-                            key: "UserNumber",
-                            data: resMobile.data.data.mobile
-                          });
+                          uni.setStorageSync(
+                            "UserNumber",
+                            resMobile.data.data.mobile
+                          );
                         }
                       }
                     );
@@ -274,7 +271,7 @@ export default {
           }
         });
       } else {
-        console.log("点击了拒绝授权");
+        console.log("点击了拒绝手机号授权");
       }
     },
     // 登录
@@ -311,10 +308,9 @@ export default {
                       console.log("success", e);
                     }
                   });
-                  uni.setStorage({
-                    key: "UserNumber",
-                    data: res.data.data.mobile
-                  });
+                  if(res.data.data.mobile){
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
                 }
               }
             );
@@ -345,13 +341,6 @@ export default {
               },
               record => {}
             );
-          }
-        });
-        uni.setStorage({
-          key: "userInfo",
-          data: this.is_getuserInfo,
-          success: userInfo => {
-            console.log("detail已经授权基本信息了");
           }
         });
         this.loginIn();
