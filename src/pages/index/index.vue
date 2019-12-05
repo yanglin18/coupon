@@ -1,5 +1,8 @@
 <template>
   <view class="content">
+    <button @click="NavToagreement('../userCenter/agreement/privacyAgreement')">
+      协议
+    </button>
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -37,7 +40,7 @@
         </view>
       </view>
       <view @click="sellOut" v-if="item.inventory === 0" class="card_sell_out">
-        <text>已售罄</text>
+        <text>补货中</text>
       </view>
       <view v-else class="card_bottom">
         <view class="left">
@@ -46,7 +49,6 @@
               <image
                 v-show="item.buy_number === 1"
                 src="../../static/images/no_reduce.png"
-                @click="Toast('只有一张，不能再减少啦')"
               />
               <image
                 v-show="item.buy_number !== 1"
@@ -58,7 +60,6 @@
               <image
                 v-show="item.buy_number === 10"
                 src="../../static/images/no_add.png"
-                @click="Toast('该优惠券最多只能买十张哦')"
               />
               <image
                 v-show="item.buy_number !== 10"
@@ -257,7 +258,6 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
-
       title: "我告诉你，这是喝星巴克最优惠的方式",
       path: "/pages/loading/loading",
       imageUrl: "../../static/images/shareCard.jpg"
@@ -501,20 +501,28 @@ export default {
     // 减少购买数量
     reduce_number(item) {
       if (item.buy_number <= 1) {
+        uni.showToast({
+          title: "只有一张，不能再减少啦",
+          icon: "none"
+        });
         return;
       }
       item.buy_number--;
     },
     // 增加购买数量
     add_number(item) {
+      if (item.buy_number >= 10) {
+        uni.showToast({
+          title: "一次只能购买10张哦",
+          icon: "none"
+        });
+        return
+      }
       if (item.buy_number >= item.inventory) {
         uni.showToast({
           title: "哎呀，库存不够了~",
           icon: "none"
         });
-        return;
-      }
-      if (item.buy_number >= 10) {
         return;
       }
       item.buy_number++;
@@ -551,7 +559,7 @@ export default {
     },
     sellOut() {
       uni.showToast({
-        title: "该优惠券暂时没货哦~",
+        title: "全力补货中，请稍等...",
         icon: "none"
       });
     },
@@ -1033,8 +1041,8 @@ export default {
       background-color: #ffffff;
       border-radius: 45rpx;
       width: 260rpx;
-      height: 60rpx;
-      line-height: 60rpx;
+      height: 72rpx;
+      line-height: 72rpx;
       font-size: 30rpx;
       color: #005334;
       font-weight: 600;

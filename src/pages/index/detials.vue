@@ -7,7 +7,9 @@
       </view>
       <view class="tip_content">
         <view class="texta">
-          <text v-for="(item,index) in instructionsForUse" :key="index">{{ item }}</text>
+          <text v-for="(item, index) in instructionsForUse" :key="index">{{
+            item
+          }}</text>
         </view>
       </view>
     </view>
@@ -114,9 +116,9 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
-       title: "我告诉你，这是喝星巴克最优惠的方式",
+      title: "我告诉你，这是喝星巴克最优惠的方式",
       path: "/pages/loading/loading",
-      imageUrl:'../../static/images/shareCard.jpg'
+      imageUrl: "../../static/images/shareCard.jpg"
     };
   },
   computed: {
@@ -376,6 +378,10 @@ export default {
     // 减少购买数量
     reduce_number() {
       if (this.buy_number <= 1) {
+        uni.showToast({
+          title: "只有一张，不能再减少啦",
+          icon: "none"
+        });
         return;
       } else {
         this.buy_number--;
@@ -383,18 +389,21 @@ export default {
     },
     // 增加购买数量
     add_number() {
-      if (this.buy_number >= this.goodsInfo.inventory) {
+      if (this.buy_number >= 10) {
         uni.showToast({
-          title: "哎呀，库存不够了~",
-          icon:"none"
+          title: "一次只能购买10张哦",
+          icon: "none"
         });
         return;
       }
-      if (this.buy_number >= 10) {
+      if (this.buy_number >= this.goodsInfo.inventory) {
+        uni.showToast({
+          title: "哎呀，库存不够了~",
+          icon: "none"
+        });
         return;
-      } else {
-        this.buy_number++;
       }
+      this.buy_number++;
     },
     // 提示
     Toast(e) {
@@ -444,8 +453,8 @@ export default {
       display: flex;
       flex-direction: column;
       margin-top: 8rpx;
-      text{
-      	margin-bottom: 8rpx;
+      text {
+        margin-bottom: 8rpx;
       }
     }
   }
@@ -555,9 +564,9 @@ export default {
       border-radius: 45rpx;
       font-size: 30rpx;
       color: #ffffff;
-      height: 60rpx;
+      height: 72rpx;
       width: 260rpx;
-      line-height: 60rpx;
+      line-height: 72rpx;
     }
   }
 }

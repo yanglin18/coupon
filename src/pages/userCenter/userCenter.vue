@@ -595,6 +595,7 @@ export default {
     .arrow {
       width: 15rpx;
       height: 25rpx;
+      margin-top: 8rpx;
     }
     .left {
       display: flex;

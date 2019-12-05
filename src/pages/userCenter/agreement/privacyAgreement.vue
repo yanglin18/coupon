@@ -48,7 +48,7 @@
 			<br />
 			十三、 其他
 		</view>
-		<view class="title">正文</view>
+		<view class="title1">正文</view>
 		<view class="title">一、本《隐私政策》的适用范围</view>
 		<view class="p1">
 			1.1 、除本《隐私政策》另有规定外，本《隐私政策》所用词语与《服务协议》所定义的词语具有相同的涵义。
@@ -266,7 +266,13 @@ export default {
 	background: #ffffff;
 }
 .title {
-	margin: 16rpx 0;
+	// margin: 16rpx 0;
+	font-size: 36rpx;
+	color: #000000;
+	letter-spacing: 0.45px;
+}
+.title1 {
+	margin: 40rpx 0 16rpx;
 	font-size: 36rpx;
 	color: #000000;
 	letter-spacing: 0.45px;
