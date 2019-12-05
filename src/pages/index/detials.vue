@@ -223,7 +223,9 @@ export default {
         }
       });
     },
-    To_buy1(e) {},
+    To_buy1(e) {
+      console.log("to_buy1")
+    },
     // 获取手机号
     GetPhoneNumber(res0) {
       if (res0.detail.iv) {

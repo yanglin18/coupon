@@ -25,9 +25,7 @@ export default {
   },
   onShow() {
     wx.hideHomeButton({
-      success: res => {
-        
-      }
+      success: res => {}
     });
   },
   onLoad() {
@@ -39,7 +37,7 @@ export default {
   methods: {
     GetUserInfo(res) {
       if (res.detail.userInfo) {
-        console.log("点击了同意基本信息授权",res);
+        console.log("点击了同意基本信息授权", res);
         this.is_getuserInfo = true;
         // 记录同意授权的人
         uni.getStorage({
@@ -58,9 +56,6 @@ export default {
           }
         });
         this.loginIn(res.detail);
-        uni.switchTab({
-          url: "./index"
-        });
       } else {
         console.log("点击了拒绝授权");
         // record拒绝授权的人
@@ -109,12 +104,14 @@ export default {
                   uni.setStorage({
                     key: "storage_key",
                     data: res.data.data,
-                    success: function(e) {
-                    }
+                    success: function(e) {}
                   });
-                  if(res.data.data.mobile){
+                  if (res.data.data.mobile) {
                     uni.setStorageSync("UserNumber", res.data.data.mobile);
                   }
+                  uni.switchTab({
+                    url: "./index"
+                  });
                 }
               }
             );

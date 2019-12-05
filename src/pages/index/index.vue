@@ -1,6 +1,6 @@
 <template>
   <view class="content">
-    <!-- <button @click="cleanEvent">清理</button> -->
+    <button @click="cleanEvent">清理</button>
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -567,11 +567,15 @@ export default {
     },
     // 直接去购买
     To_buy(item) {
+      console.log("to_buy");
       if (this.buyFlag) {
         clearTimeout(this.buyFlag);
       }
       this.buyFlag = setTimeout(() => {
         // 先从storage拿到session3rd
+        uni.showLoading({
+          title: "加载中..."
+        });
         uni.getStorage({
           key: "storage_key",
           success: res0 => {
@@ -595,6 +599,7 @@ export default {
                     signType: res.data.data.signType,
                     paySign: res.data.data.paySign,
                     success: res1 => {
+                      uni.hideLoading();
                       this.getGoodsInfo();
                       // 记录支付成功的人
                       uni.getStorage({
@@ -619,6 +624,7 @@ export default {
                       });
                     },
                     fail: err => {
+                      uni.hideLoading();
                       console.log("支付失败" + JSON.stringify(err));
                       uni.showToast({
                         title: "取消支付",
@@ -643,6 +649,7 @@ export default {
                     }
                   });
                 } else {
+                  uni.hideLoading();
                   if (res.data.code === "0032" || res.data.code === "0035") {
                     uni.showToast({
                       title: res.data.msg || "库存不足",
@@ -657,11 +664,16 @@ export default {
         });
       }, 500);
     },
-    To_buy1(e) {},
+    To_buy1(e) {
+      console.log("to_buy1");
+    },
     // 获取手机号
     GetPhoneNumber(res0) {
-      console.log(res0);
+      uni.showLoading({
+        title: "加载中..."
+      });
       if (res0.detail.iv) {
+        uni.hideLoading();
         console.log("点击了同意授权", res0.detail);
         this.is_getNumber = true;
         // 判断登录态
@@ -710,6 +722,7 @@ export default {
           }
         });
       } else {
+        uni.hideLoading();
         console.log("点击了拒绝授权");
       }
     },
