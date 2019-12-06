@@ -109,6 +109,7 @@ export default {
                   if (res.data.data.mobile) {
                     uni.setStorageSync("UserNumber", res.data.data.mobile);
                   }
+                  uni.setStorageSync("isAuthorizeLogin", true);
                   uni.switchTab({
                     url: "./index"
                   });

@@ -222,13 +222,15 @@ export default {
     if (hasLogin) {
       this.is_getuserInfo = true;
     }
+    console.log("登录成功？",hasLogin,this.is_getuserInfo)
   },
   onLoad() {
     this.getInstructionsForUse();
     this.getBanner();
     this.showTips = false;
+    const isAuthorizeLogin = uni.getStorageSync("isAuthorizeLogin")
     const hasLogin = uni.getStorageSync("hasLogin");
-    if (hasLogin) {
+    if (hasLogin && !isAuthorizeLogin) {
       this.userAgree = true;
     } else {
       this.userAgree = false;
