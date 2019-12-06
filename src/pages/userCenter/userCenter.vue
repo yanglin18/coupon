@@ -74,7 +74,7 @@
           >
         </view>
         <view class="copy_weixin">
-          <text>微信号：mokaxing001</text>
+          <text>微信号：mokaxing01</text>
           <text @click="copy_no" class="copy">复制</text>
         </view>
       </view>

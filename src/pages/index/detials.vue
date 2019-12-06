@@ -16,8 +16,8 @@
     <view class="goods_card">
       <view class="card_top">
         <view class="price">
-          <text class="price_now">&yen;{{ producePrice }}</text>
-          <text class="price_original">&yen;{{ produceOriginalPrice }}</text>
+          <text class="price_now">&yen;{{ producePrice() }}</text>
+          <text class="price_original">&yen;{{ produceOriginalPrice() }}</text>
         </view>
         <view class="name">
           <text>{{ goodsInfo.goods_name }}</text>
@@ -85,17 +85,20 @@
 export default {
   data() {
     return {
-      price: "24.00",
-      price_original: "33.00",
       buy_number: 1,
       sum_number: 999,
       goodsId: "",
       goodsInfo: {},
-      instructionsForUse: "",
+      instructionsForUse: {},
       is_getuserInfo: false,
       is_getNumber: false,
-      objQueryPid: ""
+      objQueryPid: "",
+      buyFlag: null
     };
+  },
+  onReady() {
+    this.getGoodInfo();
+    this.getInstructionsForUse();
   },
   onShow() {
     this.getGoodInfo();
@@ -104,14 +107,16 @@ export default {
     if (hasLogin) {
       this.is_getuserInfo = true;
     }
-    const UserNumber = uni.getStorageSync("UserNumber")
-    if(UserNumber){
+    const UserNumber = uni.getStorageSync("UserNumber");
+    if (UserNumber) {
       this.is_getNumber = true;
     }
   },
   onLoad(val) {
+    console.log("val",val)
     this.goodsId = val.id;
     this.buy_number = Number(val.buy_number);
+    // this.instructionsForUse = JSON.parse(val.instructions);
     uni.setNavigationBarColor({
       backgroundColor: "#0D5A3A",
       frontColor: "#ffffff"
@@ -125,7 +130,8 @@ export default {
       imageUrl: "../../static/images/shareCard.jpg"
     };
   },
-  computed: {
+  computed: {},
+  methods: {
     // 优惠价格
     producePrice() {
       return this.goodsInfo.price * this.buy_number;
@@ -133,9 +139,7 @@ export default {
     // 原价格
     produceOriginalPrice() {
       return this.goodsInfo.original_price * this.buy_number + ".00" || 0;
-    }
-  },
-  methods: {
+    },
     // 获取商品信息
     getGoodInfo() {
       this.Ajax(
@@ -164,67 +168,93 @@ export default {
     },
     // 直接去购买
     To_buy() {
-      let that = this;
-      // 先从storage拿到session3rd
-      uni.getStorage({
-        key: "storage_key",
-        success: res0 => {
-          // 调取后台接口，得到支付参数
-          this.Ajax(
-            "post",
-            "member/order/create_order",
-            {
-              session3rd: res0.data.session3rd,
-              goods_id: that.goodsInfo.goods_id,
-              num: that.buy_number
-            },
-            res => {
-              if (res.data.code === "200") {
-                console.log("去支付参数", res);
-                // 调起支付
-                uni.requestPayment({
-                  provider: "wxpay",
-                  timeStamp: String(res.data.data.timeStamp),
-                  nonceStr: res.data.data.nonceStr,
-                  package: res.data.data.package,
-                  signType: res.data.data.signType,
-                  paySign: res.data.data.paySign,
-                  success: function(res1) {
-                    console.log("支付成功" + JSON.stringify(res));
-                    that.getGoodInfo();
-                    uni.navigateTo({
-                      url:
-                        "../myCardBug/cards?order_id=" + res.data.data.order_id
-                    });
-                  },
-                  fail: function(err) {
-                    console.log("支付失败" + JSON.stringify(err));
+      if (this.buyFlag) {
+        clearTimeout(this.buyFlag);
+      }
+      this.buyFlag = setTimeout(() => {
+        // 先从storage拿到session3rd
+        uni.showLoading({
+          title: "加载中..."
+        });
+        uni.getStorage({
+          key: "storage_key",
+          success: res0 => {
+            // 调取后台接口，得到支付参数
+            this.Ajax(
+              "post",
+              "member/order/create_order",
+              {
+                session3rd: res0.data.session3rd,
+                goods_id: this.goodsInfo.goods_id,
+                num: this.buy_number
+              },
+              res => {
+                if (res.data.code === "200") {
+                  console.log("去支付参数", res);
+                  // 调起支付
+                  uni.requestPayment({
+                    provider: "wxpay",
+                    timeStamp: String(res.data.data.timeStamp),
+                    nonceStr: res.data.data.nonceStr,
+                    package: res.data.data.package,
+                    signType: res.data.data.signType,
+                    paySign: res.data.data.paySign,
+                    success: res1 => {
+                      uni.hideLoading();
+                      console.log("支付成功" + JSON.stringify(res));
+                      this.getGoodInfo();
+                      uni.navigateTo({
+                        url:
+                          "../myCardBug/cards?order_id=" +
+                          res.data.data.order_id
+                      });
+                    },
+                    fail: err => {
+                      uni.hideLoading();
+                      console.log("支付失败" + JSON.stringify(err));
+                      uni.showToast({
+                        title: "取消支付",
+                        icon: "none"
+                      });
+                      // 记录取消支付的人
+                      uni.getStorage({
+                        key: "userID",
+                        success: success => {
+                          this.Record(
+                            {
+                              openId: success.data,
+                              event_type: 3,
+                              result: 0,
+                              order_id: res.data.data.order_id,
+                              msg: ""
+                            },
+                            record => {}
+                          );
+                        }
+                      });
+                    }
+                  });
+                } else {
+                  if (res.data.code === "0032" || res.data.code === "0035") {
                     uni.showToast({
-                      title: "取消支付",
+                      title: res.data.msg || "库存不足",
+                      icon: "none"
+                    });
+                  } else {
+                    uni.showToast({
+                      title: "网络异常，请稍后重试",
                       icon: "none"
                     });
                   }
-                });
-              } else {
-                if (res.data.code === "0032" || res.data.code === "0035") {
-                  uni.showToast({
-                    title: res.data.msg || "库存不足",
-                    icon: "none"
-                  });
-                } else {
-                  uni.showToast({
-                    title: "网络异常，请稍后重试",
-                    icon: "none"
-                  });
                 }
               }
-            }
-          );
-        }
-      });
+            );
+          }
+        });
+      }, 500);
     },
     To_buy1(e) {
-      console.log("to_buy1")
+      console.log("to_buy1");
     },
     // 获取手机号
     GetPhoneNumber(res0) {
@@ -310,7 +340,7 @@ export default {
                       console.log("success", e);
                     }
                   });
-                  if(res.data.data.mobile){
+                  if (res.data.data.mobile) {
                     uni.setStorageSync("UserNumber", res.data.data.mobile);
                   }
                 }

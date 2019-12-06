@@ -50,7 +50,7 @@
     <view class="Toast" v-if="clickScna">
       <view class="title">已扫码确认</view>
       <view class="row1">{{ num }}张“星巴克中杯通兑券“已完成扫码？</view>
-      <view class="row2"> （在“我的摩卡券”可查看已购买的券码）</view>
+      <view class="row2"> （在“我的卡券”可查看已购买的券码）</view>
       <view class="button">
         <button size="mini" class="button1" @click="cancel">未完成</button>
         <button size="mini" class="button2" @click="submit">
@@ -69,9 +69,6 @@ export default {
     return {
       clickScna: false, //是否点击下面确认扫描按钮
       title: "Hello",
-      price: 24,
-      price_original: 33,
-      buy_number: 555,
       sum_number: 999,
       CardHeight: 0,
       TipsHeight: 0,

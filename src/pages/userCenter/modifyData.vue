@@ -14,9 +14,20 @@
         <text>性别</text>
         <text class="right">{{ user_info.gender > 1 ? "女" : "男" }}</text>
       </view>
-      <view class="row" @click="Toast(4)">
+      <view class="row">
         <text>手机</text>
-        <text class="right">{{ user_info.mobile }}</text>
+        <button
+          v-if="!userPhoneNumber"
+          open-type="getPhoneNumber"
+          size="mini"
+          @getphonenumber="GetPhoneNumber"
+          class="mobileButton"
+        >
+          绑定
+        </button>
+        <text v-else class="right" @click="Toast(4)">{{
+          user_info.mobile
+        }}</text>
       </view>
       <view class="row">
         <text>生日</text>
@@ -55,8 +66,15 @@ export default {
       startDate: "1900-00-00",
       endDate: "2019-00-00",
       user_info: {},
-      birthday: "请选择生日"
+      birthday: "请选择生日",
+      userPhoneNumber: ""
     };
+  },
+  onShow() {
+    let phone = uni.getStorageSync("UserNumber");
+    if (phone) {
+      this.userPhoneNumber = true;
+    }
   },
   onLoad(e) {
     this.userData = e;
@@ -103,6 +121,57 @@ export default {
           );
         }
       });
+    },
+    // 获取手机号
+    GetPhoneNumber(res0) {
+      if (res0.detail.iv) {
+        console.log("点击了同意手机号授权", res0.detail);
+        this.userPhoneNumber = true;
+        // 判断登录态
+        uni.checkSession({
+          // 已登录状态
+          success: loginres => {
+            console.log("已登录状态：", loginres);
+            // 获取手机号
+            uni.getStorage({
+              key: "storage_key",
+              success: storageRes => {
+                uni.login({
+                  success: loginRes => {
+                    this.Ajax(
+                      "post",
+                      "member/user/set_mobile",
+                      {
+                        session3rd: storageRes.data.session3rd,
+                        code: loginRes.code,
+                        encryptedData: res0.detail.encryptedData,
+                        iv: res0.detail.iv
+                      },
+                      resMobile => {
+                        if (resMobile.data.code === "200") {
+                          this.getUserInfo()
+                          uni.setStorageSync(
+                            "UserNumber",
+                            resMobile.data.data.mobile
+                          );
+                        }
+                      }
+                    );
+                  }
+                });
+              },
+              fail: errorStorage => {
+                console.log("获取session3rd的storage失败", errorStorage);
+              }
+            });
+          },
+          fail: error => {
+            this.loginIn();
+          }
+        });
+      } else {
+        console.log("点击了拒绝手机号授权");
+      }
     },
     saveChange() {
       if (this.birthday === "请选择生日") {
@@ -225,6 +294,14 @@ export default {
       opacity: 0.4;
       letter-spacing: 0.38px;
       text-align: right;
+    }
+    .mobileButton {
+      margin: 0;
+      padding: 0;
+      line-height: 42rpx;
+      &:after {
+        border: none;
+      }
     }
     &:last-child {
       border-bottom: 0;

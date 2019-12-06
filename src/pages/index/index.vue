@@ -1,6 +1,6 @@
 <template>
   <view class="content">
-    <button @click="cleanEvent">清理</button>
+    <!-- <button @click="cleanEvent">清理</button> -->
     <view id="tips" :class="computedClassStr">
       <view class="title">
         <image src="../../static/assets/coffee.png" />
@@ -222,13 +222,14 @@ export default {
     if (hasLogin) {
       this.is_getuserInfo = true;
     }
-    console.log("登录成功？",hasLogin,this.is_getuserInfo)
+    console.log("登录成功？", hasLogin, this.is_getuserInfo);
   },
   onLoad() {
     this.getInstructionsForUse();
     this.getBanner();
     this.showTips = false;
-    const isAuthorizeLogin = uni.getStorageSync("isAuthorizeLogin")
+    const isAuthorizeLogin = uni.getStorageSync("isAuthorizeLogin");
+    console.log("是在授权页登录过了吗？", isAuthorizeLogin);
     const hasLogin = uni.getStorageSync("hasLogin");
     if (hasLogin && !isAuthorizeLogin) {
       this.userAgree = true;
@@ -549,14 +550,11 @@ export default {
         });
         return;
       }
+      let inst = JSON.stringify(this.instructions_for_use)
       uni.navigateTo({
         url:
           "./detials?id=" +
           item.goods_id +
-          "&is_getNumber=" +
-          this.is_getNumber +
-          "&is_getuserInfo=" +
-          this.is_getuserInfo +
           "&buy_number=" +
           item.buy_number
       });
@@ -702,12 +700,10 @@ export default {
                       resMobile => {
                         if (resMobile.data.code === "200") {
                           console.log(resMobile);
-                          if (resMobile.data.data.mobile) {
-                            uni.setStorageSync(
-                              "UserNumber",
-                              resMobile.data.data.mobile
-                            );
-                          }
+                          uni.setStorageSync(
+                            "UserNumber",
+                            resMobile.data.data.mobile
+                          );
                         }
                       }
                     );
@@ -784,6 +780,7 @@ export default {
       if (!this.userOptions) {
         this.NotLearned();
       } else {
+        uni.removeStorageSync("isAuthorizeLogin");
         uni.showTabBar({
           animation: true
         });
