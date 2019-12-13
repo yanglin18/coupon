@@ -126,7 +126,6 @@ export default {
     GetPhoneNumber(res0) {
       if (res0.detail.iv) {
         console.log("点击了同意手机号授权", res0.detail);
-        this.userPhoneNumber = true;
         // 判断登录态
         uni.checkSession({
           // 已登录状态
@@ -149,6 +148,7 @@ export default {
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
+                          this.userPhoneNumber = true;
                           this.getUserInfo()
                           uni.setStorageSync(
                             "UserNumber",

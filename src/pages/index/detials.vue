@@ -31,36 +31,25 @@
           <view class="number">
             <view @click="reduce_number" class="reduce">
               <image
-                v-show="buy_number === 1"
+                v-if="buy_number === 1"
                 src="../../static/images/no_reduce.png"
                 @click="Toast('只有一张，不能再减少啦')"
               />
-              <image
-                v-show="buy_number !== 1"
-                src="../../static/images/reduce.png"
-              />
+              <image v-else src="../../static/images/reduce.png" />
             </view>
             <view class="num">{{ buy_number }}</view>
             <view @click="add_number" class="add">
               <image
-                v-show="buy_number === 10"
+                v-if="buy_number === 10"
                 src="../../static/images/no_add.png"
                 @click="Toast('该优惠券最多只能买十张哦')"
               />
-              <image
-                v-show="buy_number !== 10"
-                src="../../static/images/add.png"
-              />
+              <image v-else src="../../static/images/add.png" />
             </view>
-            <!-- <uni-number-box
-              :value="buy_number"
-              :min="1"
-              :max="10"
-            ></uni-number-box> -->
           </view>
           <view class="purchase_limit">
             <text>每次限购十张</text>
-            <text class="inventory">库存：{{ goodsInfo.inventory }}</text>
+            <!-- <text class="inventory">库存：{{ goodsInfo.inventory }}</text> -->
           </view>
         </view>
         <view class="right">
@@ -113,7 +102,7 @@ export default {
     }
   },
   onLoad(val) {
-    console.log("val",val)
+    console.log("val", val);
     this.goodsId = val.id;
     this.buy_number = Number(val.buy_number);
     // this.instructionsForUse = JSON.parse(val.instructions);
@@ -260,7 +249,6 @@ export default {
     GetPhoneNumber(res0) {
       if (res0.detail.iv) {
         console.log("点击了同意手机号授权", res0.detail);
-        this.is_getNumber = true;
         // 判断登录态
         uni.checkSession({
           // 已登录状态
@@ -283,6 +271,7 @@ export default {
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
+                          this.is_getNumber = true;
                           uni.setStorageSync(
                             "UserNumber",
                             resMobile.data.data.mobile
@@ -342,6 +331,11 @@ export default {
                   });
                   if (res.data.data.mobile) {
                     uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
                   }
                 }
               }

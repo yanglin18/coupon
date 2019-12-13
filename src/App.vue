@@ -1,6 +1,24 @@
 <script>
 export default {
   onLaunch: function() {
+    uni.getSystemInfo({
+      success: res => {
+        console.log("设备信息：", res);
+        this.globalData.statusBarHeight = res.statusBarHeight; //状态栏的高度
+        if (res.system.substring(0, 7) === "Android") {
+          let bread = res.model.substring(0, 8);
+          this.globalData.navHeight = 68; //自定义的顶部导航栏总高度
+        } else {
+          let bread = res.model.substring(0, 8);
+          console.log("型号：", bread);
+          if (bread === "iPhone X") {
+            this.globalData.navHeight = 88;
+          } else {
+            this.globalData.navHeight = 64;
+          }
+        }
+      }
+    });
     console.log("APP Launch");
   },
   onShow: function() {
@@ -27,11 +45,21 @@ export default {
     width: 46rpx;
   }
 }
-button{
-	background: transparent;
-	// 清除微信自带样式
-	&::after{
-		display: none;
-	}
+button {
+  background: transparent;
+  // 清除微信自带样式
+  &::after {
+    display: none;
+  }
+}
+
+.allBgImg {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  box-sizing: border-box;
 }
 </style>

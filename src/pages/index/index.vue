@@ -1,197 +1,244 @@
 <template>
-  <view class="content">
-    <!-- <button @click="cleanEvent">清理</button> -->
-    <view id="tips" :class="computedClassStr">
-      <view class="title">
-        <image src="../../static/assets/coffee.png" />
-        <text>使用须知</text>
-      </view>
-      <view class="tip_content">
-        <view class="texta">
-          <text v-for="(item, index) in instructions_for_use" :key="index">
-            {{ item }}
-          </text>
-        </view>
-      </view>
-    </view>
-    <view
-      class="goods_card"
-      v-for="(item, index) in goodsInfo"
-      :key="index"
-      v-bind:style="{
-        background: 'url(' + item.img + ')no-repeat center',
-        backgroundSize: 'cover',
-        height: item.height + 'rpx',
-        width: item.width + 'rpx',
-        color: item.color
-      }"
-    >
-      <view class="card_top" @click="NavToDetial(item)">
-        <view class="price">
-          <text class="price_now">&yen;{{ producePrice(item) }}</text>
-          <text class="price_original"
-            >&yen;{{ produceOriginalPrice(item) }}</text
+  <view class="main">
+    <navigationbar
+      class="navbar"
+      :status_img="skin.status_img ? skin.status_img : ''"
+      :title="'摩卡星'"
+    ></navigationbar>
+    <scroll-view :scroll-y="userNotice ? false : true" style="height:100vh">
+      <view v-bind:style="{ height: navHeight + 'px' }"></view>
+      <view class="content">
+        <image
+          :src="skin.img"
+          class="allBgImg"
+          v-bind:style="{
+            paddingTop: navHeight + 'px'
+          }"
+        ></image>
+        <!-- <button @click="cleanEvent">清理</button> -->
+        <view
+          class="goods_card"
+          v-for="(item, index) in goodsInfo"
+          :key="index"
+          v-bind:style="{
+            background: 'url(' + item.img + ')no-repeat center',
+            backgroundSize: 'cover',
+            height: item.height + 'rpx',
+            width: item.width + 'rpx',
+            color: item.color
+          }"
+        >
+          <view class="card_top" @click="NavToDetial(item)">
+            <view class="price">
+              <text class="price_now">&yen;{{ producePrice(item) }}</text>
+              <text class="price_original"
+                >&yen;{{ produceOriginalPrice(item) }}</text
+              >
+            </view>
+            <view class="name">
+              <text>{{ item.goods_name }}</text>
+            </view>
+          </view>
+          <view
+            @click="sellOut"
+            v-if="item.inventory === 0"
+            class="card_sell_out"
           >
-        </view>
-        <view class="name">
-          <text>{{ item.goods_name }}</text>
-        </view>
-      </view>
-      <view @click="sellOut" v-if="item.inventory === 0" class="card_sell_out">
-        <text>补货中</text>
-      </view>
-      <view v-else class="card_bottom">
-        <view class="left">
-          <view class="number">
-            <view @click.stop="reduce_number(item)" class="reduce">
-              <image
-                v-show="item.buy_number === 1"
-                src="../../static/images/no_reduce.png"
-              />
-              <image
-                v-show="item.buy_number !== 1"
-                src="../../static/images/reduce.png"
-              />
+            <text>补货中</text>
+          </view>
+          <view v-else class="card_bottom">
+            <view class="left">
+              <view class="number">
+                <view @click.stop="reduce_number(item)" class="reduce">
+                  <image
+                    v-if="item.buy_number === 1"
+                    src="../../static/images/no_reduce.png"
+                  />
+                  <image v-else src="../../static/images/reduce.png" />
+                </view>
+                <view class="num">{{ item.buy_number }}</view>
+                <view @click.stop="add_number(item)" class="add">
+                  <image
+                    v-if="item.buy_number === 10"
+                    src="../../static/images/no_add.png"
+                  />
+                  <image v-else src="../../static/images/add.png" />
+                </view>
+              </view>
+              <view class="purchase_limit">
+                <text>最多可购买10张/次</text>
+                <!-- <text class="inventory">库存：{{ item.inventory }}</text> -->
+              </view>
             </view>
-            <view class="num">{{ item.buy_number }}</view>
-            <view @click.stop="add_number(item)" class="add">
-              <image
-                v-show="item.buy_number === 10"
-                src="../../static/images/no_add.png"
-              />
-              <image
-                v-show="item.buy_number !== 10"
-                src="../../static/images/add.png"
-              />
+            <view class="right">
+              <!-- 已授权的话第一个button生效，直接去购买 -->
+              <!-- 未授权的话第二个button生效，先逐渐授权 -->
+              <button v-if="is_getNumber" @click.stop="To_buy(item)">
+                去支付
+              </button>
+              <button
+                v-else
+                :open-type="is_getuserInfo ? 'getPhoneNumber' : 'getUserInfo'"
+                @getphonenumber="GetPhoneNumber"
+                @getuserinfo="GetUserInfo"
+                @click.stop="To_buy1"
+                :disabled="HasSave ? false : true"
+              >
+                去支付
+              </button>
             </view>
           </view>
-          <view class="purchase_limit">
-            <text>每次限购十张</text>
-            <text class="inventory">库存：{{ item.inventory }}</text>
+        </view>
+        <!-- banner -->
+        <view
+          class="banner"
+          @click="Share"
+          v-for="(item, index) in banners"
+          :key="index"
+          v-bind:style="{
+            background: 'url(' + item.img + ')no-repeat center',
+            backgroundSize: 'cover',
+            height: item.height + 'rpx',
+            width: item.width + 'rpx',
+            color: item.color
+          }"
+        >
+          <view class="card_content">
+            <view class="text1">
+              <text>{{ item.title }}</text>
+            </view>
+            <view class="text2">
+              <text>{{ item.introduce }}</text>
+            </view>
           </view>
         </view>
-        <view class="right">
-          <!-- 已授权的话第一个button生效，直接去购买 -->
-          <!-- 未授权的话第二个button生效，先逐渐授权 -->
-          <button v-if="is_getNumber" @click.stop="To_buy(item)">
-            去支付
-          </button>
+        <!-- 温馨提示 -->
+        <view v-if="userAgree === false" class="warmPrompt">
+          <view class="Prompttitle">
+            <text>温馨提示</text>
+          </view>
+          <view class="Promptcontent">
+            <text>
+              欢迎您来到摩卡星小程序，我们更新了《摩卡星用户使用协议》和《用户隐私政策》。为了让您更好地了解摩卡星，请先点击下方链接，仔细阅读，充分理解协议中的条款内容并通过勾选同意的形式后，再次进入摩卡星。
+            </text>
+          </view>
+          <view class="check">
+            <view>
+              <image
+                @click="agree"
+                v-if="userOptions"
+                src="../../static/assets/option.png"
+              />
+              <image
+                @click="agree"
+                v-else
+                src="../../static/assets/option_no.png"
+              />
+            </view>
+            <view>
+              同意
+              <text
+                class="agreement"
+                @click="NavToagreement('../userCenter/agreement/useAgreement')"
+                >《摩卡星用户使用协议》</text
+              >
+              和
+              <text
+                class="agreement"
+                @click="
+                  NavToagreement('../userCenter/agreement/privacyAgreement')
+                "
+                >《摩卡星用户隐私保护政策》</text
+              >
+            </view>
+          </view>
+          <!-- 因为此按钮绑定的事件有三个：1.已经勾选隐私协议。2.调起基本信息授权。3.控制页面下滑露出使用须知 -->
+          <!-- 因为调起基本信息无法控制，所以用两个一模一样的按钮。控制这三件事 -->
           <button
-            v-else
-            :open-type="is_getuserInfo ? 'getPhoneNumber' : 'getUserInfo'"
-            @getphonenumber="GetPhoneNumber"
-            @getuserinfo="GetUserInfo"
-            @click.stop="To_buy1"
+            :class="userOptions === true ? '' : 'opacity1'"
+            @click="IHaveLearned"
           >
-            去支付
+            我已了解
           </button>
         </view>
-      </view>
-    </view>
-    <!-- banner -->
-    <view
-      class="banner"
-      @click="Share"
-      v-for="(item, index) in banners"
-      :key="index"
-      v-bind:style="{
-        background: 'url(' + item.img + ')no-repeat center',
-        backgroundSize: 'cover',
-        height: item.height + 'rpx',
-        width: item.width + 'rpx',
-        color: item.color
-      }"
-    >
-      <view class="card_content">
-        <view class="text1">
-          <text>{{ item.title }}</text>
-        </view>
-        <view class="text2">
-          <text>{{ item.introduce }}</text>
-        </view>
-      </view>
-    </view>
-    <!-- 温馨提示 -->
-    <view v-if="userAgree === false" class="warmPrompt">
-      <view class="Prompttitle">
-        <text>温馨提示</text>
-      </view>
-      <view class="Promptcontent">
-        <text>
-          欢迎您来到摩卡星小程序，我们更新了《摩卡星用户使用协议》和《用户隐私政策》。为了让您更好地了解摩卡星，请先点击下方链接，仔细阅读，充分理解协议中的条款内容并通过勾选同意的形式后，再次进入摩卡星。
-        </text>
-      </view>
-      <view class="check">
-        <view>
-          <image
-            @click="agree"
-            v-show="userOptions === true"
-            src="../../static/assets/option.png"
-          />
-          <image
-            @click="agree"
-            v-show="userOptions === false"
-            src="../../static/assets/option_no.png"
-          />
-        </view>
-        <view>
-          同意
-          <text
-            class="agreement"
-            @click="NavToagreement('../userCenter/agreement/useAgreement')"
-            >《摩卡星用户使用协议》</text
-          >
-          和
-          <text
-            class="agreement"
-            @click="NavToagreement('../userCenter/agreement/privacyAgreement')"
-            >《摩卡星用户隐私保护政策》</text
-          >
-        </view>
-      </view>
-      <!-- 因为此按钮绑定的事件有三个：1.已经勾选隐私协议。2.调起基本信息授权。3.控制页面下滑露出使用须知 -->
-      <!-- 因为调起基本信息无法控制，所以用两个一模一样的按钮。控制这三件事 -->
-      <button
-        :class="userOptions === true ? '' : 'opacity1'"
-        @click="IHaveLearned"
-      >
-        我已了解
-      </button>
-    </view>
-    <!-- 分享弹窗 -->
-    <view v-if="share" class="sharePopup">
-      <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
-        <image :src="beautifulPhoto.show_img" class="bgImage"></image>
-        <view class="weixinIcon">
-          <view class="image_share">
-            <button open-type="share">
-              <image src="../../static/assets/weixin.png" class="imgIcon" />
-            </button>
-            <view class="text_weixin">
-              微信好友
+        <!-- 使用须知 -->
+        <view v-if="userNotice" class="notice">
+          <view class="notice_Content">
+            <text class="notice_title">使用须知</text>
+            <view class="texta">
+              <text v-for="(item, index) in instructions_for_use" :key="index">
+                {{ item }}
+              </text>
+            </view>
+            <!-- 遮罩 -->
+            <view class="whiteShadow"></view>
+          </view>
+          <view class="notice_bottom">
+            <view class="notice_option">
+              <image
+                @click="iRemeberIt"
+                v-if="is_read"
+                src="../../static/assets/option.png"
+              />
+              <image
+                @click="iRemeberIt"
+                v-else
+                src="../../static/assets/option_no.png"
+              />
+              <text>我记住了，以后不再提醒</text>
+            </view>
+            <view class="buttons">
+              <button class="button1" @click="cancelNotice">取消</button>
+              <button class="button2" @click="pay">确认支付</button>
             </view>
           </view>
         </view>
+        <!-- 分享弹窗 -->
+        <view v-if="share" class="sharePopup">
+          <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
+            <image :src="beautifulPhoto.show_img" class="bgImage"></image>
+            <view class="weixinIcon">
+              <view class="image_share">
+                <button open-type="share">
+                  <image src="../../static/assets/weixin.png" class="imgIcon" />
+                </button>
+                <view class="text_weixin">
+                  微信好友
+                </view>
+              </view>
+            </view>
+          </view>
+          <!-- 关闭按钮 -->
+          <view class="close" @click="close_share">
+            <image class="close_img" src="../../static/assets/close.png" />
+          </view>
+        </view>
+        <!-- 遮罩 -->
+        <view
+          class="shadowBox"
+          v-show="!userAgree || share || userNotice"
+        ></view>
       </view>
-      <!-- 关闭按钮 -->
-      <view class="close" @click="close_share">
-        <image class="close_img" src="../../static/assets/close.png" />
-      </view>
-    </view>
-    <!-- 遮罩 -->
-    <view class="shadowBox" v-show="!userAgree || share"></view>
+    </scroll-view>
   </view>
 </template>
 
 <script>
+import navigationbar from "@/components/navigationBar/navigationBar";
 export default {
+  components: {
+    navigationbar
+  },
   data() {
+    const app = getApp();
     return {
       userOptions: false, //用户是否勾选
-      userAgree: false, //用户是否点击“我已了解”
+      userAgree: true, //用户是否点击“我已了解”
+      is_read: app.globalData.is_read, //用户是否点击“我记住了，不用再提醒”
       goodsInfo: [], //商品信息
       instructions_for_use: "", //使用须知
       banners: {}, //banner
+      skin: {}, //皮肤
       sum_number: 66,
       animationData: {}, //动画
       user_info: {}, //用户信息,
@@ -203,14 +250,14 @@ export default {
       showTips: true,
       // 购买开关（防多次点击）
       buyFlag: null,
-      objQueryPid: "" //登录时需要的Pid
+      objQueryPid: "", //登录时需要的Pid
+      navHeight: app.globalData.navHeight,
+      userNotice: false,
+      goodItem: "",
+      HasSave: true //防止多次唤起手机号标致
     };
   },
-  computed: {
-    computedClassStr() {
-      return this.showTips ? "tips" : "hideTips";
-    }
-  },
+  computed: {},
   // 如果detail里面授权登录和手机号，标识返回到主页
   onShow() {
     this.getGoodsInfo();
@@ -223,10 +270,12 @@ export default {
       this.is_getuserInfo = true;
     }
     console.log("登录成功？", hasLogin, this.is_getuserInfo);
+    console.log("手机号？", this.is_getNumber);
   },
   onLoad() {
     this.getInstructionsForUse();
     this.getBanner();
+    this.getSkin();
     this.showTips = false;
     const isAuthorizeLogin = uni.getStorageSync("isAuthorizeLogin");
     console.log("是在授权页登录过了吗？", isAuthorizeLogin);
@@ -289,6 +338,7 @@ export default {
       });
       uni.login({
         success: reslogin => {
+          console.log("登录成功！", reslogin);
           if (reslogin.code) {
             this.Ajax(
               "post",
@@ -313,6 +363,11 @@ export default {
                   if (res.data.data.mobile) {
                     uni.setStorageSync("UserNumber", res.data.data.mobile);
                   }
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
+                  }
                 }
               }
             );
@@ -329,23 +384,6 @@ export default {
     // 原价格
     produceOriginalPrice(item) {
       return item.original_price * item.buy_number + ".00" || 0;
-    },
-    // 不用基本信息的登录
-    loginWithoutInfo() {
-      uni.login({
-        success: LoginRes => {
-          this.Ajax(
-            "post",
-            "member/Login/getLogin",
-            { brand_id: 1, channel: "wechat", code: LoginRes.code },
-            res => {
-              if (res.data.code === "200") {
-                uni.setStorageSync("isFirst", res.data.data);
-              }
-            }
-          );
-        }
-      });
     },
     // 获取商品信息
     getGoodsInfo() {
@@ -379,6 +417,16 @@ export default {
           this.banners = res.data.data.list;
         }
         console.log("信息：", this.banners);
+      });
+    },
+    // 获取皮肤
+    getSkin() {
+      this.Ajax("post", "member/index/skin", { brand_id: 1 }, res => {
+        console.log(res);
+        if (res.data.code === "200") {
+          this.skin = res.data.data.skin;
+          console.log("皮肤：", this.skin);
+        }
       });
     },
     // 分享
@@ -550,13 +598,9 @@ export default {
         });
         return;
       }
-      let inst = JSON.stringify(this.instructions_for_use)
+      let inst = JSON.stringify(this.instructions_for_use);
       uni.navigateTo({
-        url:
-          "./detials?id=" +
-          item.goods_id +
-          "&buy_number=" +
-          item.buy_number
+        url: "./detials?id=" + item.goods_id + "&buy_number=" + item.buy_number
       });
     },
     sellOut() {
@@ -565,17 +609,28 @@ export default {
         icon: "none"
       });
     },
-    // 直接去购买
+    //点击去支付
     To_buy(item) {
-      console.log("to_buy");
+      if (!this.is_read) {
+        this.userNotice = true;
+        this.goodItem = item; //弹出用户须知
+        return;
+      } else {
+        this.wxPayMent(item);
+      }
+    },
+    // 微信支付
+    wxPayMent(item) {
+      console.log("to_buy", item);
+      uni.showLoading({
+        title: "加载中...",
+        mask:true
+      });
       if (this.buyFlag) {
         clearTimeout(this.buyFlag);
       }
       this.buyFlag = setTimeout(() => {
         // 先从storage拿到session3rd
-        uni.showLoading({
-          title: "加载中..."
-        });
         uni.getStorage({
           key: "storage_key",
           success: res0 => {
@@ -669,13 +724,12 @@ export default {
     },
     // 获取手机号
     GetPhoneNumber(res0) {
-      uni.showLoading({
-        title: "加载中..."
-      });
       if (res0.detail.iv) {
-        uni.hideLoading();
+        uni.showLoading({
+          title: "加载中..."
+        });
         console.log("点击了同意授权", res0.detail);
-        this.is_getNumber = true;
+        this.HasSave = false;
         // 判断登录态
         uni.checkSession({
           // 已登录状态
@@ -699,11 +753,23 @@ export default {
                       },
                       resMobile => {
                         if (resMobile.data.code === "200") {
-                          console.log(resMobile);
+                          this.HasSave = true;
+                          if (!this.is_read) {
+                            this.userNotice = true; //弹出用户须知
+                          }
+                          uni.hideLoading();
+                          this.is_getNumber = true;
                           uni.setStorageSync(
                             "UserNumber",
                             resMobile.data.data.mobile
                           );
+                        } else {
+                          this.HasSave = true;
+                          uni.hideLoading();
+                          uni.showToast({
+                            title: "网络请求失败，请重试",
+                            icon: "none"
+                          });
                         }
                       }
                     );
@@ -771,7 +837,6 @@ export default {
     NotLearned() {
       uni.showToast({
         title: "请勾选服务/隐私协议",
-        duration: 3000,
         icon: "none"
       });
     },
@@ -783,9 +848,6 @@ export default {
         uni.removeStorageSync("isAuthorizeLogin");
         uni.showTabBar({
           animation: true
-        });
-        uni.checkSession({
-          success: loginRes => {}
         });
         this.userAgree = true;
         this.showTips = true;
@@ -811,23 +873,69 @@ export default {
     agree() {
       this.userOptions = !this.userOptions;
     },
+    iRemeberIt() {
+      this.is_read = !this.is_read;
+      // console.log("用户是否阅读了", this.is_read);
+    },
     // 跳转到协议详情
     NavToagreement(val) {
       console.log(val);
       uni.navigateTo({
         url: val
       });
+    },
+    // 我了解了，不用再提醒我
+    set_field() {
+      if (this.is_read) {
+        uni.getStorage({
+          key: "storage_key",
+          success: res0 => {
+            this.Ajax(
+              "post",
+              "member/user/set_field",
+              {
+                session3rd: res0.data.session3rd,
+                field: "is_read",
+                data: 1
+              },
+              res => {
+                if (res.data.code === "200") {
+                } else {
+                }
+              }
+            );
+          }
+        });
+      }
+    },
+    cancelNotice() {
+      this.userNotice = false;
+      this.is_read = false;
+    },
+    pay() {
+      this.userNotice = false;
+      this.set_field();
+      this.wxPayMent(this.goodsInfo[0]);
     }
   }
 };
 </script>
 
 <style lang="scss">
+.main {
+  .navbar {
+    position: fixed;
+    width: 100%;
+    height: auto;
+    z-index: 999;
+    background: #ffffff;
+  }
+}
 .content {
   position: relative;
-  background: #ffffff;
   padding: 24rpx 40rpx 40rpx;
-  min-height: 100vh;
+  background-size: cover;
+  overflow: auto;
 }
 .shadowBox {
   position: absolute;
@@ -898,54 +1006,95 @@ export default {
     color: #f8f8f8;
   }
 }
-.tips {
-  height: auto;
-  font-size: 26rpx;
-  padding: 28rpx 0 20rpx;
-  overflow: hidden;
-  transition: all 0.5s;
+.notice {
+  position: fixed;
+  top: 26%;
+  left: 50%;
+  z-index: 1000;
+  transform: translateX(-50%);
+  padding: 60rpx 60rpx 100rpx;
+  width: 630rpx;
+  background: #ffffff;
+  color: #000000;
+  font-size: 30rpx;
+  border-radius: 24rpx;
   box-sizing: border-box;
-  text-align: justify;
-  .title {
-    display: flex;
-    align-items: center;
-    margin-top: 8rpx;
-    image {
-      height: 48rpx;
-      width: 40rpx;
-      margin-right: 20rpx;
+  .notice_Content {
+    text-align: center;
+    position: relative;
+    .whiteShadow {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100rpx;
+      background-image: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0) 0%,
+        #ffffff 100%
+      );
     }
-    font-size: 30rpx;
-    font-weight: 600;
-    color: #000000;
-    letter-spacing: -0.68px;
-  }
-  .tip_content {
-    display: flex;
-    flex-direction: column;
-    opacity: 0.6;
-    font-size: 24rpx;
-    color: rgb(43, 43, 44);
-    letter-spacing: -0.58rpx;
-    line-height: 42rpx;
+    .notice_title {
+      display: inline-block;
+      text-align: center;
+      font-size: 40rpx;
+      font-weight: bold;
+      margin: 0 auto 24rpx;
+    }
     .texta {
+      height: 408rpx;
+      overflow: auto;
       display: flex;
       flex-direction: column;
       margin-top: 8rpx;
       text {
         margin-bottom: 8rpx;
+        color: #666666;
+        text-align: justify;
+        line-height: 45rpx;
       }
     }
   }
-}
-.hideTips {
-  height: 0 !important;
-  padding: 0 !important;
-  overflow: hidden;
-  transition: all 0.5s;
-  box-sizing: border-box;
-  image {
-    height: 0;
+  .notice_bottom {
+    .notice_option {
+      display: flex;
+      align-items: center;
+      margin-top: 40rpx;
+      image {
+        height: 36rpx;
+        width: 36rpx;
+        margin-right: 12rpx;
+      }
+      text {
+        font-size: 24rpx;
+        color: #be9e54;
+        letter-spacing: 0.3px;
+        font-weight: bold;
+      }
+    }
+    .buttons {
+      display: flex;
+      flex-direction: row;
+      margin-top: 52rpx;
+      font-weight: bold;
+      .button1 {
+        height: 80rpx;
+        width: 180rpx;
+        line-height: 80rpx;
+        border: 2rpx solid #00b265;
+        border-radius: 40rpx;
+        color: #42b069;
+        margin-right: 20rpx;
+      }
+      .button2 {
+        width: 350rpx;
+        height: 80rpx;
+        line-height: 80rpx;
+        background: #42b069;
+        border-radius: 40rpx;
+        color: #ffffff;
+      }
+    }
   }
 }
 .goods_card {
@@ -1090,14 +1239,12 @@ export default {
   }
 }
 .sharePopup {
-  margin: 0 50rpx;
   display: flex;
   flex-direction: column;
-  margin: 0 50rpx;
   position: fixed;
-  height: 85vh;
-  top: 100rpx;
-  left: 0;
+  top: 54%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 100;
   border-radius: 28rpx;
   .imgWrap {

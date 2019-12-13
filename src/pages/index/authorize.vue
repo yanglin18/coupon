@@ -113,6 +113,11 @@ export default {
                   uni.switchTab({
                     url: "./index"
                   });
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
+                  }
                 }
               }
             );

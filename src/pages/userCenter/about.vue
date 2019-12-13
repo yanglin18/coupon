@@ -51,8 +51,8 @@ export default {
   },
   methods: {
     NavTo(e) {
-      if(e==="./About/commonProblem"){
-        if(!this.hasLogin){
+      if (e === "./About/commonProblem") {
+        if (!this.hasLogin) {
           return;
         }
       }
@@ -129,15 +129,20 @@ export default {
                 console.log("调登录接口返回：", res);
 
                 if (res.data.code === "200") {
-                  this.get
+                  this.get;
                   uni.setStorageSync("hasLogin", true);
                   this.hasLogin = true;
                   uni.setStorage({
                     key: "storage_key",
-                    data: res.data.data,
+                    data: res.data.data
                   });
                   if (res.data.data.mobile) {
                     uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
                   }
                 }
               }

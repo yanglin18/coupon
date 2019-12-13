@@ -26,6 +26,7 @@ export default {
       }
     });
     // 一个不用基本信息的登录判断是否是新用户
+    // #ifdef  MP-WEIXIN
     uni.login({
       success: LoginRes => {
         this.Ajax(
@@ -35,7 +36,7 @@ export default {
           res => {
             if (res.data.code === "200") {
               uni.setStorageSync("hasLogin", true);
-              console.log("不是第一次来的顾客");
+              console.log("老顾客");
               uni.setStorage({
                 key: "storage_key",
                 data: res.data.data
@@ -46,6 +47,13 @@ export default {
               uni.switchTab({
                 url: "../index/index"
               });
+              if(res.data.data.is_read ===0){
+                getApp().globalData.is_read = false;
+              }
+              else{
+                getApp().globalData.is_read = true;
+              }
+              
             } else {
               if (res.data.code === "0020") {
                 // 将用户id或者游客id存到storage
@@ -55,7 +63,7 @@ export default {
                 });
               }
               uni.setStorageSync("hasLogin", false);
-              console.log("是第一次来的顾客");
+              console.log("新顾客");
               uni.navigateTo({
                 url: "../index/authorize"
               });
@@ -65,6 +73,12 @@ export default {
       },
       fail: error => {}
     });
+    // #endif
+    // #ifdef  MP-ALIPAY
+    uni.switchTab({
+      url: "../index/index"
+    });
+    // #endif
   },
   onLoad() {
     uni.setNavigationBarColor({
@@ -81,11 +95,13 @@ export default {
         }
       }
     });
+    // #ifdef  MP-WEIXIN
     let obj = wx.getLaunchOptionsSync();
     uni.setStorage({
       key: "obj.query.pid",
       data: obj.query.pid
     });
+    // #endif
   }
 };
 </script>

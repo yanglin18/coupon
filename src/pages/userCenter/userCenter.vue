@@ -1,85 +1,104 @@
 <template>
-  <view class="content">
-    <view>
-      <view class="top_card">
-        <view class="title">
-          <text>个人中心 </text>
-        </view>
-        <view class="bottom" @click="NavToModify">
-          <view class="left">
-            <image :src="user_info.head_img || default_avter" />
-            <button
-              size="mini"
-              open-type="getUserInfo"
-              @getuserinfo="GetUserInfo"
-              v-if="!hasLogin1"
-              class="Login_in"
-            >
-              登录
-            </button>
-            <text v-else class="name">{{ user_info.user_name }}</text>
+  <view
+    class="main"
+    v-bind:style="{
+      paddingTop: navHeight + 'px'
+    }"
+  >
+    <navigationbar
+      class="navbar"
+      :status_img="skin.status_img ? skin.status_img : ''"
+      :title="text"
+    ></navigationbar>
+    <view class="content">
+      <image
+        :src="skin.img"
+        class="allBgImg"
+        v-bind:style="{
+          paddingTop: navHeight + 'px'
+        }"
+      ></image>
+      <view>
+        <view class="top_card">
+          <view class="title">
+            <text>个人中心 </text>
           </view>
-          <view class="right">
-            <image class="arrow" src="../../static/assets/toRight.png" />
-          </view>
-        </view>
-      </view>
-      <view class="about">
-        <view class="service deline" @click="contactService">
-          <view class="left">
-            <image src="../../static/assets/service.png" />
-            <text>联系客服</text>
-          </view>
-          <image class="arrow" src="../../static/assets/toRight.png" />
-        </view>
-        <view class="service" @click="NavTo('./about')">
-          <view class="left">
-            <image src="../../static/assets/about.png" />
-            <text>关于</text>
-          </view>
-
-          <image class="arrow" src="../../static/assets/toRight.png" />
-        </view>
-      </view>
-      <view @click="Share" class="share">
-        <image src="../../static/images/share3.jpg" />
-      </view>
-    </view>
-    <!-- 分享弹窗 -->
-    <view v-if="share" class="sharePopup">
-      <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
-        <image :src="beautifulPhoto.show_img" class="bgImage"></image>
-        <view class="weixinIcon">
-          <view class="image_share">
-            <button open-type="share">
-              <image src="../../static/assets/weixin.png" class="imgIcon" />
-            </button>
-            <view class="text_weixin">
-              微信好友
+          <view class="bottom" @click="NavToModify">
+            <view class="left">
+              <image :src="user_info.head_img || default_avter" />
+              <button
+                size="mini"
+                open-type="getUserInfo"
+                @getuserinfo="GetUserInfo"
+                v-if="!hasLogin1"
+                class="Login_in"
+              >
+                登录
+              </button>
+              <text v-else class="name">{{ user_info.user_name }}</text>
+            </view>
+            <view class="right">
+              <image class="arrow" src="../../static/assets/toRight.png" />
             </view>
           </view>
         </view>
-      </view>
-      <!-- 关闭按钮 -->
-      <view class="close" @click="close_share">
-        <image class="close_img" src="../../static/assets/close.png" />
-      </view>
-    </view>
-    <!-- 联系客服弹窗 -->
-    <view v-if="contactUS" class="contactUS">
-      <view class="contactTop">
-        <view class="Phone_number">
-          <text @click="callUS"
-            >手机号：<text style="color: #42B069;">13570303413</text></text
-          >
+        <view class="about">
+          <view class="service deline" @click="contactService">
+            <view class="left">
+              <image src="../../static/assets/service.png" />
+              <text>联系客服</text>
+            </view>
+            <image class="arrow" src="../../static/assets/toRight.png" />
+          </view>
+          <view class="service" @click="NavTo('./about')">
+            <view class="left">
+              <image src="../../static/assets/about.png" />
+              <text>关于</text>
+            </view>
+
+            <image class="arrow" src="../../static/assets/toRight.png" />
+          </view>
         </view>
-        <view class="copy_weixin">
-          <text>微信号：mokaxing01</text>
-          <text @click="copy_no" class="copy">复制</text>
+        <view @click="Share" class="share">
+          <image src="../../static/images/share3.jpg" />
         </view>
       </view>
-      <view class="contactBottom" @click="Iknow">
-        <text>我知道了</text>
+      <!-- 分享弹窗 -->
+      <view v-if="share" class="sharePopup">
+        <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
+          <image :src="beautifulPhoto.show_img" class="bgImage"></image>
+          <view class="weixinIcon">
+            <view class="image_share">
+              <button open-type="share">
+                <image src="../../static/assets/weixin.png" class="imgIcon" />
+              </button>
+              <view class="text_weixin">
+                微信好友
+              </view>
+            </view>
+          </view>
+        </view>
+        <!-- 关闭按钮 -->
+        <view class="close" @click="close_share">
+          <image class="close_img" src="../../static/assets/close.png" />
+        </view>
+      </view>
+      <!-- 联系客服弹窗 -->
+      <view v-if="contactUS" class="contactUS">
+        <view class="contactTop">
+          <view class="Phone_number">
+            <text @click="callUS"
+              >手机号：<text style="color: #42B069;">13570303413</text></text
+            >
+          </view>
+          <view class="copy_weixin">
+            <text>微信号：mokaxing01</text>
+            <text @click="copy_no" class="copy">复制</text>
+          </view>
+        </view>
+        <view class="contactBottom" @click="Iknow">
+          <text>我知道了</text>
+        </view>
       </view>
     </view>
     <!-- 遮罩 -->
@@ -87,9 +106,15 @@
   </view>
 </template>
 <script>
+import navigationbar from "@/components/navigationBar/navigationBar";
 export default {
+  components: {
+    navigationbar
+  },
   data() {
+    const app = getApp();
     return {
+      text: "",
       user_icon: "../../static/images/user.png",
       user_name: "喵喵喵",
       gender: "男",
@@ -106,7 +131,9 @@ export default {
       is_getuserInfo: false,
       UserInfo: {},
       objQueryPid: "",
-      default_avter: "../../static/assets/default_avter.png"
+      default_avter: "../../static/assets/default_avter.png",
+      skin: {},
+      navHeight: app.globalData.navHeight
     };
   },
   onShow() {
@@ -117,6 +144,7 @@ export default {
     }
   },
   onLoad() {
+    this.getSkin();
     uni.setNavigationBarColor({
       backgroundColor: "#FFFFFF",
       frontColor: "#000000"
@@ -235,8 +263,13 @@ export default {
                       this.getUser();
                     }
                   });
-                  if(res.data.data.mobile){
+                  if (res.data.data.mobile) {
                     uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
                   }
                 }
               }
@@ -446,6 +479,16 @@ export default {
         }
       });
     },
+    // 获取皮肤
+    getSkin() {
+      this.Ajax("post", "member/index/skin", { brand_id: 1 }, res => {
+        console.log(res);
+        if (res.data.code === "200") {
+          this.skin = res.data.data.skin;
+          console.log("皮肤：", this.skin);
+        }
+      });
+    },
     // 复制订单号
     copy_no() {
       uni.setClipboardData({
@@ -465,10 +508,23 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.content {
-  position: relative;
-  background: #f3f4f3;
+.main {
+  display: flex;
+  box-sizing: border-box;
   min-height: 100vh;
+  .navbar {
+    position: fixed;
+    width: 100%;
+    height: auto;
+    z-index: 999;
+    top: 0;
+    left: 0;
+    background: #ffffff;
+  }
+}
+.content {
+  flex: 1;
+  position: relative;
   /deep/ .uni-button:after {
     border: 0 !important;
   }
@@ -490,7 +546,6 @@ export default {
   background: rgba(0, 0, 0, 0.8);
 }
 .top_card {
-  background: #ffffff;
   padding: 26rpx 50rpx 50rpx 40rpx;
   .title {
     font-size: 50rpx;
@@ -553,7 +608,6 @@ export default {
 }
 .about {
   margin-top: 16rpx;
-  background: #ffffff;
   padding: 0 50rpx 0 40rpx;
   .service {
     display: flex;
@@ -653,14 +707,12 @@ export default {
   }
 }
 .sharePopup {
-  margin: 0 50rpx;
   display: flex;
   flex-direction: column;
-  margin: 0 50rpx;
   position: fixed;
-  height: 85vh;
-  top: 100rpx;
-  left: 0;
+  top: 54%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 100;
   border-radius: 28rpx;
   .imgWrap {

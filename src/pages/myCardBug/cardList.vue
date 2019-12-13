@@ -1,90 +1,103 @@
 <template>
-  <view class="content">
-    <view v-if="list.length === 0" class="empty">
-      <view id="title" class="title">
-        <text>我的卡券 </text>
-      </view>
-      <view class="tips">
-        <image src="../../static/images/empty.png" />
-        <view class="text">
-          <text>您的卡券包暂时为空</text>
-        </view>
-        <view class="text">
-          <text> 快去购买一张优惠券吧</text>
-        </view>
-      </view>
-      <button @click="NavToIndex" size="mini">去选购</button>
-    </view>
-    <view v-else class="not_empty">
-      <scroll-view
-        :scroll-top="scrollTop"
-        scroll-y="true"
-        class="scroll-Y"
-        @scrolltoupper="upper"
-        @scroll="scroll"
-      >
+  <view
+    class="main"
+    v-bind:style="{
+      paddingTop: navHeight + 'px'
+    }"
+  >
+    <navigationbar
+      class="navbar"
+      :status_img="skin.status_img ? skin.status_img : ''"
+      :title="title"
+    ></navigationbar>
+    <view class="content">
+      <image
+        :src="skin.img"
+        class="allBgImg"
+        v-bind:style="{
+          paddingTop: navHeight + 'px'
+        }"
+      ></image>
+      <view v-if="list.length === 0" class="empty">
         <view id="title" class="title">
           <text>我的卡券 </text>
         </view>
-        <view v-for="(item, index) in list" :key="index" class="by_mouth">
-          <view class="mouth">
-            <text>{{ item.date }}</text>
+        <view class="tips">
+          <image src="../../static/images/empty.png" />
+          <view class="text">
+            <text>您的卡券包暂时为空</text>
           </view>
-          <view v-for="(val, idx) in item.order" :key="idx" class="lists">
-            <view class="card_left">00000</view>
-            <view class="listCard" @click="NavToDetail(val)">
-              <view class="row1">
-                <view class="order_name"
-                  >{{ val.goods_name }}X{{ val.num }}</view
-                >
-                <view class="price">
-                  <image src="../../static/assets/money.png" />
-                  {{ val.price }}</view
-                >
-              </view>
-              <view class="order_no"
-                ><text>订单编号：</text>{{ val.order_number }}
-                <text class="copy" @click.stop="copy_no(val.order_number)"
-                  >复制</text
-                ></view
-              >
-              <view class="buy_time"
-                ><text>购买时间：</text>{{ val.add_time }}</view
-              >
-              <view class="row4">
-                <view class="useful_time">
-                  <text>有效期至：</text>{{ val.expire_time }}
-                </view>
-                <button v-if="val.status === '2'" class="isUsed" size="mini">
-                  已收货
-                </button>
-                <button @click.stop="affirmReceive(val)" v-else size="mini">
-                  确认收货
-                </button>
-              </view>
-            </view>
+          <view class="text">
+            <text> 快去购买一张优惠券吧</text>
           </view>
         </view>
-      </scroll-view>
-    </view>
-    <!-- 分享弹窗 -->
-    <view v-if="share" class="sharePopup">
-      <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
-        <image :src="beautifulPhoto.show_img" class="bgImage"></image>
-        <view class="weixinIcon">
-          <view class="image_share">
-            <button open-type="share">
-              <image src="../../static/assets/weixin.png" class="imgIcon" />
-            </button>
-            <view class="text_weixin">
-              微信好友
+        <button @click="NavToIndex" size="mini">去选购</button>
+      </view>
+      <view v-else class="not_empty">
+        <view>
+          <view id="title" class="title">
+            <text>我的卡券 </text>
+          </view>
+          <view v-for="(item, index) in list" :key="index" class="by_mouth">
+            <view class="mouth">
+              <text>{{ item.date }}</text>
+            </view>
+            <view v-for="(val, idx) in item.order" :key="idx" class="lists">
+              <view class="card_left">00000</view>
+              <view class="listCard" @click="NavToDetail(val)">
+                <view class="row1">
+                  <view class="order_name"
+                    >{{ val.goods_name }}X{{ val.num }}</view
+                  >
+                  <view class="price">
+                    <image src="../../static/assets/money.png" />
+                    {{ val.price }}</view
+                  >
+                </view>
+                <view class="order_no"
+                  ><text>订单编号：</text>{{ val.order_number }}
+                  <text class="copy" @click.stop="copy_no(val.order_number)"
+                    >复制</text
+                  ></view
+                >
+                <view class="buy_time"
+                  ><text>购买时间：</text>{{ val.add_time }}</view
+                >
+                <view class="row4">
+                  <view class="useful_time">
+                    <text>有效期至：</text>{{ val.expire_time }}
+                  </view>
+                  <button v-if="val.status === '2'" class="isUsed" size="mini">
+                    已收货
+                  </button>
+                  <button @click.stop="affirmReceive(val)" v-else size="mini">
+                    确认收货
+                  </button>
+                </view>
+              </view>
             </view>
           </view>
         </view>
       </view>
-      <!-- 关闭按钮 -->
-      <view class="close" @click="close_share">
-        <image class="close_img" src="../../static/assets/close.png" />
+      <!-- 分享弹窗 -->
+      <view v-if="share" class="sharePopup">
+        <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
+          <image :src="beautifulPhoto.show_img" class="bgImage"></image>
+          <view class="weixinIcon">
+            <view class="image_share">
+              <button open-type="share">
+                <image src="../../static/assets/weixin.png" class="imgIcon" />
+              </button>
+              <view class="text_weixin">
+                微信好友
+              </view>
+            </view>
+          </view>
+        </view>
+        <!-- 关闭按钮 -->
+        <view class="close" @click="close_share">
+          <image class="close_img" src="../../static/assets/close.png" />
+        </view>
       </view>
     </view>
     <!-- 遮罩 -->
@@ -92,15 +105,23 @@
   </view>
 </template>
 <script>
+import navigationbar from "@/components/navigationBar/navigationBar";
 export default {
+  components: {
+    navigationbar
+  },
   data() {
+    const app = getApp();
     return {
       // list: [],
+      title: "",
       scrollTop: 0,
       orderList: "",
       list: [],
       share: false,
-      beautifulPhoto: ""
+      beautifulPhoto: "",
+      skin: {},
+      navHeight: app.globalData.navHeight
     };
   },
   onLoad() {
@@ -108,6 +129,7 @@ export default {
       backgroundColor: "#ffffff",
       frontColor: "#000000"
     });
+    this.getSkin();
   },
   onShow() {
     this.getOrderList();
@@ -141,12 +163,12 @@ export default {
   onPageScroll(top) {
     this.scrollFun(top);
   },
-    // 用户分享
+  // 用户分享
   onShareAppMessage() {
     return {
       title: "我告诉你，这是喝星巴克最优惠的方式",
       path: "/pages/loading/loading",
-      imageUrl:'../../static/images/shareCard.jpg'
+      imageUrl: "../../static/images/shareCard.jpg"
     };
   },
   methods: {
@@ -355,6 +377,16 @@ export default {
         }
       });
     },
+    // 获取皮肤
+    getSkin() {
+      this.Ajax("post", "member/index/skin", { brand_id: 1 }, res => {
+        console.log(res);
+        if (res.data.code === "200") {
+          this.skin = res.data.data.skin;
+          console.log("皮肤：", this.skin);
+        }
+      });
+    },
     upper(e) {
       console.log(e);
     },
@@ -370,10 +402,23 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.content {
+.main {
+  display: flex;
+  box-sizing: border-box;
   min-height: 100vh;
-  background: #f3f4f3;
-  padding-bottom: 40rpx;
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index: 999;
+    background: #ffffff;
+  }
+}
+.content {
+  flex: 1;
+  box-sizing: border-box;
   position: relative;
 }
 .shadowBox {
@@ -386,9 +431,8 @@ export default {
 }
 .empty {
   display: flex;
-  height: 100vh;
+  height: 80vh;
   flex-direction: column;
-  background: #ffffff;
   .title {
     font-size: 50rpx;
     color: #000000;
@@ -398,9 +442,9 @@ export default {
   }
   .tips {
     position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%,-50%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -422,10 +466,10 @@ export default {
     }
   }
   button {
-	position: absolute;
-	left: 50%;
-	bottom: 200rpx;
-	transform: translateX(-50%);
+    position: absolute;
+    left: 50%;
+    bottom: 200rpx;
+    transform: translateX(-50%);
     border: 2rpx solid #00b657;
     border-radius: 45rpx;
     font-size: 30rpx;
@@ -459,8 +503,8 @@ export default {
       display: flex;
       font-size: 26rpx;
       flex-direction: column;
-      margin-bottom: 16rpx;
-      box-shadow: 1px 10px 20px -10px rgba(4, 32, 8, 0.2);
+      margin-bottom: 16rpx; 
+      box-shadow: 1px 10px 70px -10px rgba(155, 166, 156, 0.2);
       display: flex;
       flex-direction: row;
       &:last-child {
@@ -555,7 +599,7 @@ export default {
             font-size: 28rpx;
             color: #42b069;
             font-weight: 600;
-            &:after{
+            &:after {
               border: none;
             }
           }
@@ -565,14 +609,12 @@ export default {
   }
 }
 .sharePopup {
-  margin: 0 50rpx;
   display: flex;
   flex-direction: column;
-  margin: 0 50rpx;
   position: fixed;
-  top: 100rpx;
-  height: 85vh;
-  left: 0;
+  top: 54%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 100;
   border-radius: 28rpx;
   .imgWrap {

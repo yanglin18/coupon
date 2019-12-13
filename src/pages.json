@@ -1,26 +1,29 @@
 {
   "pages": [
-    { "path": "pages/loading/loading",
+    {
+      "path": "pages/loading/loading",
       "style": {
         "navigationBarTitleText": "摩卡星"
       }
     },
     {
       "path": "pages/index/index",
+      "usingComponents": {
+        "mp-navigation-bar": "../components/navigationBar/navigationBar"
+      },
       "style": {
         "navigationBarTitleText": "摩卡星",
-        "enablePullDownRefresh": true
+        "navigationStyle": "custom"
       }
-    },   
+    },
     {
       "path": "pages/index/authorize",
       "style": {
         "navigationBarTitleText": "摩卡星",
-        "navigationStyle":"custom"
-        
+        "navigationStyle": "custom"
       }
-    },  
-     {
+    },
+    {
       "path": "pages/loading/no_network",
       "style": {
         "navigationBarTitleText": "摩卡星"
@@ -35,13 +38,15 @@
     {
       "path": "pages/myCardBug/cardList",
       "style": {
-        "navigationBarTitleText": ""
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/userCenter/userCenter",
       "style": {
-        "navigationBarTitleText": ""
+        "navigationBarTitleText": "",
+        "navigationStyle": "custom"
       }
     },
     {

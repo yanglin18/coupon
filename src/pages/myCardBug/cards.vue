@@ -384,9 +384,9 @@ swiper.uni-swiper-slide-frame {
   height: 500rpx;
   width: 630rpx;
   position: fixed;
-  top: 50%;
+  top: 46%;
   left: 0;
-  transform: translateY(-40%);
+  transform: translateY(-50%);
   z-index: 100;
   margin: 0 60rpx;
   color: #000000;
