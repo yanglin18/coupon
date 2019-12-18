@@ -1,7 +1,7 @@
 <template>
   <view
     class="navigation"
-    v-bind:style="{ height: navHeight+ 'px',background: 'url(' + status_img + ')no-repeat center', backgroundSize:cover}"
+    v-bind:style="{ height: navHeight+ 'px',background: 'url(' + status_img + ')no-repeat center', backgroundSize:'cover'}"
   >
     <view
       class="tool_bar"

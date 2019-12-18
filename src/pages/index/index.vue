@@ -7,12 +7,18 @@
     ></navigationbar>
     <scroll-view :scroll-y="userNotice ? false : true" style="height:100vh">
       <view v-bind:style="{ height: navHeight + 'px' }"></view>
-      <view class="content">
+      <view
+        class="content"
+        v-bind:style="{
+          paddingBottom: tabHeight+20 + 'px'
+        }"
+      >
         <image
           :src="skin.img"
           class="allBgImg"
           v-bind:style="{
-            paddingTop: navHeight + 'px'
+            paddingTop: navHeight + 'px',
+            paddingBottom: tabHeight + 'px'
           }"
         ></image>
         <!-- <button @click="cleanEvent">清理</button> -->
@@ -220,14 +226,17 @@
         ></view>
       </view>
     </scroll-view>
+    <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
   </view>
 </template>
 
 <script>
 import navigationbar from "@/components/navigationBar/navigationBar";
+import tabBar from "@/components/tabBar/tabBar";
 export default {
   components: {
-    navigationbar
+    navigationbar,
+    tabBar
   },
   data() {
     const app = getApp();
@@ -252,6 +261,7 @@ export default {
       buyFlag: null,
       objQueryPid: "", //登录时需要的Pid
       navHeight: app.globalData.navHeight,
+      tabHeight: app.globalData.tabHeight,
       userNotice: false,
       goodItem: "",
       HasSave: true //防止多次唤起手机号标致
@@ -284,9 +294,6 @@ export default {
       this.userAgree = true;
     } else {
       this.userAgree = false;
-      uni.hideTabBar({
-        animation: true
-      });
     }
     uni.setNavigationBarColor({
       backgroundColor: "#FFFFFF",
@@ -438,9 +445,6 @@ export default {
         });
         return;
       }
-      uni.hideTabBar({
-        animation: true
-      });
       this.share = true;
       uni.getStorage({
         key: "storage_key",
@@ -547,9 +551,6 @@ export default {
     // 关闭分享
     close_share() {
       this.share = false;
-      uni.showTabBar({
-        animation: true
-      });
     },
     // 减少购买数量
     reduce_number(item) {
@@ -624,7 +625,7 @@ export default {
       console.log("to_buy", item);
       uni.showLoading({
         title: "加载中...",
-        mask:true
+        mask: true
       });
       if (this.buyFlag) {
         clearTimeout(this.buyFlag);
@@ -846,9 +847,6 @@ export default {
         this.NotLearned();
       } else {
         uni.removeStorageSync("isAuthorizeLogin");
-        uni.showTabBar({
-          animation: true
-        });
         this.userAgree = true;
         this.showTips = true;
         // 记录同意协议的人
@@ -927,7 +925,15 @@ export default {
     position: fixed;
     width: 100%;
     height: auto;
+    z-index: 10;
+    background: #ffffff;
+  }
+  .tabBar {
+    position: fixed;
+    width: 100%;
+    height: auto;
     z-index: 999;
+    bottom: 0;
     background: #ffffff;
   }
 }
@@ -944,6 +950,7 @@ export default {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
 }
 .warmPrompt {
   display: flex;
@@ -958,6 +965,7 @@ export default {
   background: #ffffff;
   color: #000000;
   border-radius: 24rpx;
+  z-index: 1500;
   .Prompttitle {
     font-size: 40rpx;
     margin: 0 auto;
@@ -1019,6 +1027,7 @@ export default {
   font-size: 30rpx;
   border-radius: 24rpx;
   box-sizing: border-box;
+  z-index: 1500;
   .notice_Content {
     text-align: center;
     position: relative;
@@ -1245,7 +1254,7 @@ export default {
   top: 54%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 100;
+  z-index: 1500;
   border-radius: 28rpx;
   .imgWrap {
     display: flex;

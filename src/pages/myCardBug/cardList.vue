@@ -10,12 +10,18 @@
       :status_img="skin.status_img ? skin.status_img : ''"
       :title="title"
     ></navigationbar>
-    <view class="content">
+    <view
+      class="content"
+      v-bind:style="{
+        paddingBottom: tabHeight + 20 + 'px'
+      }"
+    >
       <image
         :src="skin.img"
         class="allBgImg"
         v-bind:style="{
-          paddingTop: navHeight + 'px'
+          paddingTop: navHeight + 'px',
+          paddingBottom: tabHeight + 'px'
         }"
       ></image>
       <view v-if="list.length === 0" class="empty">
@@ -102,13 +108,16 @@
     </view>
     <!-- 遮罩 -->
     <view class="shadowBox" v-show="share"></view>
+    <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
   </view>
 </template>
 <script>
 import navigationbar from "@/components/navigationBar/navigationBar";
+import tabBar from "@/components/tabBar/tabBar";
 export default {
   components: {
-    navigationbar
+    navigationbar,
+    tabBar
   },
   data() {
     const app = getApp();
@@ -121,7 +130,8 @@ export default {
       share: false,
       beautifulPhoto: "",
       skin: {},
-      navHeight: app.globalData.navHeight
+      navHeight: app.globalData.navHeight,
+      tabHeight: app.globalData.tabHeight
     };
   },
   onLoad() {
@@ -137,9 +147,6 @@ export default {
     this.share = app.globalData.share;
     console.log("是支付完成进入的卡券页面", this.share);
     if (this.share) {
-      uni.hideTabBar({
-        animation: true
-      });
       uni.getStorage({
         key: "storage_key",
         success: res0 => {
@@ -160,8 +167,13 @@ export default {
     }
   },
 
-  onPageScroll(top) {
-    this.scrollFun(top);
+  onPageScroll(scrollTop) {
+    if(scrollTop.scrollTop >= 100){
+      this.title="我的卡券"
+    }
+    else{
+      this.title=""
+    }
   },
   // 用户分享
   onShareAppMessage() {
@@ -224,9 +236,6 @@ export default {
     },
     // 关闭分享
     close_share() {
-      uni.showTabBar({
-        animation: true
-      });
       this.share = false;
       let app = getApp();
       app.globalData.share = false;
@@ -415,6 +424,14 @@ export default {
     z-index: 999;
     background: #ffffff;
   }
+  .tabBar {
+    position: fixed;
+    width: 100%;
+    height: auto;
+    z-index: 999;
+    bottom: 0;
+    background: #ffffff;
+  }
 }
 .content {
   flex: 1;
@@ -428,10 +445,11 @@ export default {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
 }
 .empty {
   display: flex;
-  height: 80vh;
+  // height: 80vh;
   flex-direction: column;
   .title {
     font-size: 50rpx;
@@ -442,7 +460,7 @@ export default {
   }
   .tips {
     position: absolute;
-    top: 50%;
+    top: 36%;
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
@@ -468,7 +486,7 @@ export default {
   button {
     position: absolute;
     left: 50%;
-    bottom: 200rpx;
+    top: 70%;
     transform: translateX(-50%);
     border: 2rpx solid #00b657;
     border-radius: 45rpx;
@@ -503,7 +521,7 @@ export default {
       display: flex;
       font-size: 26rpx;
       flex-direction: column;
-      margin-bottom: 16rpx; 
+      margin-bottom: 16rpx;
       box-shadow: 1px 10px 70px -10px rgba(155, 166, 156, 0.2);
       display: flex;
       flex-direction: row;
@@ -615,7 +633,7 @@ export default {
   top: 54%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 100;
+  z-index: 1500;
   border-radius: 28rpx;
   .imgWrap {
     display: flex;

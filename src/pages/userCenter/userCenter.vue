@@ -15,7 +15,8 @@
         :src="skin.img"
         class="allBgImg"
         v-bind:style="{
-          paddingTop: navHeight + 'px'
+          paddingTop: navHeight + 'px',
+          paddingBottom: tabHeight + 'px'
         }"
       ></image>
       <view>
@@ -101,15 +102,18 @@
         </view>
       </view>
     </view>
+    <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
     <!-- 遮罩 -->
     <view class="shadowBox" v-show="share || contactUS"></view>
   </view>
 </template>
 <script>
 import navigationbar from "@/components/navigationBar/navigationBar";
+import tabBar from "@/components/tabBar/tabBar";
 export default {
   components: {
-    navigationbar
+    navigationbar,
+    tabBar
   },
   data() {
     const app = getApp();
@@ -133,7 +137,8 @@ export default {
       objQueryPid: "",
       default_avter: "../../static/assets/default_avter.png",
       skin: {},
-      navHeight: app.globalData.navHeight
+      navHeight: app.globalData.navHeight,
+      tabHeight: app.globalData.tabHeight
     };
   },
   onShow() {
@@ -283,9 +288,6 @@ export default {
     // 联系客服
     contactService() {
       this.contactUS = true;
-      uni.hideTabBar({
-        animation: true
-      });
     },
     // 拨打电话
     callUS() {
@@ -296,9 +298,6 @@ export default {
     // 我知道了
     Iknow() {
       this.contactUS = false;
-      uni.showTabBar({
-        animation: true
-      });
     },
     // 跳转
     NavTo(e) {
@@ -338,9 +337,6 @@ export default {
         });
         return;
       }
-      uni.hideTabBar({
-        animation: true
-      });
       this.share = true;
       uni.getStorage({
         key: "storage_key",
@@ -363,9 +359,6 @@ export default {
     // 关闭分享
     close_share() {
       this.share = false;
-      uni.showTabBar({
-        animation: true
-      });
     },
     // 登出
     loginOutEvent() {
@@ -521,6 +514,14 @@ export default {
     left: 0;
     background: #ffffff;
   }
+  .tabBar {
+    position: fixed;
+    width: 100%;
+    height: auto;
+    z-index: 999;
+    bottom: 0;
+    background: #ffffff;
+  }
 }
 .content {
   flex: 1;
@@ -544,6 +545,7 @@ export default {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
 }
 .top_card {
   padding: 26rpx 50rpx 50rpx 40rpx;
@@ -665,6 +667,7 @@ export default {
   background: #ffffff;
   border-radius: 24rpx;
   font-size: 34rpx;
+  z-index: 1500;
 
   .contactTop {
     padding-left: 110rpx;
@@ -713,7 +716,7 @@ export default {
   top: 54%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 100;
+  z-index: 1500;
   border-radius: 28rpx;
   .imgWrap {
     display: flex;

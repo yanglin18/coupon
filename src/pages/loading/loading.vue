@@ -47,13 +47,11 @@ export default {
               uni.switchTab({
                 url: "../index/index"
               });
-              if(res.data.data.is_read ===0){
+              if (res.data.data.is_read === 0) {
                 getApp().globalData.is_read = false;
-              }
-              else{
+              } else {
                 getApp().globalData.is_read = true;
               }
-              
             } else {
               if (res.data.code === "0020") {
                 // 将用户id或者游客id存到storage

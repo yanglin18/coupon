@@ -8,13 +8,17 @@ export default {
         if (res.system.substring(0, 7) === "Android") {
           let bread = res.model.substring(0, 8);
           this.globalData.navHeight = 68; //自定义的顶部导航栏总高度
+          this.globalData.tabHeight = 54;
         } else {
           let bread = res.model.substring(0, 8);
           console.log("型号：", bread);
-          if (bread === "iPhone X") {
+          if (res.screenHeight >= 810) {
             this.globalData.navHeight = 88;
+            this.globalData.tabHeight = 82;
+            this.globalData.isIosX = true;
           } else {
             this.globalData.navHeight = 64;
+            this.globalData.tabHeight = 48;
           }
         }
       }
@@ -23,6 +27,7 @@ export default {
   },
   onShow: function() {
     console.log("App Show");
+    
   },
   onHide: function() {
     console.log("App Hide");
