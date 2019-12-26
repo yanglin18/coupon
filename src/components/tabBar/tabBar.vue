@@ -3,8 +3,7 @@
     class="tabBar"
     v-bind:style="{
       height: tabHeight + 'px',
-      background: 'url(' + banner + ')no-repeat center',
-      backgroundSize: 'cover'
+      background: 'url(' + banner + ')no-repeat center/cover',
     }"
   >
     <view v-for="(tab, index) in tabs" :key="index" class="tabBarItem">

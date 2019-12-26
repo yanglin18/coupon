@@ -10,6 +10,7 @@
         <text>隐私保护政策</text>
         <image src="../../static/assets/toRight.png" />
       </view>
+      <!-- #ifdef MP-WEIXIN -->
       <button
         :open-type="hasLogin ? '' : 'getUserInfo'"
         @getuserinfo="GetUserInfo"
@@ -19,6 +20,19 @@
         <text>常见问题</text>
         <image src="../../static/assets/toRight.png" />
       </button>
+      <!-- #endif -->
+      <!-- #ifdef MP-ALIPAY -->
+      <button
+        :open-type="hasLogin ? '' : 'getAuthorize'"
+        @getAuthorize="onGetAuthorize"
+        class="rowButton"
+        @click="NavTo('./About/commonProblem')"
+        scope="userInfo"
+      >
+        <text>常见问题</text>
+        <image src="../../static/assets/toRight.png" />
+      </button>
+      <!-- #endif -->
     </view>
   </view>
 </template>
@@ -58,6 +72,18 @@ export default {
       }
       uni.navigateTo({
         url: e
+      });
+    },
+    onGetAuthorize() {
+      my.getOpenUserInfo({
+        success: resInfo => {
+          let userInfo = JSON.parse(resInfo.response).response;
+          console.log("获取基本信息返回", userInfo);
+          this.loginIn(userInfo);
+        },
+        error: e => {
+          console.log("错误信息", e);
+        }
       });
     },
     // 获取基本信息授权
@@ -104,13 +130,14 @@ export default {
       }
     },
     // 登录
-    loginIn() {
+    loginIn(user_info) {
       uni.getStorage({
         key: "obj.query.pid",
         success: pid => {
           this.objQueryPid = pid.data;
         }
       });
+      // #ifdef MP-WEIXIN
       uni.login({
         success: reslogin => {
           console.log("登录返回：", reslogin);
@@ -152,6 +179,48 @@ export default {
           }
         }
       });
+      // #endif
+      // #ifdef MP-ALIPAY
+      my.getAuthCode({
+        scopes: "auth_base",
+        success: reslogin => {
+          console.log("授权码为:", reslogin);
+          if (reslogin.authCode) {
+            this.Ajax(
+              "post",
+              "member/Login/aligetLogin",
+              {
+                brand_id: 1,
+                channel: "ali",
+                code: reslogin.authCode,
+                detail: user_info,
+                pid: 0
+              },
+              res => {
+                console.log("调登录接口返回：", res);
+                if (res.data.code === "200") {
+                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data
+                  });
+                  if (res.data.data.mobile) {
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
+                  }
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+      // #endif
     }
   }
 };
@@ -194,6 +263,7 @@ export default {
     display: flex;
     justify-content: space-between;
     border-bottom: 0.5px solid rgba(97, 97, 97, 0.2);
+    border: none;
     text {
       letter-spacing: 0.38px;
       font-size: 30rpx;

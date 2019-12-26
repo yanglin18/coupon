@@ -112,6 +112,7 @@ export default {
       image {
         width: 25rpx;
         height: 15rpx;
+        background-size: cover;
       }
     }
     .questionBox-allVal,

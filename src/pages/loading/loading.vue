@@ -25,7 +25,7 @@ export default {
         }
       }
     });
-    // 一个不用基本信息的登录判断是否是新用户
+    //微信 一个不用基本信息的登录判断是否是新用户
     // #ifdef  MP-WEIXIN
     uni.login({
       success: LoginRes => {
@@ -34,7 +34,13 @@ export default {
           "member/Login/getLogin",
           { brand_id: 1, channel: "wechat", code: LoginRes.code },
           res => {
-            if (res.data.code === "200") {
+            if (res.data.code === "0020") {
+              // 将用户id或者游客id存到storage
+              uni.setStorage({
+                key: "userID",
+                data: res.data.data.openid
+              });
+            } else if (res.data.code === "200") {
               uni.setStorageSync("hasLogin", true);
               console.log("老顾客");
               uni.setStorage({
@@ -53,17 +59,10 @@ export default {
                 getApp().globalData.is_read = true;
               }
             } else {
-              if (res.data.code === "0020") {
-                // 将用户id或者游客id存到storage
-                uni.setStorage({
-                  key: "userID",
-                  data: res.data.data.openid
-                });
-              }
               uni.setStorageSync("hasLogin", false);
               console.log("新顾客");
               uni.navigateTo({
-                url: "../index/authorize"
+                url: "/pages/index/authorize"
               });
             }
           }
@@ -72,16 +71,58 @@ export default {
       fail: error => {}
     });
     // #endif
-    // #ifdef  MP-ALIPAY
-    uni.switchTab({
-      url: "../index/index"
+    // 支付宝判断是否新用户
+    // #ifdef MP-ALIPAY
+    my.getAuthCode({
+      scopes: "auth_base",
+      success: reslogin => {
+        console.log("授权码为:", reslogin);
+        if (reslogin.authCode) {
+          this.Ajax(
+            "post",
+            "member/Login/aligetLogin",
+            {
+              brand_id: 1,
+              channel: "ali",
+              code: reslogin.authCode
+            },
+            res => {
+              console.log("调登录接口返回：", res);
+              if (res.data.code === "200") {
+                uni.setStorageSync("hasLogin", true);
+                uni.setStorage({
+                  key: "storage_key",
+                  data: res.data.data
+                });
+                if (res.data.data.mobile) {
+                  uni.setStorageSync("UserNumber", res.data.data.mobile);
+                }
+                uni.switchTab({
+                  url: "/pages/index/index"
+                });
+                if (res.data.data.is_read === 0) {
+                  getApp().globalData.is_read = false;
+                } else {
+                  getApp().globalData.is_read = true;
+                }
+              } else {
+                uni.navigateTo({
+                  url: "/pages/index/authorize"
+                });
+              }
+            }
+          );
+        } else {
+          console.log("获取授权码失败！" + res.errMsg);
+        }
+      }
     });
     // #endif
   },
   onLoad() {
     uni.setNavigationBarColor({
-      backgroundColor: "#F3F4F3",
-      frontColor: "#000000"
+      backgroundColor: "#F3F4F3"
+      // frontColor: "#000000"
     });
     uni.getSetting({
       success: succ => {

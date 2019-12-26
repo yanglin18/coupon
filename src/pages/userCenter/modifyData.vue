@@ -16,6 +16,7 @@
       </view>
       <view class="row">
         <text>手机</text>
+        <!-- #ifdef MP-WEIXIN -->
         <button
           v-if="!userPhoneNumber"
           open-type="getPhoneNumber"
@@ -25,6 +26,20 @@
         >
           绑定
         </button>
+        <!-- #endif -->
+        <!-- #ifdef MP-ALIPAY -->
+        <button
+          v-if="!userPhoneNumber"
+          open-type="getAuthorize"
+          size="mini"
+          onGetAuthorize="onGetAuthorize"
+          @click.stop="onGetAuthorize"
+          scope="phoneNumber"
+          class="mobileButton"
+        >
+          绑定
+        </button>
+        <!-- #endif -->
         <text v-else class="right" @click="Toast(4)">{{
           user_info.mobile
         }}</text>
@@ -149,7 +164,7 @@ export default {
                       resMobile => {
                         if (resMobile.data.code === "200") {
                           this.userPhoneNumber = true;
-                          this.getUserInfo()
+                          this.getUserInfo();
                           uni.setStorageSync(
                             "UserNumber",
                             resMobile.data.data.mobile
@@ -172,6 +187,46 @@ export default {
       } else {
         console.log("点击了拒绝手机号授权");
       }
+    },
+    // 支付宝获取手机号
+    onGetAuthorize() {
+      my.getPhoneNumber({
+        success: resNumber => {
+          uni.getStorage({
+            key: "storage_key",
+            success: storageRes => {
+              this.Ajax(
+                "post",
+                "member/user/ali_mobile",
+                {
+                  session3rd: storageRes.data.session3rd,
+                  response: resNumber.response
+                },
+                resMobile => {
+                  if (resMobile.data.code === "200") {
+                    console.log("保存成功");
+                    this.userPhoneNumber = true;
+                    this.getUserInfo();
+                    uni.setStorageSync(
+                      "UserNumber",
+                      resMobile.data.data.mobile
+                    );
+                  } else {
+                    uni.showToast({
+                      title: "网络请求失败，请重试",
+                      icon: "none"
+                    });
+                  }
+                }
+              );
+            }
+          });
+        },
+        fail: res => {
+          console.log(res);
+          console.log("getPhoneNumber_fail");
+        }
+      });
     },
     saveChange() {
       if (this.birthday === "请选择生日") {
@@ -316,6 +371,6 @@ export default {
   border-radius: 40rpx;
   font-size: 30rpx;
   color: #00b35f;
-  margin-top: 60rpx;
+  margin: 60rpx auto 0;
 }
 </style>

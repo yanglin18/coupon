@@ -7,7 +7,7 @@
   >
     <navigationbar
       class="navbar"
-      :status_img="skin.status_img ? skin.status_img : ''"
+      :status_img="skin.status_img"
       :title="text"
     ></navigationbar>
     <view class="content">
@@ -27,6 +27,7 @@
           <view class="bottom" @click="NavToModify">
             <view class="left">
               <image :src="user_info.head_img || default_avter" />
+              <!-- #ifdef MP-WEIXIN -->
               <button
                 size="mini"
                 open-type="getUserInfo"
@@ -36,6 +37,18 @@
               >
                 登录
               </button>
+              <!-- #endif -->
+              <!-- #ifdef MP-ALIPAY -->
+              <button
+                size="mini"
+                open-type="getAuthorize"
+                @getAuthorize="GetAuthorize"
+                @error="onAuthError"
+                scope="userInfo"
+                v-if="!hasLogin1"
+                class="Login_in"
+              ></button>
+              <!-- #endif -->
               <text v-else class="name">{{ user_info.user_name }}</text>
             </view>
             <view class="right">
@@ -102,7 +115,9 @@
         </view>
       </view>
     </view>
+    <!-- #ifndef MP-ALIPAY -->
     <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
+    <!--#endif  -->
     <!-- 遮罩 -->
     <view class="shadowBox" v-show="share || contactUS"></view>
   </view>
@@ -154,9 +169,9 @@ export default {
       backgroundColor: "#FFFFFF",
       frontColor: "#000000"
     });
-    uni.showShareMenu({
-      withShareTicket: true
-    });
+    // uni.showSharePanel({
+    //   withShareTicket: true
+    // });
   },
   // 用户分享
   onShareAppMessage() {
@@ -233,14 +248,72 @@ export default {
         });
       }
     },
+    // 支付宝授权
+    GetAuthorize() {
+      my.getOpenUserInfo({
+        success: resInfo => {
+          console.log("支付宝用户基本信息：", resInfo);
+          let userInfo = JSON.parse(resInfo.response).response;
+          this.loginIn(userInfo);
+        },
+        error: e => {
+          console.log("错误信息", e);
+        }
+      });
+    },
+    onAuthError() {},
     // 登录
-    loginIn() {
+    loginIn(user_info) {
       uni.getStorage({
         key: "obj.query.pid",
         success: pid => {
           this.objQueryPid = pid.data;
         }
       });
+      // 支付宝
+      // #ifdef MP-ALIPAY
+      my.getAuthCode({
+        scopes: "auth_base",
+        success: reslogin => {
+          console.log("授权码为:", reslogin);
+          if (reslogin.authCode) {
+            this.Ajax(
+              "post",
+              "member/Login/aligetLogin",
+              {
+                brand_id: 1,
+                channel: "ali",
+                code: reslogin.authCode,
+                detail: user_info,
+                pid: 0
+              },
+              res => {
+                if (res.data.code === "200") {
+                  this.getUser()
+                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data
+                  });
+                  if (res.data.data.mobile) {
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
+                  }
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+      // #endif
+      // 微信
+      // #ifdef MP-WEIXIN
       uni.login({
         success: reslogin => {
           console.log("登录返回：", reslogin);
@@ -284,6 +357,7 @@ export default {
           }
         }
       });
+      // #endif
     },
     // 联系客服
     contactService() {
@@ -331,62 +405,13 @@ export default {
     },
     // 分享
     Share() {
-      if (!this.hasLogin1) {
-        uni.navigateTo({
-          url: "../index/authorize"
-        });
-        return;
-      }
-      this.share = true;
-      uni.getStorage({
-        key: "storage_key",
-        success: res0 => {
-          console.log("storage参数：", res0);
-          this.Ajax(
-            "post",
-            "member/user/my_qrcode",
-            { session3rd: res0.data.session3rd },
-            res => {
-              if (res.data.code === "200") {
-                console.log("我要的生成美图", res.data.data.list);
-                this.beautifulPhoto = res.data.data.list;
-              }
-            }
-          );
-        }
+      uni.showSharePanel({
+        withShareTicket: true
       });
     },
     // 关闭分享
     close_share() {
       this.share = false;
-    },
-    // 登出
-    loginOutEvent() {
-      uni.showModal({
-        title: "提示",
-        content: "您确定要退出登录吗？",
-        success: function(res) {
-          if (res.confirm) {
-            uni.getStorage({
-              key: "storage_key",
-              success: res0 => {
-                this.Ajax(
-                  "post",
-                  "member/Login/login_out",
-                  { session3rd: res0.data.session3rd },
-                  res => {
-                    if (res.data.code === "200") {
-                      console.log(res);
-                    }
-                  }
-                );
-              }
-            });
-          } else if (res.cancel) {
-            console.log("用户点击取消");
-          }
-        }
-      });
     },
     // 长按保存图片
     saveImg(url) {
@@ -500,7 +525,7 @@ export default {
   }
 };
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .main {
   display: flex;
   box-sizing: border-box;

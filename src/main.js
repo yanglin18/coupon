@@ -5,8 +5,8 @@ Vue.config.productionTip = false;
 
 App.mpType = "app";
 
-let baseURL = "https://coupon.houselai.com/public/index.php/";
-// let baseURL = "https://coupontest.yingbei365.com/public/index.php/"
+// let baseURL = "https://coupon.houselai.com/public/index.php/";
+let baseURL = "https://coupontest.yingbei365.com/public/index.php/"
 Vue.prototype.Ajax = (method, url, data, callback) => {
   // let m = ""
   // for(let key in data){

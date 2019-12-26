@@ -1,11 +1,14 @@
 <template>
   <view
     class="navigation"
-    v-bind:style="{ height: navHeight+ 'px',background: 'url(' + status_img + ')no-repeat center', backgroundSize:'cover'}"
+    v-bind:style="{
+      height: navHeight + 'px',
+      background: 'url(' + navBg + ') no-repeat center/cover'
+    }"
   >
     <view
       class="tool_bar"
-      v-bind:style="{height:statusBarHeight+ 'px'}"
+      v-bind:style="{ height: statusBarHeight + 'px' }"
       style="height:40rpx"
     ></view>
     <view class="title">
@@ -15,17 +18,22 @@
 </template>
 <script>
 export default {
-  props: ['status_img',"title"],
+  props: ["status_img", "title"],
+  computed: {
+    navBg() {
+      return this.status_img;
+    }
+  },
   data() {
     const app = getApp();
     return {
       navHeight: app.globalData.navHeight,
       // title: "自定义的状态栏",
-      statusBarHeight:app.globalData.statusBarHeight
+      statusBarHeight: app.globalData.statusBarHeight
     };
   },
-  created(){
-    console.log(this.title)
+  created() {
+    console.log(this.title);
   },
   onLoad() {
     console.log("状态栏高度：", this.navHeight);
@@ -39,7 +47,6 @@ export default {
   // position: fixed;
   width: 100%;
   height: var(--status-bar-height);
-  background-size: cover;
 
   .title {
     width: 100%;

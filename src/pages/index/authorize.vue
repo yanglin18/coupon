@@ -4,6 +4,7 @@
       <text>允许微信授权后，可体验更多功能</text>
     </view>
     <view class="bottom">
+      <!--#ifdef MP-WEIXIN-->
       <button
         class="button1"
         open-type="getUserInfo"
@@ -11,6 +12,18 @@
       >
         授权基本信息
       </button>
+      <!-- #endif -->
+      <!--#ifdef MP-ALIPAY-->
+      <button
+        class="button1"
+        open-type="getAuthorize"
+        @getAuthorize="onGetAuthorize"
+        @error="onAuthError"
+        scope="userInfo"
+      >
+        授权基本信息
+      </button>
+      <!-- #endif -->
       <button class="button2" @click="backToIndex">跳过</button>
     </view>
   </view>
@@ -24,14 +37,16 @@ export default {
     };
   },
   onShow() {
+    // #ifdef  MP-WEIXIN
     wx.hideHomeButton({
       success: res => {}
     });
+    // #endif
   },
   onLoad() {
     uni.setNavigationBarColor({
-      backgroundColor: "#F3F4F3",
-      frontColor: "#000000"
+      backgroundColor: "#F3F4F3"
+      // frontColor: "#000000"
     });
   },
   methods: {
@@ -76,6 +91,18 @@ export default {
         });
       }
     },
+    onGetAuthorize(res) {
+      my.getOpenUserInfo({
+        success: resInfo => {
+          let userInfo = JSON.parse(resInfo.response).response;
+          console.log("QQQQ", userInfo);
+          this.loginIn(userInfo);
+        },
+        error: e => {
+          console.log("错误信息", e);
+        }
+      });
+    },
     // 登录
     loginIn(user_info) {
       uni.getStorage({
@@ -84,16 +111,72 @@ export default {
           this.objQueryPid = pid.data;
         }
       });
+      // 支付宝
+      // #ifdef MP-ALIPAY
+      my.getAuthCode({
+        scopes: "auth_base",
+        success: reslogin => {
+          console.log("授权码为:", reslogin);
+          if (reslogin.authCode) {
+            this.Ajax(
+              "post",
+              "member/Login/aligetLogin",
+              {
+                brand_id: 1,
+                channel: "ali",
+                code: reslogin.authCode,
+                detail: user_info,
+                pid: 0
+              },
+              res => {
+                console.log("调登录接口返回：", res);
+                if (res.data.code === "200") {
+                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data
+                  });
+                  if (res.data.data.mobile) {
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  uni.setStorageSync("isAuthorizeLogin", true);
+                  uni.switchTab({
+                    url: "/pages/index/index"
+                  });
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
+                  }
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+      // #endif
+      // 微信
+      // #ifdef MP-WEIXIN
       uni.login({
         success: reslogin => {
+          console.log("resLogin:", reslogin);
           if (reslogin.code) {
             this.Ajax(
               "post",
               "member/Login/getLogin",
+              // #ifdef MP-ALIPAY
+              "member/Login/aligetLogin",
+              // #endif
               {
                 brand_id: 1,
                 channel: "wechat",
                 code: reslogin.code,
+                // #ifdef MP-ALIPAY
+                channel: "ali",
+                code: reslogin.authCode,
+                // #endif
                 detail: user_info,
                 pid: this.objQueryPid || 0
               },
@@ -126,10 +209,12 @@ export default {
           }
         }
       });
+      // #endif
     },
     backToIndex() {
+      console.log("backToIndex");
       uni.switchTab({
-        url: "./index"
+        url: "/pages/index/index"
       });
     }
   }
@@ -154,6 +239,7 @@ export default {
   }
   .bottom {
     padding-bottom: 394rpx;
+    margin: 0 auto;
     .button1 {
       background: #42b069;
       border-radius: 44rpx;

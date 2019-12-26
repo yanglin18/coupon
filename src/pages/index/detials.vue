@@ -53,6 +53,7 @@
           </view>
         </view>
         <view class="right">
+          <!-- #ifdef MP-WEIXIN -->
           <button v-if="is_getNumber" @click.stop="To_buy">
             去支付
           </button>
@@ -65,6 +66,23 @@
           >
             去支付
           </button>
+          <!-- #endif -->
+          <!-- #ifdef MP-ALIPAY -->
+          <button v-if="is_getNumber" @click.stop="To_buy">
+            去支付
+          </button>
+          <button
+            v-else
+            open-type="getAuthorize"
+            @getAuthorize="onGetAuthorize"
+            @error="onAuthError"
+            @click.stop="To_buy1ALI"
+            :scope="is_getuserInfo ? 'phoneNumber' : 'userInfo'"
+            :disabled="HasSave ? false : true"
+          >
+            去支付
+          </button>
+          <!-- #endif -->
         </view>
       </view>
     </view>
@@ -107,8 +125,7 @@ export default {
     this.buy_number = Number(val.buy_number);
     // this.instructionsForUse = JSON.parse(val.instructions);
     uni.setNavigationBarColor({
-      backgroundColor: "#0D5A3A",
-      frontColor: "#ffffff"
+      backgroundColor: "#0D5A3A"
     });
   },
   // 用户分享
@@ -156,15 +173,18 @@ export default {
       );
     },
     // 直接去购买
-    To_buy() {
+    To_buy() {},
+    wxPayMent(item) {
+      uni.showLoading({
+        title: "加载中...",
+        mask: true
+      });
       if (this.buyFlag) {
         clearTimeout(this.buyFlag);
       }
       this.buyFlag = setTimeout(() => {
         // 先从storage拿到session3rd
-        uni.showLoading({
-          title: "加载中..."
-        });
+
         uni.getStorage({
           key: "storage_key",
           success: res0 => {
@@ -180,7 +200,8 @@ export default {
               res => {
                 if (res.data.code === "200") {
                   console.log("去支付参数", res);
-                  // 调起支付
+                  // 调起微信支付
+                  // #ifdef MP-WEIXIN
                   uni.requestPayment({
                     provider: "wxpay",
                     timeStamp: String(res.data.data.timeStamp),
@@ -223,6 +244,53 @@ export default {
                       });
                     }
                   });
+                  // #endif
+                  // #ifdef MP-ALIPAY
+                  my.tradePay({
+                    // 调用统一收单交易创建接口（alipay.trade.create），获得返回字段支付宝交易号trade_no
+                    tradeNO: res.data.data.trade_no,
+                    success: res => {
+                      console.log("调起支付成功！");
+                      uni.hideLoading();
+                      this.getGoodsInfo();
+                      // 记录支付成功的人
+                      this.Record(
+                        {
+                          openId: res0.data.openid,
+                          event_type: 3,
+                          result: 1,
+                          order_id: res.data.data.order_id,
+                          msg: ""
+                        },
+                        record => {}
+                      );
+                      uni.navigateTo({
+                        url:
+                          "/pages/myCardBug/cards?order_id=" +
+                          res.data.data.order_id
+                      });
+                    },
+                    fail: res => {
+                      console.log("调起支付失败！");
+                      uni.hideLoading();
+                      uni.showToast({
+                        title: "取消支付",
+                        icon: "none"
+                      });
+                      // 记录取消支付的人
+                      this.Record(
+                        {
+                          openId: res0.data.openid,
+                          event_type: 3,
+                          result: 0,
+                          order_id: res.data.data.order_id,
+                          msg: ""
+                        },
+                        record => {}
+                      );
+                    }
+                  });
+                  // #endif
                 } else {
                   if (res.data.code === "0032" || res.data.code === "0035") {
                     uni.showToast({
@@ -242,10 +310,72 @@ export default {
         });
       }, 500);
     },
-    To_buy1(e) {
-      console.log("to_buy1");
+
+    To_buy1() {},
+    // 支付宝获取基本信息或者手机号
+    onGetAuthorize() {
+      if (this.is_getuserInfo) {
+        console.log("应该调起获取手机号");
+        my.getPhoneNumber({
+          success: resNumber => {
+            console.log("获取手机号返回：", resNumber);
+            uni.getStorage({
+              key: "storage_key",
+              success: storageRes => {
+                this.Ajax(
+                  "post",
+                  "member/user/ali_mobile",
+                  {
+                    session3rd: storageRes.data.session3rd,
+                    response: resNumber.response
+                  },
+                  resMobile => {
+                    if (resMobile.data.code === "200") {
+                      console.log("保存成功");
+                      this.HasSave = true;
+                      if (!this.is_read) {
+                        this.userNotice = true; //弹出用户须知
+                      }
+                      uni.hideLoading();
+                      this.is_getNumber = true;
+                      uni.setStorageSync(
+                        "UserNumber",
+                        resMobile.data.data.mobile
+                      );
+                    } else {
+                      this.HasSave = true;
+                      uni.hideLoading();
+                      uni.showToast({
+                        title: "网络请求失败，请重试",
+                        icon: "none"
+                      });
+                    }
+                  }
+                );
+              }
+            });
+          },
+          fail: res => {
+            console.log(res);
+            console.log("getPhoneNumber_fail");
+          }
+        });
+      } else {
+        console.log("应该调起获取基本信息");
+        my.getOpenUserInfo({
+          success: resInfo => {
+            let userInfo = JSON.parse(resInfo.response).response;
+            console.log("获取基本信息返回", userInfo);
+            this.loginIn(userInfo);
+          },
+          error: e => {
+            console.log("错误信息", e);
+          }
+        });
+      }
     },
-    // 获取手机号
+    To_buy1ALI(e) {},
+    // 微信获取手机号
     GetPhoneNumber(res0) {
       if (res0.detail.iv) {
         console.log("点击了同意手机号授权", res0.detail);
@@ -296,13 +426,14 @@ export default {
       }
     },
     // 登录
-    loginIn() {
+    loginIn(user_info) {
       uni.getStorage({
         key: "obj.query.pid",
         success: pid => {
           this.objQueryPid = pid.data;
         }
       });
+      // #ifdef MP-WEIXIN
       uni.login({
         success: reslogin => {
           console.log("登录返回：", reslogin);
@@ -324,10 +455,7 @@ export default {
                   uni.setStorageSync("hasLogin", true);
                   uni.setStorage({
                     key: "storage_key",
-                    data: res.data.data,
-                    success: function(e) {
-                      console.log("success", e);
-                    }
+                    data: res.data.data
                   });
                   if (res.data.data.mobile) {
                     uni.setStorageSync("UserNumber", res.data.data.mobile);
@@ -345,6 +473,49 @@ export default {
           }
         }
       });
+      // #endif
+      //   支付宝登录
+      // #ifdef MP-ALIPAY
+      my.getAuthCode({
+        scopes: "auth_base",
+        success: reslogin => {
+          console.log("授权码为:", reslogin);
+          if (reslogin.authCode) {
+            this.Ajax(
+              "post",
+              "member/Login/aligetLogin",
+              {
+                brand_id: 1,
+                channel: "ali",
+                code: reslogin.authCode,
+                detail: user_info,
+                pid: 0
+              },
+              res => {
+                console.log("调登录接口返回：", res);
+                if (res.data.code === "200") {
+                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data
+                  });
+                  if (res.data.data.mobile) {
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
+                  }
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+      // #endif
     },
     // 获取基本信息
     GetUserInfo(res) {

@@ -5,11 +5,13 @@
       paddingTop: navHeight + 'px'
     }"
   >
+    <!--#ifdef MP-WEIXIN-->
     <navigationbar
       class="navbar"
-      :status_img="skin.status_img ? skin.status_img : ''"
+      :status_img="skin.status_img"
       :title="title"
     ></navigationbar>
+    <!-- #endif -->
     <view
       class="content"
       v-bind:style="{
@@ -108,7 +110,9 @@
     </view>
     <!-- 遮罩 -->
     <view class="shadowBox" v-show="share"></view>
+    <!-- #ifndef MP-ALIPAY -->
     <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
+    <!-- #endif -->
   </view>
 </template>
 <script>
@@ -136,12 +140,12 @@ export default {
   },
   onLoad() {
     uni.setNavigationBarColor({
-      backgroundColor: "#ffffff",
-      frontColor: "#000000"
+      backgroundColor: "#ffffff"
     });
     this.getSkin();
   },
   onShow() {
+
     this.getOrderList();
     let app = getApp();
     this.share = app.globalData.share;
@@ -168,11 +172,10 @@ export default {
   },
 
   onPageScroll(scrollTop) {
-    if(scrollTop.scrollTop >= 100){
-      this.title="我的卡券"
-    }
-    else{
-      this.title=""
+    if (scrollTop.scrollTop >= 100) {
+      this.title = "我的卡券";
+    } else {
+      this.title = "";
     }
   },
   // 用户分享
@@ -410,7 +413,7 @@ export default {
   onHide() {}
 };
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .main {
   display: flex;
   box-sizing: border-box;

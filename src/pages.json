@@ -13,7 +13,8 @@
       },
       "style": {
         "navigationBarTitleText": "摩卡星",
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "transparentTitle": "always"
       }
     },
     {
@@ -39,6 +40,7 @@
       "path": "pages/myCardBug/cardList",
       "style": {
         "navigationBarTitleText": "",
+        "transparentTitle": "always",
         "navigationStyle": "custom"
       }
     },
@@ -46,6 +48,7 @@
       "path": "pages/userCenter/userCenter",
       "style": {
         "navigationBarTitleText": "",
+        "transparentTitle": "always",
         "navigationStyle": "custom"
       }
     },
@@ -111,6 +114,7 @@
     "selectedColor": "#2C9543",
     "borderStyle": "white",
     "backgroundColor": "#ffffff",
+    "transparentTitle": "always",
     "list": [
       {
         "pagePath": "pages/index/index",
