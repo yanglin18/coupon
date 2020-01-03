@@ -44,9 +44,13 @@ export default {
 <style lang="scss" scoped>
 .navigation {
   // height:
-  // position: fixed;
-  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100vw;
   height: var(--status-bar-height);
+  background: #ffffff;
 
   .title {
     width: 100%;

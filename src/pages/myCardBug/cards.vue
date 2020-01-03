@@ -7,7 +7,9 @@
       </view>
       <view class="tip_content">
         <view class="texta">
-          <text v-for="(item,index) in instructionsForUse" :key="index">{{ item }}</text>
+          <text v-for="(item, index) in instructionsForUse" :key="index">{{
+            item
+          }}</text>
         </view>
       </view>
     </view>
@@ -139,12 +141,13 @@ export default {
       this.scrollTop = ev.scrollTop;
     }, 0);
   },
-    // 用户分享
+  // 用户分享
   onShareAppMessage() {
     return {
-      title: "我告诉你，这是喝星巴克最优惠的方式",
+      title: "这是喝星吧克最优惠的一种方式",
       path: "/pages/loading/loading",
-      imageUrl:'../../static/images/shareCard.jpg'
+      desc: "星吧克咖啡电子优惠券售卖平台",
+      // imageUrl: "../../static/assets/logo.png"
     };
   },
   methods: {
@@ -198,10 +201,15 @@ export default {
         title: "扫码已完成"
       });
       // 改全局数据值
+      // #ifdef MP-WEIXIN
       let app = getApp();
       app.globalData.share = true;
       console.log("app:", app);
+      // #endif
       // 记录点击了确认星伙伴已扫码的人
+      uni.switchTab({
+        url: "./cardList"
+      });
       uni.getStorage({
         key: "userID",
         success: success => {
@@ -210,15 +218,12 @@ export default {
               openId: success.data,
               event_type: 4,
               result: 1,
-              order_id: '',
+              order_id: "",
               msg: ""
             },
             record => {}
           );
         }
-      });
-      uni.switchTab({
-        url: "./cardList"
       });
     },
     cancel() {
@@ -232,7 +237,7 @@ export default {
               openId: success.data,
               event_type: 4,
               result: 0,
-              order_id: '',
+              order_id: "",
               msg: ""
             },
             record => {}
@@ -244,7 +249,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .content {
   position: relative;
   padding: 0 40rpx 160rpx;
@@ -294,12 +299,13 @@ swiper.uni-swiper-slide-frame {
     flex-direction: column;
     opacity: 0.6;
     font-size: 24rpx;
+    line-height: 42rpx;
     .texta {
       display: flex;
       flex-direction: column;
       margin-top: 8rpx;
-      text{
-    	  margin-bottom: 8rpx;
+      text {
+        margin-bottom: 8rpx;
       }
     }
   }
@@ -329,7 +335,7 @@ swiper.uni-swiper-slide-frame {
   }
   .userful_time {
     font-size: 26rpx;
-    margin: 4rpx auto 0;
+    margin: 8rpx auto 0;
     letter-spacing: 0.43px;
     opacity: 0.6;
   }

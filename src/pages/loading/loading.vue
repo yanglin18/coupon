@@ -9,12 +9,14 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
-      title: "我告诉你，这是喝星巴克最优惠的方式",
+      title: "这是喝星吧克最优惠的一种方式",
       path: "/pages/loading/loading",
-      imageUrl: "../../static/images/shareCard.jpg"
+      desc: "星吧克咖啡电子优惠券售卖平台"
+      // imageUrl: "../../static/assets/logo.png"
     };
   },
   onShow() {
+    uni.clearStorage();
     // 无网络状态下进小程序跳转到无网络页面
     uni.getNetworkType({
       success: network => {
@@ -25,24 +27,18 @@ export default {
         }
       }
     });
-    //微信 一个不用基本信息的登录判断是否是新用户
-    // #ifdef  MP-WEIXIN
+    // #ifdef MP-BAIDU
     uni.login({
       success: LoginRes => {
+        console.log("success");
         this.Ajax(
           "post",
-          "member/Login/getLogin",
-          { brand_id: 1, channel: "wechat", code: LoginRes.code },
+          "member/Login/bdgetLogin",
+          { brand_id: 1, channel: "baidu", code: LoginRes.code },
           res => {
-            if (res.data.code === "0020") {
-              // 将用户id或者游客id存到storage
-              uni.setStorage({
-                key: "userID",
-                data: res.data.data.openid
-              });
-            } else if (res.data.code === "200") {
-              uni.setStorageSync("hasLogin", true);
-              console.log("老顾客");
+            if (res.data.code === "200") {
+              uni.setStorageSync("hasLogin", 1);
+              console.log("老用户");
               uni.setStorage({
                 key: "storage_key",
                 data: res.data.data
@@ -51,7 +47,7 @@ export default {
                 uni.setStorageSync("UserNumber", res.data.data.mobile);
               }
               uni.switchTab({
-                url: "../index/index"
+                url: "/pages/index/index"
               });
               if (res.data.data.is_read === 0) {
                 getApp().globalData.is_read = false;
@@ -59,8 +55,64 @@ export default {
                 getApp().globalData.is_read = true;
               }
             } else {
-              uni.setStorageSync("hasLogin", false);
-              console.log("新顾客");
+              if (res.data.code === "0020") {
+                // 将用户id或者游客id存到storage
+                uni.setStorage({
+                  key: "userID",
+                  data: res.data.data.openid
+                });
+              }
+              uni.setStorageSync("hasLogin", 0);
+              console.log("新用户");
+              uni.navigateTo({
+                url: "/pages/index/authorize"
+              });
+            }
+          }
+        );
+      },
+      fail: error => {}
+    });
+    // #endif
+
+    //微信 一个不用基本信息的登录判断是否是新用户
+    // #ifdef  MP-WEIXIN
+    uni.login({
+      success: LoginRes => {
+        console.log("success");
+        this.Ajax(
+          "post",
+          "member/Login/getLogin",
+          { brand_id: 1, channel: "wechat", code: LoginRes.code },
+          res => {
+            if (res.data.code === "200") {
+              uni.setStorageSync("hasLogin", 1);
+              console.log("老用户");
+              uni.setStorage({
+                key: "storage_key",
+                data: res.data.data
+              });
+              if (res.data.data.mobile) {
+                uni.setStorageSync("UserNumber", res.data.data.mobile);
+              }
+              uni.switchTab({
+                url: "/pages/index/index"
+              });
+              if (res.data.data.is_read === 0) {
+                getApp().globalData.is_read = false;
+              } else {
+                getApp().globalData.is_read = true;
+              }
+            } else {
+              if (res.data.code === "0020") {
+                // 将用户id或者游客id存到storage
+                uni.setStorage({
+                  key: "userID",
+                  data: res.data.data.openid
+                });
+              }
+              uni.setStorageSync("hasLogin", 0);
+              console.log("新用户");
               uni.navigateTo({
                 url: "/pages/index/authorize"
               });
@@ -76,7 +128,6 @@ export default {
     my.getAuthCode({
       scopes: "auth_base",
       success: reslogin => {
-        console.log("授权码为:", reslogin);
         if (reslogin.authCode) {
           this.Ajax(
             "post",
@@ -88,8 +139,14 @@ export default {
             },
             res => {
               console.log("调登录接口返回：", res);
+              if (res.data.data.openid) {
+                uni.setStorage({
+                  key: "userID",
+                  data: res.data.data.openid
+                });
+              }
               if (res.data.code === "200") {
-                uni.setStorageSync("hasLogin", true);
+                uni.setStorageSync("hasLogin", 1);
                 uni.setStorage({
                   key: "storage_key",
                   data: res.data.data
@@ -119,6 +176,7 @@ export default {
     });
     // #endif
   },
+
   onLoad() {
     uni.setNavigationBarColor({
       backgroundColor: "#F3F4F3"

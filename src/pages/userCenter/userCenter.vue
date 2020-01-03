@@ -13,6 +13,7 @@
     <view class="content">
       <image
         :src="skin.img"
+        :default-source="skin.img"
         class="allBgImg"
         v-bind:style="{
           paddingTop: navHeight + 'px',
@@ -27,7 +28,7 @@
           <view class="bottom" @click="NavToModify">
             <view class="left">
               <image :src="user_info.head_img || default_avter" />
-              <!-- #ifdef MP-WEIXIN -->
+              <!-- #ifndef MP-ALIPAY -->
               <button
                 size="mini"
                 open-type="getUserInfo"
@@ -47,7 +48,9 @@
                 scope="userInfo"
                 v-if="!hasLogin1"
                 class="Login_in"
-              ></button>
+              >
+                登录
+              </button>
               <!-- #endif -->
               <text v-else class="name">{{ user_info.user_name }}</text>
             </view>
@@ -59,14 +62,14 @@
         <view class="about">
           <view class="service deline" @click="contactService">
             <view class="left">
-              <image src="../../static/assets/service.png" />
+              <image class="leftImage" src="../../static/assets/service.png" />
               <text>联系客服</text>
             </view>
             <image class="arrow" src="../../static/assets/toRight.png" />
           </view>
           <view class="service" @click="NavTo('./about')">
             <view class="left">
-              <image src="../../static/assets/about.png" />
+              <image class="leftImage" src="../../static/assets/about.png" />
               <text>关于</text>
             </view>
 
@@ -83,7 +86,7 @@
           <image :src="beautifulPhoto.show_img" class="bgImage"></image>
           <view class="weixinIcon">
             <view class="image_share">
-              <button open-type="share">
+              <button class="image_share_button" open-type="share">
                 <image src="../../static/assets/weixin.png" class="imgIcon" />
               </button>
               <view class="text_weixin">
@@ -115,9 +118,7 @@
         </view>
       </view>
     </view>
-    <!-- #ifndef MP-ALIPAY -->
     <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
-    <!--#endif  -->
     <!-- 遮罩 -->
     <view class="shadowBox" v-show="share || contactUS"></view>
   </view>
@@ -145,7 +146,7 @@ export default {
       src2: "",
       isLoginIn: false, //是否登录
       beautifulPhoto: "", //美图保存地址
-      hasLogin1: false, //是否登录
+      hasLogin1: null, //是否登录
       contactUS: false,
       is_getuserInfo: false,
       UserInfo: {},
@@ -162,6 +163,7 @@ export default {
     if (hasLogin) {
       this.hasLogin1 = true;
     }
+    console.log("hasLoginSSSSSSSSSSSSSSSSSSSSSusercenter",hasLogin)
   },
   onLoad() {
     this.getSkin();
@@ -169,16 +171,14 @@ export default {
       backgroundColor: "#FFFFFF",
       frontColor: "#000000"
     });
-    // uni.showSharePanel({
-    //   withShareTicket: true
-    // });
   },
   // 用户分享
   onShareAppMessage() {
     return {
-      title: "我告诉你，这是喝星巴克最优惠的方式",
+      title: "这是喝星吧克最优惠的一种方式",
       path: "/pages/loading/loading",
-      imageUrl: "../../static/images/shareCard.jpg"
+      desc: "星吧克咖啡电子优惠券售卖平台"
+      // imageUrl: "../../static/assets/logo.png"
     };
   },
   methods: {
@@ -207,7 +207,7 @@ export default {
     // 获取基本信息授权
     GetUserInfo(res) {
       console.log(res);
-      if (res.detail.userInfo) {
+      if (res.detail.iv) {
         console.log("点击了同意基本信息授权");
         this.is_getuserInfo = true;
         this.UserInfo = res.detail;
@@ -289,11 +289,14 @@ export default {
               },
               res => {
                 if (res.data.code === "200") {
-                  this.getUser()
-                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorageSync("hasLogin", 1);
+                  this.hasLogin1 = true;
                   uni.setStorage({
                     key: "storage_key",
-                    data: res.data.data
+                    data: res.data.data,
+                    success: () => {
+                      this.getUser();
+                    }
                   });
                   if (res.data.data.mobile) {
                     uni.setStorageSync("UserNumber", res.data.data.mobile);
@@ -332,7 +335,52 @@ export default {
                 console.log("调登录接口返回：", res);
 
                 if (res.data.code === "200") {
-                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorageSync("hasLogin", 1);
+                  this.hasLogin1 = true;
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data,
+                    success: e => {
+                      this.getUser();
+                    }
+                  });
+                  if (res.data.data.mobile) {
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
+                  }
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+      // #endif
+      // 百度
+      // #ifdef MP-BAIDU
+      uni.login({
+        success: reslogin => {
+          console.log("resLogin:", reslogin);
+          if (reslogin.code) {
+            this.Ajax(
+              "post",
+              "member/Login/bdgetLogin",
+              {
+                brand_id: 1,
+                channel: "baidu",
+                code: reslogin.code,
+                detail: this.UserInfo,
+                pid: this.objQueryPid || 0
+              },
+              res => {
+                console.log("调登录接口返回：", res);
+                if (res.data.code === "200") {
+                  uni.setStorageSync("hasLogin", 1);
                   this.hasLogin1 = true;
                   uni.setStorage({
                     key: "storage_key",
@@ -405,9 +453,43 @@ export default {
     },
     // 分享
     Share() {
+      // #ifdef MP-ALIPAY
       uni.showSharePanel({
         withShareTicket: true
       });
+      // #endif
+      // #ifdef MP-WEIXIN
+      if (!this.hasLogin1) {
+        uni.navigateTo({
+          url: "../index/authorize"
+        });
+        return;
+      }
+      uni.hideTabBar({
+        animation: true
+      });
+      this.share = true;
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          console.log("storage参数：", res0);
+          this.Ajax(
+            "post",
+            "member/user/my_qrcode",
+            { session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                console.log("我要的生成美图", res.data.data.list);
+                this.beautifulPhoto = res.data.data.list;
+              }
+            }
+          );
+        }
+      });
+      // #endif
+      // #ifdef MP-BAIDU
+      swan.openShare();
+      // #endif
     },
     // 关闭分享
     close_share() {
@@ -593,10 +675,10 @@ export default {
       }
       .Login_in {
         color: #999999;
-        background: #ffffff;
         font-weight: bold;
         font-size: 40rpx;
         padding: 0 400rpx 0 0;
+        border: 0px;
         &:after {
           border: none;
         }
@@ -624,12 +706,14 @@ export default {
       }
       .arrow {
         width: 15rpx;
-      }
-      image {
         height: 25rpx;
-        width: 25rpx;
         margin-left: 19rpx;
       }
+      // image {
+      //   height: 25rpx;
+      //   width: 25rpx;
+      //   margin-left: 19rpx;
+      // }
     }
   }
 }
@@ -654,15 +738,11 @@ export default {
       display: flex;
       flex-direction: row;
       align-items: center;
-      image {
-        height: 32rpx;
-        width: 32rpx;
-        margin-right: 12rpx;
-      }
     }
-    image {
+    .leftImage {
       height: 32rpx;
       width: 32rpx;
+      margin-right: 12rpx;
     }
   }
   .deline {
@@ -764,7 +844,7 @@ export default {
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      button {
+      .image_share_button {
         line-height: inherit;
         background: #ffffff;
         &:after {

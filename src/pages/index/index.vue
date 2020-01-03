@@ -1,15 +1,28 @@
 <template>
-  <view class="main">
+  <view
+    class="main"
+    v-bind:style="{
+      paddingTop: navHeight + 'px'
+    }"
+  >
     <navigationbar
       class="navbar"
       :status_img="skin.status_img"
-      :title="'摩卡星'"
+      :title="title"
     ></navigationbar>
-    <scroll-view :scroll-y="userNotice ? false : true" style="height:100vh">
+    <scroll-view
+      :trap-scroll="true"
+      class="scrollBox"
+      :class="userNotice || !userAgree ? 'indexFixed' : ''"
+      :scroll-y="userNotice || !userAgree ? false : true"
+      v-bind:style="{
+        top: navHeight + 'px'
+      }"
+    >
       <view
         class="content"
         v-bind:style="{
-          paddingBottom: tabHeight + 20 + 'px'
+          paddingBottom: 2 * tabHeight + 30 + 'px'
         }"
       >
         <image
@@ -78,13 +91,18 @@
             </view>
             <view class="right">
               <!-- 已授权的话第一个button生效，直接去购买 -->
-              <!-- 未授权的话第二个button生效，先逐渐授权 -->
-              <!-- #ifdef MP-WEIXIN -->
-              <button v-if="is_getNumber" @click.stop="To_buy(item)">
+              <!-- 未授权的话第二n个button生效，先逐渐授权 -->
+              <!-- #ifndef MP-ALIPAY -->
+              <button
+                class="goods_card_button"
+                v-if="is_getNumber"
+                @click.stop="To_buy(item)"
+              >
                 去支付
               </button>
               <button
                 v-else
+                class="goods_card_button"
                 :open-type="is_getuserInfo ? 'getPhoneNumber' : 'getUserInfo'"
                 @getphonenumber="GetPhoneNumber"
                 @getuserinfo="GetUserInfo"
@@ -95,11 +113,16 @@
               </button>
               <!-- #endif -->
               <!-- #ifdef MP-ALIPAY -->
-              <button v-if="is_getNumber" @click.stop="To_buy(item)">
+              <button
+                class="goods_card_button"
+                v-if="is_getNumber"
+                @click.stop="To_buy(item)"
+              >
                 去支付
               </button>
               <button
                 v-else
+                class="goods_card_button"
                 open-type="getAuthorize"
                 @getAuthorize="onGetAuthorize"
                 @error="onAuthError"
@@ -179,23 +202,44 @@
           <!-- 因为此按钮绑定的事件有三个：1.已经勾选隐私协议。2.调起基本信息授权。3.控制页面下滑露出使用须知 -->
           <!-- 因为调起基本信息无法控制，所以用两个一模一样的按钮。控制这三件事 -->
           <button
+            class="check_button"
             :class="userOptions === true ? '' : 'opacity1'"
             @click="IHaveLearned"
           >
             我已了解
           </button>
         </view>
+        <!-- 分享弹窗 -->
+        <view v-if="share" class="sharePopup">
+          <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
+            <image :src="beautifulPhoto.show_img" class="bgImage"></image>
+            <view class="weixinIcon">
+              <view class="image_share">
+                <button class="image_share_button" open-type="share">
+                  <image src="../../static/assets/weixin.png" class="imgIcon" />
+                </button>
+                <view class="text_weixin">
+                  微信好友
+                </view>
+              </view>
+            </view>
+          </view>
+          <!-- 关闭按钮 -->
+          <view class="close" @click="close_share">
+            <image class="close_img" src="../../static/assets/close.png" />
+          </view>
+        </view>
         <!-- 使用须知 -->
-        <view v-if="userNotice" class="notice">
+        <view v-if="userNotice" class="notice" catchtouchmove="true">
           <view class="notice_Content">
             <text class="notice_title">使用须知</text>
-            <view class="texta">
+            <scroll-view scroll-y="true" class="texta">
               <text v-for="(item, index) in instructions_for_use" :key="index">
                 {{ item }}
               </text>
-            </view>
+            </scroll-view>
             <!-- 遮罩 -->
-            <view class="whiteShadow"></view>
+            <!-- <view class="whiteShadow"></view> -->
           </view>
           <view class="notice_bottom">
             <view class="notice_option">
@@ -220,13 +264,13 @@
         <!-- 遮罩 -->
         <view
           class="shadowBox"
-          v-show="!userAgree || userNotice"
+          catchtouchmove="ture"
+          v-show="share || !userAgree || userNotice"
         ></view>
       </view>
     </scroll-view>
-    <!-- #ifndef MP-ALIPAY -->
+
     <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
-    <!-- #endif -->
   </view>
 </template>
 
@@ -234,11 +278,16 @@
 
 <style lang="scss">
 .main {
+  box-sizing: border-box;
+  height: 100vh;
+  overflow: hidden;
   .navbar {
     position: fixed;
     width: 100%;
     height: auto;
-    z-index: 10;
+    top: 0;
+    left: 0;
+    z-index: 5000;
     background: #ffffff;
   }
   .tabBar {
@@ -250,11 +299,24 @@
     background: #ffffff;
   }
 }
+.scrollBox {
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.indexFixed {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
 .content {
+  flex: 1;
+  box-sizing: border-box;
   position: relative;
   padding: 24rpx 40rpx 40rpx;
   background-size: cover;
-  overflow: auto;
 }
 .shadowBox {
   position: absolute;
@@ -316,7 +378,7 @@
   .opacity1 {
     opacity: 0.6;
   }
-  button {
+  .check_button {
     background: #42b069;
     border-radius: 40rpx;
     margin: 52rpx auto 0;
@@ -340,7 +402,8 @@
   font-size: 30rpx;
   border-radius: 24rpx;
   box-sizing: border-box;
-  z-index: 1500;
+  z-index: 9999;
+  overflow: auto;
   .notice_Content {
     text-align: center;
     position: relative;
@@ -369,6 +432,20 @@
       display: flex;
       flex-direction: column;
       margin-top: 8rpx;
+      // &::after {
+      //   position: absolute;
+      //   left: 0;
+      //   bottom: 0;
+      //   width: 100%;
+      //   height: 100rpx;
+      //   display: block;
+      //   content: "";
+      //   background-image: linear-gradient(
+      //     180deg,
+      //     rgba(255, 255, 255, 0) 0%,
+      //     #ffffff 100%
+      //   );
+      // }
       text {
         margin-bottom: 8rpx;
         color: #666666;
@@ -523,7 +600,7 @@
         }
       }
     }
-    button {
+    .goods_card_button {
       background-color: #ffffff;
       border-radius: 45rpx;
       width: 260rpx;
@@ -590,7 +667,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      button {
+      .image_share_button {
         line-height: inherit;
         background: #ffffff;
         &:after {

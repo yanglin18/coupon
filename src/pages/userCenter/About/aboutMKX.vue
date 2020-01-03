@@ -33,9 +33,10 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
-      title: "我告诉你，这是喝星巴克最优惠的方式",
+      title: "这是喝星吧克最优惠的一种方式",
       path: "/pages/loading/loading",
-      imageUrl:'../../static/images/shareCard.jpg'
+      desc: "星吧克咖啡电子优惠券售卖平台",
+      // imageUrl: "../../static/assets/logo.png"
     };
   },
   methods: {}

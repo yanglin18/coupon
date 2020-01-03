@@ -31,27 +31,40 @@ export default {
       tabHeight: app.globalData.tabHeight,
       userNotice: false,
       goodItem: "",
-      HasSave: true //防止多次唤起手机号标致
+      HasSave: true, //防止多次唤起手机号授权
+      // #ifdef MP-WEIXIN
+      title: "摩卡星",
+      // #endif
+      // #ifdef MP-ALIPAY
+      title: ""
+      // #endif
     };
   },
   computed: {},
-  watch: {
-    userAgree(val) {
-      console.log("WatchQQQQQQWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",val);
-      if (val===false) {
-        uni.hideTabBar({
-          fail() {
-            console.log("失败");
-          }
-        });
-      }
-      else{
-          uni.showTabBar()
-      }
-    }
-  },
+  // watch: {
+  //   userAgree(val) {
+  //     console.log("WatchQQQQQQWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", val);
+  //     if (!val) {
+  //       console.log("if", val);
+  //       setTimeout(() => {
+  //         uni.hideTabBar({
+  //           fail() {
+  //             console.log("失败");
+  //           }
+  //         });
+  //       }, 500);
+  //     }
+  //   }
+  // },
   // 如果detail里面授权登录和手机号，标识返回到主页
   onShow() {
+    setTimeout(() => {
+      uni.hideTabBar({
+        fail() {
+          console.log("失败");
+        }
+      });
+    }, 300);
     this.getGoodsInfo();
     const UserNumber = uni.getStorageSync("UserNumber");
     if (UserNumber) {
@@ -61,6 +74,7 @@ export default {
     if (hasLogin) {
       this.is_getuserInfo = true;
     }
+    console.log("hasLoginSSSSSSSSSSSSSSSSSSSSSindex", hasLogin);
     console.log("登录成功？", hasLogin, this.is_getuserInfo);
     console.log("手机号？", this.is_getNumber);
   },
@@ -71,25 +85,26 @@ export default {
     this.showTips = false;
     const isAuthorizeLogin = uni.getStorageSync("isAuthorizeLogin");
     console.log("是在授权页登录过了吗？", isAuthorizeLogin);
-    const hasLogin = uni.getStorageSync("hasLogin");
-    if (hasLogin && !isAuthorizeLogin) {
+    const aa = uni.getStorageSync("hasLogin");
+    if (aa && !isAuthorizeLogin) {
       this.userAgree = true;
       uni.hideTabBar();
     } else {
       this.userAgree = false;
       uni.hideTabBar();
     }
-    // uni.setNavigationBarColor({
-    //   backgroundColor: "#FFFFFF",
-    //   frontColor: "#000000"
-    // });
+    uni.setNavigationBarColor({
+      backgroundColor: "#FFFFFF"
+      // frontColor: "#000000"
+    });
   },
   // 用户分享
   onShareAppMessage() {
     return {
-      title: "我告诉你，这是喝星巴克最优惠的方式",
+      title: "这是喝星吧克最优惠的一种方式",
       path: "/pages/loading/loading",
-      imageUrl: "../../static/images/shareCard.jpg"
+      desc: "星吧克咖啡电子优惠券售卖平台"
+      // imageUrl: "../../static/assets/logo.png"
     };
   },
   onPageScroll() {
@@ -121,9 +136,11 @@ export default {
     },
     onGetAuthorize() {
       if (this.is_getuserInfo) {
-        console.log("应该调起获取手机号");
+        console.log("应该调起获取手机号", this.is_getuserInfo);
+        uni.showLoading();
         my.getPhoneNumber({
           success: resNumber => {
+            uni.hideLoading();
             console.log("获取手机号返回：", resNumber);
             uni.getStorage({
               key: "storage_key",
@@ -162,26 +179,40 @@ export default {
             });
           },
           fail: res => {
+            uni.showToast({
+              title: "网络请求失败，请重试",
+              icon: "none"
+            });
+            uni.hideLoading();
             console.log(res);
             console.log("getPhoneNumber_fail");
           }
         });
       } else {
-        console.log("应该调起获取基本信息");
+        uni.showLoading();
+        console.log("应该调起获取基本信息", this.is_getuserInfo);
         my.getOpenUserInfo({
           success: resInfo => {
             let userInfo = JSON.parse(resInfo.response).response;
             console.log("获取基本信息返回", userInfo);
             this.loginIn(userInfo);
+            this.is_getuserInfo = true;
+            uni.hideLoading();
           },
           error: e => {
+            uni.hideLoading();
             console.log("错误信息", e);
           }
         });
       }
     },
+    // 支付宝拒绝基本信息or手机e号授权
+    onAuthError(e) {
+      console.log("拒绝授权", e);
+    },
     // 登录
     loginIn(user_info) {
+      uni.showLoading();
       uni.getStorage({
         key: "obj.query.pid",
         success: pid => {
@@ -205,7 +236,8 @@ export default {
               },
               res => {
                 if (res.data.code === "200") {
-                  uni.setStorageSync("hasLogin", true);
+                  uni.hideLoading();
+                  uni.setStorageSync("hasLogin", 1);
                   uni.setStorage({
                     key: "storage_key",
                     data: res.data.data,
@@ -221,6 +253,12 @@ export default {
                   } else {
                     getApp().globalData.is_read = true;
                   }
+                } else {
+                  uni.hideLoading();
+                  uni.showToast({
+                    title: "网络请求失败，请重试",
+                    icon: "none"
+                  });
                 }
               }
             );
@@ -250,7 +288,46 @@ export default {
               res => {
                 console.log("调登录接口返回：", res);
                 if (res.data.code === "200") {
-                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorageSync("hasLogin", 1);
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data
+                  });
+                  if (res.data.data.mobile) {
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
+                  }
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+      // #endif
+      // #ifdef MP-BAIDU
+      uni.login({
+        success: reslogin => {
+          if (reslogin.code) {
+            this.Ajax(
+              "post",
+              "member/Login/bdgetLogin",
+              {
+                brand_id: 1,
+                channel: "baidu",
+                code: reslogin.code,
+                detail: this.user_info,
+                pid: this.objQueryPid || 0
+              },
+              res => {
+                console.log("调登录接口返回：", res);
+                if (res.data.code === "200") {
+                  uni.setStorageSync("hasLogin", 1);
                   uni.setStorage({
                     key: "storage_key",
                     data: res.data.data
@@ -327,9 +404,43 @@ export default {
     },
     // 分享
     Share() {
+      // #ifdef MP-ALIPAY
       uni.showSharePanel({
         withShareTicket: true
       });
+      // #endif
+      // #ifdef MP-WEIXIN
+      if (!this.is_getuserInfo) {
+        uni.navigateTo({
+          url: "../index/authorize"
+        });
+        return;
+      }
+      uni.hideTabBar({
+        animation: true
+      });
+      this.share = true;
+      uni.getStorage({
+        key: "storage_key",
+        success: res0 => {
+          console.log("storage参数：", res0);
+          this.Ajax(
+            "post",
+            "member/user/my_qrcode",
+            { session3rd: res0.data.session3rd },
+            res => {
+              if (res.data.code === "200") {
+                console.log("我要的生成美图", res.data.data.list);
+                this.beautifulPhoto = res.data.data.list;
+              }
+            }
+          );
+        }
+      });
+      // #endif
+      // #ifdef MP-BAIDU
+      swan.openShare();
+      // #endif
     },
     // 长按保存图片
     saveImg(url) {
@@ -578,28 +689,28 @@ export default {
                   my.tradePay({
                     // 调用统一收单交易创建接口（alipay.trade.create），获得返回字段支付宝交易号trade_no
                     tradeNO: res.data.data.trade_no,
-                    success: res => {
-                      console.log("调起支付成功！");
+                    success: res0 => {
+                      console.log("调起支付成功！", res.data.data.order_id);
                       uni.hideLoading();
-                      this.getGoodsInfo();
-                      // 记录支付成功的人
-                      this.Record(
-                        {
-                          openId: res0.data.openid,
-                          event_type: 3,
-                          result: 1,
-                          order_id: res.data.data.order_id,
-                          msg: ""
-                        },
-                        record => {}
-                      );
-                      uni.navigateTo({
-                        url:
-                          "/pages/myCardBug/cards?order_id=" +
-                          res.data.data.order_id
-                      });
+                      if (res0.resultCode == 9000) {
+                        my.navigateTo({
+                          url: `../myCardBug/cards?order_id=${res.data.data.order_id}`
+                        });
+                        this.getGoodsInfo();
+                        // 记录支付成功的人
+                        this.Record(
+                          {
+                            openId: res0.data.openid,
+                            event_type: 3,
+                            result: 1,
+                            order_id: res.data.data.order_id,
+                            msg: ""
+                          },
+                          record => {}
+                        );
+                      }
                     },
-                    fail: res => {
+                    fail: e => {
                       console.log("调起支付失败！");
                       uni.hideLoading();
                       uni.showToast({
@@ -620,6 +731,24 @@ export default {
                     }
                   });
                   // #endif
+                  // #ifdef MP-BAIDU
+                  swan.requestPolymerPayment({
+                    orderInfo: res.data.data,
+                    success: res => {
+                      swan.showToast({
+                        title: "支付成功",
+                        icon: "success"
+                      });
+                    },
+                    fail: err => {
+                      swan.showToast({
+                        title: "支付失败，请稍后重试",
+                        icon: "none"
+                      });
+                      console.log("pay fail", err);
+                    }
+                  });
+                  // #endif
                 } else {
                   uni.hideLoading();
                   if (res.data.code === "0032" || res.data.code === "0035") {
@@ -628,6 +757,11 @@ export default {
                       icon: "none"
                     });
                     this.getGoodsInfo();
+                  } else {
+                    uni.showToast({
+                      title: "网络异常，请稍后重试",
+                      icon: "none"
+                    });
                   }
                 }
               }
@@ -656,9 +790,9 @@ export default {
             uni.getStorage({
               key: "storage_key",
               success: storageRes => {
-                console.log("storageRes:", storageRes);
                 uni.login({
                   success: loginRes => {
+                    // #ifdef MP-WEIXIN
                     this.Ajax(
                       "post",
                       "member/user/set_mobile",
@@ -690,6 +824,39 @@ export default {
                         }
                       }
                     );
+                    // #endif
+                    // ifdef MP-ABIDU
+                    this.Ajax(
+                      "post",
+                      "member/user/bd_mobile",
+                      {
+                        session3rd: storageRes.data.session3rd,
+                        code: loginRes.code,
+                        detail: res0.detail
+                      },
+                      resMobile => {
+                        if (resMobile.data.code === "200") {
+                          this.HasSave = true;
+                          if (!this.is_read) {
+                            this.userNotice = true; //弹出用户须知
+                          }
+                          uni.hideLoading();
+                          this.is_getNumber = true;
+                          uni.setStorageSync(
+                            "UserNumber",
+                            resMobile.data.data.mobile
+                          );
+                        } else {
+                          this.HasSave = true;
+                          uni.hideLoading();
+                          uni.showToast({
+                            title: "网络请求失败，请重试",
+                            icon: "none"
+                          });
+                        }
+                      }
+                    );
+                    // endif
                   }
                 });
               },
@@ -767,11 +934,11 @@ export default {
         this.showTips = true;
         // 记录同意协议的人
         uni.getStorage({
-          key: "storage_key",
+          key: "userID",
           success: resKey => {
             this.Record(
               {
-                openId: resKey.data.openid,
+                openId: resKey.data,
                 event_type: 2,
                 result: 1,
                 order_id: "",

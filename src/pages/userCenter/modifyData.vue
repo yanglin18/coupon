@@ -16,7 +16,7 @@
       </view>
       <view class="row">
         <text>手机</text>
-        <!-- #ifdef MP-WEIXIN -->
+        <!-- #ifndef MP-ALIPAY -->
         <button
           v-if="!userPhoneNumber"
           open-type="getPhoneNumber"
@@ -32,8 +32,7 @@
           v-if="!userPhoneNumber"
           open-type="getAuthorize"
           size="mini"
-          onGetAuthorize="onGetAuthorize"
-          @click.stop="onGetAuthorize"
+          @getAuthorize="onGetAuthorize"
           scope="phoneNumber"
           class="mobileButton"
         >
@@ -65,7 +64,7 @@
       </view>
     </view>
     <button
-      v-show="user_info.birthday === '请选择生日'"
+      v-if="user_info.birthday === '请选择生日'"
       @click="saveChange"
       class="save"
     >
@@ -104,9 +103,10 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
-      title: "我告诉你，这是喝星巴克最优惠的方式",
+      title: "这是喝星吧克最优惠的一种方式",
       path: "/pages/loading/loading",
-      imageUrl: "../../static/images/shareCard.jpg"
+      desc: "星吧克咖啡电子优惠券售卖平台",
+      // imageUrl: "../../static/assets/logo.png"
     };
   },
   methods: {
@@ -351,6 +351,7 @@ export default {
       text-align: right;
     }
     .mobileButton {
+      border: 0px;
       margin: 0;
       padding: 0;
       line-height: 42rpx;

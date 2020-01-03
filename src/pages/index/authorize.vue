@@ -1,10 +1,18 @@
 <template>
   <view class="content">
     <view class="top">
+      <!-- #ifdef MP-WEIXIN -->
       <text>允许微信授权后，可体验更多功能</text>
+      <!-- #endif -->
+      <!-- #ifdef MP-ALIPAY -->
+      <text>允许支付宝授权后，可体验更多功能</text>
+      <!-- #endif -->
+      <!-- #ifdef MP-BAIDU -->
+      <text>允许百度授权后，可体验更多功能</text>
+      <!-- #endif -->
     </view>
     <view class="bottom">
-      <!--#ifdef MP-WEIXIN-->
+      <!--#ifndef MP-ALIPAY-->
       <button
         class="button1"
         open-type="getUserInfo"
@@ -51,7 +59,7 @@ export default {
   },
   methods: {
     GetUserInfo(res) {
-      if (res.detail.userInfo) {
+      if (res.detail.iv) {
         console.log("点击了同意基本信息授权", res);
         this.is_getuserInfo = true;
         // 记录同意授权的人
@@ -72,7 +80,7 @@ export default {
         });
         this.loginIn(res.detail);
       } else {
-        console.log("点击了拒绝授权");
+        console.log("点击了拒绝授权",res);
         // record拒绝授权的人
         uni.getStorage({
           key: "userID",
@@ -131,7 +139,7 @@ export default {
               res => {
                 console.log("调登录接口返回：", res);
                 if (res.data.code === "200") {
-                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorageSync("hasLogin", 1);
                   uni.setStorage({
                     key: "storage_key",
                     data: res.data.data
@@ -166,24 +174,62 @@ export default {
             this.Ajax(
               "post",
               "member/Login/getLogin",
-              // #ifdef MP-ALIPAY
-              "member/Login/aligetLogin",
-              // #endif
               {
                 brand_id: 1,
                 channel: "wechat",
                 code: reslogin.code,
-                // #ifdef MP-ALIPAY
-                channel: "ali",
-                code: reslogin.authCode,
-                // #endif
                 detail: user_info,
                 pid: this.objQueryPid || 0
               },
               res => {
                 console.log("调登录接口返回：", res);
                 if (res.data.code === "200") {
-                  uni.setStorageSync("hasLogin", true);
+                  uni.setStorageSync("hasLogin", 1);
+                  uni.setStorage({
+                    key: "storage_key",
+                    data: res.data.data,
+                    success: function(e) {}
+                  });
+                  if (res.data.data.mobile) {
+                    uni.setStorageSync("UserNumber", res.data.data.mobile);
+                  }
+                  uni.setStorageSync("isAuthorizeLogin", true);
+                  uni.switchTab({
+                    url: "./index"
+                  });
+                  if (res.data.data.is_read === 0) {
+                    getApp().globalData.is_read = false;
+                  } else {
+                    getApp().globalData.is_read = true;
+                  }
+                }
+              }
+            );
+          } else {
+            console.log("登录失败！" + res.errMsg);
+          }
+        }
+      });
+      // #endif
+      // #ifdef MP-BAIDU
+      uni.login({
+        success: reslogin => {
+          console.log("resLogin:", reslogin);
+          if (reslogin.code) {
+            this.Ajax(
+              "post",
+              "member/Login/bdgetLogin",
+              {
+                brand_id: 1,
+                channel: "baidu",
+                code: reslogin.code,
+                detail: user_info,
+                pid: this.objQueryPid || 0
+              },
+              res => {
+                console.log("调登录接口返回：", res);
+                if (res.data.code === "200") {
+                  uni.setStorageSync("hasLogin", 1);
                   uni.setStorage({
                     key: "storage_key",
                     data: res.data.data,

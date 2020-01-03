@@ -10,16 +10,12 @@
       >
         <view class="questionBox-title">
           <text>{{ item.title }}</text>
-          <image
-            src="../../../static/assets/toTop.png"
-            mode=""
-            v-show="item.showAllVal"
-          ></image>
-          <image
-            src="../../../static/assets/toBottom.png"
-            mode=""
-            v-show="!item.showAllVal"
-          ></image>
+          <view v-show="item.showAllVal">
+            <image src="../../../static/assets/toTop.png" mode=""></image>
+          </view>
+          <view v-show="!item.showAllVal">
+            <image src="../../../static/assets/toBottom.png" mode=""></image>
+          </view>
         </view>
         <view class="questionBox-ellipsisVal" v-if="!item.showAllVal">{{
           item.text
@@ -35,7 +31,8 @@
 export default {
   data() {
     return {
-      issues: []
+      issues: [],
+      title: ""
     };
   },
   onShow() {
@@ -44,8 +41,8 @@ export default {
       success: res0 => {
         this.Ajax(
           "post",
-          "member/user/question",
-          { session3rd: res0.data.session3rd },
+          "member/index/question",
+          {},
           res => {
             if (res.data.code === "200") {
               this.issues = res.data.data.list.map(item => {
@@ -67,10 +64,18 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
-      title: "我告诉你，这是喝星巴克最优惠的方式",
+      title: "喝星巴克最优惠的方式，也给你的朋友分享一下吧",
       path: "/pages/loading/loading",
-      imageUrl:'../../static/images/shareCard.jpg'
+      desc: "星吧克咖啡电子优惠券售卖平台",
+      // imageUrl: "../../static/assets/logo.png"
     };
+  },
+  onPageScroll(scrollTop) {
+    if (scrollTop.scrollTop >= 100) {
+      this.title = "常见问题";
+    } else {
+      this.title = "";
+    }
   },
   methods: {
     showValEvent(item) {
