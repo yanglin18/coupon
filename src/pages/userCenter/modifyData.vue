@@ -105,7 +105,7 @@ export default {
     return {
       title: "这是喝星吧克最优惠的一种方式",
       path: "/pages/loading/loading",
-      desc: "星吧克咖啡电子优惠券售卖平台",
+      desc: "星吧克咖啡电子优惠券售卖平台"
       // imageUrl: "../../static/assets/logo.png"
     };
   },
@@ -152,6 +152,7 @@ export default {
               success: storageRes => {
                 uni.login({
                   success: loginRes => {
+                    // #ifdef MP-WEIXIN
                     this.Ajax(
                       "post",
                       "member/user/set_mobile",
@@ -172,6 +173,28 @@ export default {
                         }
                       }
                     );
+                    // #endif
+                    // #ifdef MP-BAIDU
+                    this.Ajax(
+                      "post",
+                      "member/user/bd_mobile",
+                      {
+                        session3rd: storageRes.data.session3rd,
+                        code: loginRes.code,
+                        detail: res0.detail
+                      },
+                      resMobile => {
+                        if (resMobile.data.code === "200") {
+                          this.userPhoneNumber = true;
+                          this.getUserInfo();
+                          uni.setStorageSync(
+                            "UserNumber",
+                            resMobile.data.data.mobile
+                          );
+                        }
+                      }
+                    );
+                    // #endif
                   }
                 });
               },

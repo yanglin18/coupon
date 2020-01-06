@@ -137,7 +137,9 @@ export default {
     onGetAuthorize() {
       if (this.is_getuserInfo) {
         console.log("应该调起获取手机号", this.is_getuserInfo);
-        uni.showLoading();
+        uni.showLoading({
+          title:"加载中"
+        });
         my.getPhoneNumber({
           success: resNumber => {
             uni.hideLoading();
@@ -189,7 +191,9 @@ export default {
           }
         });
       } else {
-        uni.showLoading();
+        uni.showLoading({
+          title:"加载中"
+        });
         console.log("应该调起获取基本信息", this.is_getuserInfo);
         my.getOpenUserInfo({
           success: resInfo => {
@@ -212,7 +216,9 @@ export default {
     },
     // 登录
     loginIn(user_info) {
-      uni.showLoading();
+      uni.showLoading({
+        title:'加载中'
+      });
       uni.getStorage({
         key: "obj.query.pid",
         success: pid => {
@@ -735,17 +741,51 @@ export default {
                   swan.requestPolymerPayment({
                     orderInfo: res.data.data,
                     success: res => {
-                      swan.showToast({
-                        title: "支付成功",
-                        icon: "success"
+                      uni.hideLoading();
+                      uni.getStorage({
+                        key: "userID",
+                        success: success => {
+                          this.Record(
+                            {
+                              openId: success.data,
+                              event_type: 3,
+                              result: 1,
+                              order_id: res.data.data.order_id,
+                              msg: ""
+                            },
+                            record => {}
+                          );
+                        }
+                      });
+                      uni.navigateTo({
+                        url:
+                          "../myCardBug/cards?order_id=" +
+                          res.data.data.order_id
                       });
                     },
                     fail: err => {
-                      swan.showToast({
-                        title: "支付失败，请稍后重试",
+                      uni.hideLoading();
+                      console.log("支付失败" + JSON.stringify(err));
+                      uni.showToast({
+                        title: "取消支付",
                         icon: "none"
                       });
-                      console.log("pay fail", err);
+                      // 记录取消支付的人
+                      uni.getStorage({
+                        key: "userID",
+                        success: success => {
+                          this.Record(
+                            {
+                              openId: success.data,
+                              event_type: 3,
+                              result: 0,
+                              order_id: res.data.data.order_id,
+                              msg: ""
+                            },
+                            record => {}
+                          );
+                        }
+                      });
                     }
                   });
                   // #endif
@@ -879,6 +919,9 @@ export default {
     GetUserInfo(res) {
       console.log(res);
       if (res.detail.userInfo) {
+        uni.showLoading({
+          title: "加载中..."
+        });
         console.log("点击了同意基本信息授权");
         this.user_info = res.detail;
         this.is_getuserInfo = true;
@@ -897,9 +940,11 @@ export default {
             );
           }
         });
+        uni.hideLoading();
         this.loginIn();
       } else {
         console.log("点击了拒绝授权");
+        uni.hideLoading();
         uni.getStorage({
           key: "userID",
           success: success => {

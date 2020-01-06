@@ -303,6 +303,19 @@ export default {
                         title: "支付成功",
                         icon: "success"
                       });
+                      my.navigateTo({
+                        url: `../myCardBug/cards?order_id=${res.data.data.order_id}`
+                      });
+                      this.Record(
+                        {
+                          openId: res0.data.openid,
+                          event_type: 3,
+                          result: 1,
+                          order_id: res.data.data.order_id,
+                          msg: ""
+                        },
+                        record => {}
+                      );
                     },
                     fail: err => {
                       swan.showToast({
@@ -310,6 +323,17 @@ export default {
                         icon: "none"
                       });
                       console.log("pay fail", err);
+                      // 记录取消支付的人
+                      this.Record(
+                        {
+                          openId: res0.data.openid,
+                          event_type: 3,
+                          result: 0,
+                          order_id: res.data.data.order_id,
+                          msg: ""
+                        },
+                        record => {}
+                      );
                     }
                   });
                   // #endif
@@ -337,7 +361,9 @@ export default {
     // 支付宝获取基本信息或者手机号
     onGetAuthorize() {
       if (this.is_getuserInfo) {
-        uni.showLoading();
+        uni.showLoading({
+          title: "加载中"
+        });
         console.log("应该调起获取手机号", this.is_getuserInfo);
         my.getPhoneNumber({
           success: resNumber => {
@@ -390,7 +416,9 @@ export default {
           }
         });
       } else {
-        uni.showLoading();
+        uni.showLoading({
+          title: "加载中"
+        });
         console.log("应该调起获取基本信息");
         my.getOpenUserInfo({
           success: resInfo => {
@@ -482,7 +510,9 @@ export default {
     },
     // 登录
     loginIn(user_info) {
-      uni.showLoading();
+      uni.showLoading({
+        title: "加载中"
+      });
       uni.getStorage({
         key: "obj.query.pid",
         success: pid => {
@@ -557,6 +587,7 @@ export default {
               res => {
                 console.log("调登录接口返回：", res);
                 if (res.data.code === "200") {
+                  uni.hideLoading();
                   this.is_getuserInfo = true;
                   uni.setStorageSync("hasLogin", 1);
                   uni.setStorage({
@@ -571,6 +602,9 @@ export default {
                   } else {
                     getApp().globalData.is_read = true;
                   }
+                }
+                else{
+                  uni.hideLoading();
                 }
               }
             );
@@ -599,6 +633,7 @@ export default {
               res => {
                 console.log("调登录接口返回：", res);
                 if (res.data.code === "200") {
+                  uni.hideLoading();
                   this.is_getuserInfo = true;
                   uni.setStorageSync("hasLogin", 1);
                   uni.setStorage({
@@ -613,6 +648,11 @@ export default {
                   } else {
                     getApp().globalData.is_read = true;
                   }
+                } else {
+                  uni.hideLoading();
+                  uni.showToast({
+                    title: "登录失败请重试"
+                  });
                 }
               }
             );
