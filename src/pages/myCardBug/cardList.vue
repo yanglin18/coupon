@@ -121,7 +121,9 @@
     </scroll-view>
     <!-- 遮罩 -->
     <view class="shadowBox" v-show="share"></view>
+    <!-- #ifndef MP-TOUTIAO -->
     <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
+    <!-- #endif -->
   </view>
 </template>
 <script>
@@ -209,9 +211,14 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
+      // #ifdef MP-BAIDU
+      title: "摩卡星",
+      // #endif
+      // #ifndef MP-BAIDU
       title: "这是喝星吧克最优惠的一种方式",
+      // #endif
       path: "/pages/loading/loading",
-      desc: "星吧克咖啡电子优惠券售卖平台",
+      desc: "星吧克咖啡电子优惠券售卖平台"
       // imageUrl: "../../static/assets/logo.png"
     };
   },

@@ -89,9 +89,10 @@ export default {
       backgroundColor: "#0D5A3A",
       frontColor: "#ffffff"
     });
+    this.getOrderInfo();
   },
   onShow() {
-    this.getOrderInfo();
+    // this.getOrderInfo();
   },
   onPageScroll(ev) {
     //ev是当前屏幕向上滚动的距离
@@ -144,9 +145,14 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
+      // #ifdef MP-BAIDU
+      title: "摩卡星",
+      // #endif
+      // #ifndef MP-BAIDU
       title: "这是喝星吧克最优惠的一种方式",
+      // #endif
       path: "/pages/loading/loading",
-      desc: "星吧克咖啡电子优惠券售卖平台",
+      desc: "星吧克咖啡电子优惠券售卖平台"
       // imageUrl: "../../static/assets/logo.png"
     };
   },
@@ -185,6 +191,10 @@ export default {
                 }
                 console.log("status:", this.status);
                 this.cards = cardList;
+              } else {
+                if (res.data.code === "0031") {
+                  this.getOrderInfo();
+                }
               }
             }
           );

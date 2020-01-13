@@ -9,13 +9,19 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
+      // #ifdef MP-BAIDU
+      title: "摩卡星",
+      // #endif
+      // #ifndef MP-BAIDU
       title: "这是喝星吧克最优惠的一种方式",
+      // #endif
       path: "/pages/loading/loading",
       desc: "星吧克咖啡电子优惠券售卖平台"
       // imageUrl: "../../static/assets/logo.png"
     };
   },
   onShow() {
+    console.log("onshow执行");
     uni.clearStorage();
     // 无网络状态下进小程序跳转到无网络页面
     uni.getNetworkType({
@@ -27,53 +33,6 @@ export default {
         }
       }
     });
-    // #ifdef MP-BAIDU
-    uni.login({
-      success: LoginRes => {
-        console.log("success");
-        this.Ajax(
-          "post",
-          "member/Login/bdgetLogin",
-          { brand_id: 1, channel: "baidu", code: LoginRes.code },
-          res => {
-            if (res.data.code === "200") {
-              uni.setStorageSync("hasLogin", 1);
-              console.log("老用户");
-              uni.setStorage({
-                key: "storage_key",
-                data: res.data.data
-              });
-              if (res.data.data.mobile) {
-                uni.setStorageSync("UserNumber", res.data.data.mobile);
-              }
-              uni.switchTab({
-                url: "/pages/index/index"
-              });
-              if (res.data.data.is_read === 0) {
-                getApp().globalData.is_read = false;
-              } else {
-                getApp().globalData.is_read = true;
-              }
-            } else {
-              if (res.data.code === "0020") {
-                // 将用户id或者游客id存到storage
-                uni.setStorage({
-                  key: "userID",
-                  data: res.data.data.openid
-                });
-              }
-              uni.setStorageSync("hasLogin", 0);
-              console.log("新用户");
-              uni.navigateTo({
-                url: "/pages/index/authorize"
-              });
-            }
-          }
-        );
-      },
-      fail: error => {}
-    });
-    // #endif
 
     //微信 一个不用基本信息的登录判断是否是新用户
     // #ifdef  MP-WEIXIN
@@ -178,9 +137,106 @@ export default {
   },
 
   onLoad() {
+    console.log("onload执行");
+    // #ifdef MP-BAIDU
+    uni.login({
+      success: LoginRes => {
+        console.log("success");
+        this.Ajax(
+          "post",
+          "member/Login/bdgetLogin",
+          { brand_id: 1, channel: "baidu", code: LoginRes.code },
+          res => {
+            if (res.data.code === "200") {
+              uni.setStorageSync("hasLogin", 1);
+              console.log("老用户");
+              uni.setStorage({
+                key: "storage_key",
+                data: res.data.data
+              });
+              if (res.data.data.mobile) {
+                uni.setStorageSync("UserNumber", res.data.data.mobile);
+              }
+              uni.switchTab({
+                url: "/pages/index/index"
+              });
+              if (res.data.data.is_read === 0) {
+                getApp().globalData.is_read = false;
+              } else {
+                getApp().globalData.is_read = true;
+              }
+            } else {
+              if (res.data.code === "0020") {
+                // 将用户id或者游客id存到storage
+                uni.setStorage({
+                  key: "userID",
+                  data: res.data.data.openid
+                });
+              }
+              uni.setStorageSync("hasLogin", 0);
+              console.log("新用户");
+              uni.navigateTo({
+                url: "/pages/index/authorize"
+              });
+            }
+          }
+        );
+      },
+      fail: error => {}
+    });
+    // #endif
+    // #ifdef MP-TOUTIAO
+    uni.login({
+      success:LoginRes=>{
+        console.log("头条登录成功的信息",LoginRes);
+                this.Ajax(
+          "post",
+          "member/Login/bytegetLogin",
+          { brand_id: 1, channel: "byte", code: LoginRes.code },
+          res => {
+            if (res.data.code === "200") {
+              uni.setStorageSync("hasLogin", 1);
+              console.log("老用户");
+              uni.setStorage({
+                key: "storage_key",
+                data: res.data.data
+              });
+              if (res.data.data.mobile) {
+                uni.setStorageSync("UserNumber", res.data.data.mobile);
+              }
+              uni.switchTab({
+                url: "/pages/index/index"
+              });
+              if (res.data.data.is_read === 0) {
+                getApp().globalData.is_read = false;
+              } else {
+                getApp().globalData.is_read = true;
+              }
+            } else {
+              if (res.data.code === "0020") {
+                // 将用户id或者游客id存到storage
+                uni.setStorage({
+                  key: "userID",
+                  data: res.data.data.openid
+                });
+              }
+              uni.setStorageSync("hasLogin", 0);
+              console.log("新用户");
+              uni.navigateTo({
+                url: "/pages/index/authorize"
+              });
+            }
+          }
+        );
+      }
+    })
+    uni.navigateTo({
+      url: "/pages/index/authorize"
+    });
+    // #endif
     uni.setNavigationBarColor({
-      backgroundColor: "#F3F4F3"
-      // frontColor: "#000000"
+      backgroundColor: "#F3F4F3",
+      frontColor: "#000000"
     });
     uni.getSetting({
       success: succ => {

@@ -1,10 +1,5 @@
 <template>
-  <view
-    class="main"
-    v-bind:style="{
-      paddingTop: navHeight + 'px'
-    }"
-  >
+  <view class="main">
     <navigationbar
       class="navbar"
       :status_img="skin.status_img"
@@ -16,7 +11,7 @@
       :class="userNotice || !userAgree ? 'indexFixed' : ''"
       :scroll-y="userNotice || !userAgree ? false : true"
       v-bind:style="{
-        top: navHeight + 'px'
+        paddingTop: navHeight + 'px'
       }"
     >
       <view
@@ -230,10 +225,11 @@
           </view>
         </view>
         <!-- 使用须知 -->
+        <!-- #ifndef MP-BAIDU -->
         <view v-if="userNotice" class="notice" catchtouchmove="true">
           <view class="notice_Content">
             <text class="notice_title">使用须知</text>
-            <scroll-view scroll-y="true" class="texta">
+            <scroll-view scroll-y="true" class="texta" bind:scroll="scroll">
               <text v-for="(item, index) in instructions_for_use" :key="index">
                 {{ item }}
               </text>
@@ -261,16 +257,65 @@
             </view>
           </view>
         </view>
+        <!-- #endif -->
+        <!-- #ifdef MP-BAIDU -->
+        <view v-if="userNotice" class="notice">
+          <view class="notice_Content">
+            <text class="notice_title">使用须知</text>
+            <scroll-view scroll-y="true" class="texta" bind:scroll="scroll">
+              <text v-for="(item, index) in instructions_for_use" :key="index">
+                {{ item }}<br />
+              </text>
+            </scroll-view>
+            <!-- 遮罩 -->
+            <!-- <view class="whiteShadow"></view> -->
+          </view>
+          <view class="notice_bottom">
+            <view class="notice_option">
+              <image
+                @click="iRemeberIt"
+                v-if="is_read"
+                src="../../static/assets/option.png"
+              />
+              <image
+                @click="iRemeberIt"
+                v-else
+                src="../../static/assets/option_no.png"
+              />
+              <text>我记住了，以后不再提醒</text>
+            </view>
+            <view class="buttons">
+              <button class="button1" @click="cancelNotice">取消</button>
+              <button class="button2" @click="pay">确认支付</button>
+            </view>
+          </view>
+        </view>
+        <!-- #endif -->
         <!-- 遮罩 -->
-        <view
-          class="shadowBox"
-          catchtouchmove="ture"
-          v-show="share || !userAgree || userNotice"
-        ></view>
       </view>
+      <!-- #ifndef MP-TOUTIAO -->
+      <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
+      <!-- #endif -->
+      <!-- #ifndef MP-BAIDU -->
+      <view
+        class="shadowBox"
+        catchtouchmove="ture"
+        v-show="share || !userAgree || userNotice"
+      ></view>
+      <!-- #endif -->
+      <!-- #ifdef MP-BAIDU -->
+      <view
+        class="shadowBox shadowBox1"
+        v-show="share || !userAgree || userNotice"
+      ></view>
+      <!-- #endif -->
     </scroll-view>
-
-    <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
+    <!-- #ifdef MP-BAIDU -->
+    <view
+      class="shadowBox shadowBox1"
+      v-show="share || !userAgree || userNotice"
+    ></view>
+    <!-- #endif -->
   </view>
 </template>
 
@@ -287,7 +332,7 @@
     height: auto;
     top: 0;
     left: 0;
-    z-index: 5000;
+    z-index: 999;
     background: #ffffff;
   }
   .tabBar {
@@ -303,10 +348,11 @@
   height: 100vh;
   overflow: hidden;
   box-sizing: border-box;
+  z-index: 1100;
 }
 .indexFixed {
   position: fixed;
-  top: 80px;
+  // top: 88px;
   left: 0;
   bottom: 0;
   right: 0;
@@ -322,10 +368,16 @@
   position: absolute;
   left: 0;
   top: 0;
+  bottom: 0;
+  right: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
   z-index: 1000;
+}
+// 百度样式
+.shadowBox1 {
+  position: fixed;
 }
 .warmPrompt {
   display: flex;
@@ -334,8 +386,10 @@
   padding: 60rpx 60rpx 100rpx;
   position: fixed;
   top: 44%;
+  // #ifdef MP-TOUTIAO
+  top:55%;
+  // #endif
   left: 0;
-  z-index: 100;
   transform: translateY(-50%);
   background: #ffffff;
   color: #000000;
@@ -393,7 +447,6 @@
   position: fixed;
   top: 26%;
   left: 50%;
-  z-index: 1000;
   transform: translateX(-50%);
   padding: 60rpx 60rpx 100rpx;
   width: 630rpx;
@@ -402,7 +455,7 @@
   font-size: 30rpx;
   border-radius: 24rpx;
   box-sizing: border-box;
-  z-index: 9999;
+  z-index: 1500;
   overflow: auto;
   .notice_Content {
     text-align: center;
@@ -447,10 +500,13 @@
       //   );
       // }
       text {
+        display: block;
         margin-bottom: 8rpx;
         color: #666666;
         text-align: justify;
         line-height: 45rpx;
+        word-break: break-all;
+        word-wrap: break-word;
       }
     }
   }
@@ -514,7 +570,7 @@
       align-items: baseline;
       justify-content: flex-start;
       height: 108rpx;
-      margin-bottom: 10rpx;
+      margin-bottom: 6rpx;
       color: #ffffff;
       .price_now {
         line-height: 108rpx;

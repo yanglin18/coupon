@@ -93,15 +93,22 @@ export default {
       this.userAgree = false;
       uni.hideTabBar();
     }
+    // ifndef MP-TOUTIAO
     uni.setNavigationBarColor({
-      backgroundColor: "#FFFFFF"
-      // frontColor: "#000000"
+      backgroundColor: "#FFFFFF",
+      frontColor: "#000000"
     });
+    // endif
   },
   // 用户分享
   onShareAppMessage() {
     return {
+      // #ifdef MP-BAIDU
+      title: "摩卡星",
+      // #endif
+      // #ifndef MP-BAIDU
       title: "这是喝星吧克最优惠的一种方式",
+      // #endif
       path: "/pages/loading/loading",
       desc: "星吧克咖啡电子优惠券售卖平台"
       // imageUrl: "../../static/assets/logo.png"
@@ -117,6 +124,9 @@ export default {
     uni.stopPullDownRefresh();
   },
   methods: {
+    scroll() {
+      console.log("scrollscrollscroll");
+    },
     cleanEvent() {
       uni.getStorage({
         key: "storage_key",
@@ -138,7 +148,8 @@ export default {
       if (this.is_getuserInfo) {
         console.log("应该调起获取手机号", this.is_getuserInfo);
         uni.showLoading({
-          title:"加载中"
+          title: "加载中",
+          mask: true
         });
         my.getPhoneNumber({
           success: resNumber => {
@@ -192,7 +203,8 @@ export default {
         });
       } else {
         uni.showLoading({
-          title:"加载中"
+          title: "加载中",
+          mask: true
         });
         console.log("应该调起获取基本信息", this.is_getuserInfo);
         my.getOpenUserInfo({
@@ -217,7 +229,8 @@ export default {
     // 登录
     loginIn(user_info) {
       uni.showLoading({
-        title:'加载中'
+        title: "加载中",
+        mask: true
       });
       uni.getStorage({
         key: "obj.query.pid",
@@ -269,6 +282,7 @@ export default {
               }
             );
           } else {
+            uni.hideLoading();
             console.log("登录失败！" + res.errMsg);
           }
         }
@@ -294,6 +308,7 @@ export default {
               res => {
                 console.log("调登录接口返回：", res);
                 if (res.data.code === "200") {
+                  uni.hideLoading();
                   uni.setStorageSync("hasLogin", 1);
                   uni.setStorage({
                     key: "storage_key",
@@ -307,6 +322,8 @@ export default {
                   } else {
                     getApp().globalData.is_read = true;
                   }
+                } else {
+                  uni.hideLoading();
                 }
               }
             );
@@ -319,6 +336,7 @@ export default {
       // #ifdef MP-BAIDU
       uni.login({
         success: reslogin => {
+          console.log("登录成功！", reslogin);
           if (reslogin.code) {
             this.Ajax(
               "post",
@@ -333,6 +351,7 @@ export default {
               res => {
                 console.log("调登录接口返回：", res);
                 if (res.data.code === "200") {
+                  uni.hideLoading();
                   uni.setStorageSync("hasLogin", 1);
                   uni.setStorage({
                     key: "storage_key",
@@ -346,6 +365,8 @@ export default {
                   } else {
                     getApp().globalData.is_read = true;
                   }
+                } else {
+                  uni.hideLoading();
                 }
               }
             );
@@ -355,10 +376,13 @@ export default {
         }
       });
       // #endif
+      // 头条登录
+      // #ifdef MP-TOUTIAO
+      // #endif
     },
     // 优惠价格
     producePrice(item) {
-      return item.price * item.buy_number;
+      return (item.price * item.buy_number).toFixed(2);
     },
     // 原价格
     produceOriginalPrice(item) {
@@ -740,7 +764,7 @@ export default {
                   // #ifdef MP-BAIDU
                   swan.requestPolymerPayment({
                     orderInfo: res.data.data,
-                    success: res => {
+                    success: resbaidu => {
                       uni.hideLoading();
                       uni.getStorage({
                         key: "userID",
@@ -789,6 +813,77 @@ export default {
                     }
                   });
                   // #endif
+                  // #ifdef MP-TOUTIAO
+                  console.log(res.data.data, typeof res.data.data);
+                  tt.pay({
+                    orderInfo: res.data.data,
+                    service: 1,
+                    getOrderStatus(res) {
+                      let { out_order_no } = res;
+                      return new Promise(function(resolve, reject) {
+                        // 商户前端根据 out_order_no 请求商户后端查询微信支付订单状态
+                        tt.request({
+                          url: "<your-backend-url>",
+                          success(res) {
+                            // 商户后端查询的微信支付状态，通知收银台支付结果
+                            resolve({ code: 0 | 1 | 2 | 3 | 9 });
+                          },
+                          fail(err) {
+                            reject(err);
+                          }
+                        });
+                      });
+                    },
+                    success: payment => {
+                      console.log("支付成功");
+                      uni.hideLoading();
+                      uni.getStorage({
+                        key: "userID",
+                        success: success => {
+                          this.Record(
+                            {
+                              openId: success.data,
+                              event_type: 3,
+                              result: 1,
+                              order_id: res.data.data.order_id,
+                              msg: ""
+                            },
+                            record => {}
+                          );
+                        }
+                      });
+                      uni.navigateTo({
+                        url:
+                          "../myCardBug/cards?order_id=" +
+                          res.data.data.order_id
+                      });
+                    },
+                    fail: err => {
+                      uni.hideLoading();
+                      console.log("支付失败" + JSON.stringify(err));
+                      uni.showToast({
+                        title: "取消支付" + JSON.stringify(err),
+                        icon: "none"
+                      });
+                      // 记录取消支付的人
+                      uni.getStorage({
+                        key: "userID",
+                        success: success => {
+                          this.Record(
+                            {
+                              openId: success.data,
+                              event_type: 3,
+                              result: 0,
+                              order_id: res.data.data.order_id,
+                              msg: ""
+                            },
+                            record => {}
+                          );
+                        }
+                      });
+                    }
+                  });
+                  // #endif
                 } else {
                   uni.hideLoading();
                   if (res.data.code === "0032" || res.data.code === "0035") {
@@ -810,16 +905,82 @@ export default {
         });
       }, 500);
     },
-    To_buy1() {},
+    To_buy1() {
+      console.log("tobuy1", this.is_getuserInfo);
+      // #ifdef MP-TOUTIAO
+      if (this.is_getuserInfo === true) {
+        console.log("拿到了基本信息");
+        return;
+      }
+      uni.login({
+        success: reslogin => {
+          console.log("登录成功！", reslogin);
+          uni.setStorageSync("resloginCode", reslogin.code);
+          tt.getUserInfo({
+            withCredentials: true,
+            success: userinfo => {
+              if (reslogin.code) {
+                this.Ajax(
+                  "post",
+                  "member/Login/bytegetLogin",
+                  {
+                    brand_id: 1,
+                    channel: "byte",
+                    code: reslogin.code,
+                    detail: userinfo
+                  },
+                  res => {
+                    console.log("调登录接口返回：", res);
+                    if (res.data.code === "200") {
+                      this.is_getuserInfo = true;
+                      uni.hideLoading();
+                      uni.setStorageSync("hasLogin", 1);
+                      uni.setStorage({
+                        key: "storage_key",
+                        data: res.data.data
+                      });
+                      if (res.data.data.mobile) {
+                        uni.setStorageSync("UserNumber", res.data.data.mobile);
+                      }
+                      if (res.data.data.is_read === 0) {
+                        getApp().globalData.is_read = false;
+                      } else {
+                        getApp().globalData.is_read = true;
+                      }
+                    } else {
+                      uni.hideLoading();
+                    }
+                  }
+                );
+              } else {
+                console.log("登录失败！" + res.errMsg);
+              }
+            },
+            fail(res) {
+              console.log(`getUserInfo 调用失败`);
+            }
+          });
+        }
+      });
+      // #endif
+    },
     // 支付宝小程序中点击去支付获取信息或手机号
     To_buy1ALI(e) {},
     // 获取手机号
+
     GetPhoneNumber(res0) {
       if (res0.detail.iv) {
         uni.showLoading({
-          title: "加载中..."
+          title: "加载中...",
+          mask: true,
+          success: () => {
+            console.log("showLoading生效");
+          },
+          fail: () => {
+            console.log("showLoading失败");
+          }
         });
-        console.log("点击了同意授权", res0.detail);
+        console.log("点击了同意手机号授权", res0.detail);
         this.HasSave = false;
         // 判断登录态
         uni.checkSession({
@@ -830,8 +991,42 @@ export default {
             uni.getStorage({
               key: "storage_key",
               success: storageRes => {
+                // #ifdef MP-TOUTIAO
+                this.Ajax(
+                  "post",
+                  "member/user/byte_mobile",
+                  {
+                    session3rd: storageRes.data.session3rd,
+                    encryptedData: res0.detail.encryptedData,
+                    iv: res0.detail.iv
+                  },
+                  resMobile => {
+                    if (resMobile.data.code === "200") {
+                      this.HasSave = true;
+                      if (!this.is_read) {
+                        this.userNotice = true; //弹出用户须知
+                      }
+                      uni.hideLoading();
+                      this.is_getNumber = true;
+                      uni.setStorageSync(
+                        "UserNumber",
+                        resMobile.data.data.mobile
+                      );
+                    } else {
+                      this.HasSave = true;
+                      uni.hideLoading();
+                      uni.showToast({
+                        title: "网络请求失败，请重试",
+                        icon: "none"
+                      });
+                    }
+                  }
+                );
+                // #endif
+                // #ifndef MP-TOUTIAO
                 uni.login({
                   success: loginRes => {
+                    console.log("登录成功！", loginRes);
                     // #ifdef MP-WEIXIN
                     this.Ajax(
                       "post",
@@ -865,7 +1060,7 @@ export default {
                       }
                     );
                     // #endif
-                    // ifdef MP-ABIDU
+                    // #ifdef MP-BAIDU
                     this.Ajax(
                       "post",
                       "member/user/bd_mobile",
@@ -896,9 +1091,10 @@ export default {
                         }
                       }
                     );
-                    // endif
+                    // #endif
                   }
                 });
+                // #endif
               },
               fail: errorStorage => {
                 console.log("获取session3rd的storage失败", errorStorage);
@@ -917,10 +1113,11 @@ export default {
 
     // 获取基本信息
     GetUserInfo(res) {
-      console.log(res);
-      if (res.detail.userInfo) {
+      console.log("唤起基本信息的成功回调", res);
+      if (res.detail.iv) {
         uni.showLoading({
-          title: "加载中..."
+          title: "加载中...",
+          mask: true
         });
         console.log("点击了同意基本信息授权");
         this.user_info = res.detail;

@@ -33,6 +33,7 @@
                 size="mini"
                 open-type="getUserInfo"
                 @getuserinfo="GetUserInfo"
+                @click="ByteLoginIn"
                 v-if="!hasLogin1"
                 class="Login_in"
               >
@@ -76,9 +77,9 @@
             <image class="arrow" src="../../static/assets/toRight.png" />
           </view>
         </view>
-        <view @click="Share" class="share">
+        <button open-type="share" @click="Share" class="share">
           <image src="../../static/images/share3.jpg" />
-        </view>
+        </button>
       </view>
       <!-- 分享弹窗 -->
       <view v-if="share" class="sharePopup">
@@ -118,7 +119,9 @@
         </view>
       </view>
     </view>
+    <!-- #ifndef MP-TOUTIAO -->
     <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
+    <!-- #endif -->
     <!-- 遮罩 -->
     <view class="shadowBox" v-show="share || contactUS"></view>
   </view>
@@ -163,7 +166,7 @@ export default {
     if (hasLogin) {
       this.hasLogin1 = true;
     }
-    console.log("hasLoginSSSSSSSSSSSSSSSSSSSSSusercenter",hasLogin)
+    console.log("hasLoginSSSSSSSSSSSSSSSSSSSSSusercenter", hasLogin);
   },
   onLoad() {
     this.getSkin();
@@ -175,7 +178,12 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
+      // #ifdef MP-BAIDU
+      title: "摩卡星",
+      // #endif
+      // #ifndef MP-BAIDU
       title: "这是喝星吧克最优惠的一种方式",
+      // #endif
       path: "/pages/loading/loading",
       desc: "星吧克咖啡电子优惠券售卖平台"
       // imageUrl: "../../static/assets/logo.png"
@@ -247,6 +255,66 @@ export default {
           }
         });
       }
+    },
+    // 头条的获取基本信息和登录
+    ByteLoginIn() {
+      // #ifdef MP-TOUTIAO
+      if (this.is_getuserInfo === true) {
+        console.log("拿到了基本信息");
+        return;
+      }
+      uni.login({
+        success: reslogin => {
+          console.log("登录成功！", reslogin);
+          uni.setStorageSync("resloginCode", reslogin.code);
+          tt.getUserInfo({
+            withCredentials: true,
+            success: userinfo => {
+              if (reslogin.code) {
+                this.Ajax(
+                  "post",
+                  "member/Login/bytegetLogin",
+                  {
+                    brand_id: 1,
+                    channel: "byte",
+                    code: reslogin.code,
+                    detail: userinfo
+                  },
+                  res => {
+                    console.log("调登录接口返回：", res);
+                    if (res.data.code === "200") {
+                      uni.setStorageSync("hasLogin", 1);
+                      this.hasLogin1 = true;
+                      uni.setStorage({
+                        key: "storage_key",
+                        data: res.data.data,
+                        success: () => {
+                          this.getUser();
+                        }
+                      });
+                      if (res.data.data.mobile) {
+                        uni.setStorageSync("UserNumber", res.data.data.mobile);
+                      }
+                      if (res.data.data.is_read === 0) {
+                        getApp().globalData.is_read = false;
+                      } else {
+                        getApp().globalData.is_read = true;
+                      }
+                    } else {
+                    }
+                  }
+                );
+              } else {
+                console.log("登录失败！" + res.errMsg);
+              }
+            },
+            fail(res) {
+              console.log(`getUserInfo 调用失败`);
+            }
+          });
+        }
+      });
+      // #endif
     },
     // 支付宝授权
     GetAuthorize() {
@@ -768,7 +836,6 @@ export default {
   width: 640rpx;
   margin: 0 55rpx;
   padding: 50rpx 0 0;
-  z-index: 100;
   background: #ffffff;
   border-radius: 24rpx;
   font-size: 34rpx;

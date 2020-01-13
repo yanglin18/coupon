@@ -103,7 +103,12 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
+      // #ifdef MP-BAIDU
+      title: "摩卡星",
+      // #endif
+      // #ifndef MP-BAIDU
       title: "这是喝星吧克最优惠的一种方式",
+      // #endif
       path: "/pages/loading/loading",
       desc: "星吧克咖啡电子优惠券售卖平台"
       // imageUrl: "../../static/assets/logo.png"
@@ -150,6 +155,33 @@ export default {
             uni.getStorage({
               key: "storage_key",
               success: storageRes => {
+                // #ifdef MP-TOUTIAO
+                this.Ajax(
+                  "post",
+                  "member/user/byte_mobile",
+                  {
+                    session3rd: storageRes.data.session3rd,
+                    encryptedData: res0.detail.encryptedData,
+                    iv: res0.detail.iv
+                  },
+                  resMobile => {
+                    if (resMobile.data.code === "200") {
+                      this.userPhoneNumber = true;
+                      this.getUserInfo();
+                      uni.setStorageSync(
+                        "UserNumber",
+                        resMobile.data.data.mobile
+                      );
+                    } else {
+                      uni.showToast({
+                        title: "网络请求失败，请重试",
+                        icon: "none"
+                      });
+                    }
+                  }
+                );
+                // #endif
+                // #ifndef TOUTIAO
                 uni.login({
                   success: loginRes => {
                     // #ifdef MP-WEIXIN
@@ -197,6 +229,7 @@ export default {
                     // #endif
                   }
                 });
+                // #endif
               },
               fail: errorStorage => {
                 console.log("获取session3rd的storage失败", errorStorage);

@@ -17,6 +17,7 @@
         class="button1"
         open-type="getUserInfo"
         @getuserinfo="GetUserInfo"
+        @click="ByteLoginIn"
       >
         授权基本信息
       </button>
@@ -53,8 +54,8 @@ export default {
   },
   onLoad() {
     uni.setNavigationBarColor({
-      backgroundColor: "#F3F4F3"
-      // frontColor: "#000000"
+      backgroundColor: "#F3F4F3",
+      frontColor: "#000000"
     });
   },
   methods: {
@@ -80,7 +81,7 @@ export default {
         });
         this.loginIn(res.detail);
       } else {
-        console.log("点击了拒绝授权",res);
+        console.log("点击了拒绝授权", res);
         // record拒绝授权的人
         uni.getStorage({
           key: "userID",
@@ -110,6 +111,63 @@ export default {
           console.log("错误信息", e);
         }
       });
+    },
+    // 头条的获取基本信息和登录
+    ByteLoginIn() {
+      // #ifdef MP-TOUTIAO
+      uni.login({
+        success: reslogin => {
+          console.log("登录成功！", reslogin);
+          uni.setStorageSync("resloginCode", reslogin.code);
+          tt.getUserInfo({
+            withCredentials: true,
+            success: userinfo => {
+              if (reslogin.code) {
+                this.Ajax(
+                  "post",
+                  "member/Login/bytegetLogin",
+                  {
+                    brand_id: 1,
+                    channel: "byte",
+                    code: reslogin.code,
+                    detail: userinfo
+                  },
+                  res => {
+                    console.log("调登录接口返回：", res);
+                    if (res.data.code === "200") {
+                      uni.setStorageSync("hasLogin", 1);
+                      uni.setStorage({
+                        key: "storage_key",
+                        data: res.data.data,
+                        success: function(e) {}
+                      });
+                      if (res.data.data.mobile) {
+                        uni.setStorageSync("UserNumber", res.data.data.mobile);
+                      }
+                      uni.setStorageSync("isAuthorizeLogin", true);
+                      uni.switchTab({
+                        url: "./index"
+                      });
+                      if (res.data.data.is_read === 0) {
+                        getApp().globalData.is_read = false;
+                      } else {
+                        getApp().globalData.is_read = true;
+                      }
+                    } else {
+                    }
+                  }
+                );
+              } else {
+                console.log("登录失败！" + res.errMsg);
+              }
+            },
+            fail(res) {
+              console.log(`getUserInfo 调用失败`);
+            }
+          });
+        }
+      });
+      // #endif
     },
     // 登录
     loginIn(user_info) {

@@ -39,19 +39,14 @@ export default {
     uni.getStorage({
       key: "storage_key",
       success: res0 => {
-        this.Ajax(
-          "post",
-          "member/index/question",
-          {},
-          res => {
-            if (res.data.code === "200") {
-              this.issues = res.data.data.list.map(item => {
-                item.showAllVal = false;
-                return item;
-              });
-            }
+        this.Ajax("post", "member/index/question", {}, res => {
+          if (res.data.code === "200") {
+            this.issues = res.data.data.list.map(item => {
+              item.showAllVal = false;
+              return item;
+            });
           }
-        );
+        });
       }
     });
   },
@@ -64,9 +59,14 @@ export default {
   // 用户分享
   onShareAppMessage() {
     return {
-      title: "喝星巴克最优惠的方式，也给你的朋友分享一下吧",
+      // #ifdef MP-BAIDU
+      title: "摩卡星",
+      // #endif
+      // #ifndef MP-BAIDU
+      title: "这是喝星吧克最优惠的一种方式",
+      // #endif
       path: "/pages/loading/loading",
-      desc: "星吧克咖啡电子优惠券售卖平台",
+      desc: "星吧克咖啡电子优惠券售卖平台"
       // imageUrl: "../../static/assets/logo.png"
     };
   },

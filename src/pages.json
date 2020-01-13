@@ -98,7 +98,8 @@
     {
       "path": "pages/index/detials",
       "style": {
-        "navigationBarTitleText": "全国星巴克中杯通兑券"
+        "navigationBarTitleText": "全国星巴克中杯通兑券",
+        "backgroundColor":"#0D5A3A"
       }
     }
   ],
