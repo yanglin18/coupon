@@ -5,6 +5,7 @@ export default {
       success: res => {
         console.log("设备信息：", res);
         this.globalData.statusBarHeight = res.statusBarHeight; //状态栏的高度
+        console.log("QQQQQQQQQQQQ",res.system.substring(0, 7))
         if (res.system.substring(0, 7) === "Android"||res.platform.substring(0, 7) === "android") {
           this.globalData.navHeight = 68; //自定义的顶部导航栏总高度
           this.globalData.tabHeight = 54;

@@ -58,6 +58,8 @@ export default {
   // },
   // 如果detail里面授权登录和手机号，标识返回到主页
   onShow() {
+    console.log("QQQQQQQQQQQ", this.navHeight);
+    // #ifndef MP-TOUTIAO
     setTimeout(() => {
       uni.hideTabBar({
         fail() {
@@ -65,6 +67,7 @@ export default {
         }
       });
     }, 300);
+    // #endif
     this.getGoodsInfo();
     const UserNumber = uni.getStorageSync("UserNumber");
     if (UserNumber) {
@@ -88,10 +91,14 @@ export default {
     const aa = uni.getStorageSync("hasLogin");
     if (aa && !isAuthorizeLogin) {
       this.userAgree = true;
+      // #ifndef MP-TOUTIAO
       uni.hideTabBar();
+      // #endif
     } else {
       this.userAgree = false;
+      // #ifndef MP-TOUTIAO
       uni.hideTabBar();
+      // #endif
     }
     // ifndef MP-TOUTIAO
     uni.setNavigationBarColor({
@@ -835,28 +842,30 @@ export default {
                       });
                     },
                     success: payment => {
-                      console.log("支付成功");
+                      console.log("支付成功", payment);
                       uni.hideLoading();
-                      uni.getStorage({
-                        key: "userID",
-                        success: success => {
-                          this.Record(
-                            {
-                              openId: success.data,
-                              event_type: 3,
-                              result: 1,
-                              order_id: res.data.data.order_id,
-                              msg: ""
-                            },
-                            record => {}
-                          );
-                        }
-                      });
-                      uni.navigateTo({
-                        url:
-                          "../myCardBug/cards?order_id=" +
-                          res.data.data.order_id
-                      });
+                      if (payment.code === 0) {
+                        uni.getStorage({
+                          key: "userID",
+                          success: success => {
+                            this.Record(
+                              {
+                                openId: success.data,
+                                event_type: 3,
+                                result: 1,
+                                order_id: res.data.data.order_id,
+                                msg: ""
+                              },
+                              record => {}
+                            );
+                          }
+                        });
+                        uni.navigateTo({
+                          url:
+                            "../myCardBug/cards?order_id=" +
+                            res.data.data.order_id
+                        });
+                      }
                     },
                     fail: err => {
                       uni.hideLoading();
@@ -919,6 +928,9 @@ export default {
           tt.getUserInfo({
             withCredentials: true,
             success: userinfo => {
+              uni.showLoading({
+                title: "登录中..."
+              });
               if (reslogin.code) {
                 this.Ajax(
                   "post",
@@ -958,6 +970,14 @@ export default {
             },
             fail(res) {
               console.log(`getUserInfo 调用失败`);
+              uni.openSetting({
+                success(dataAu) {
+                  console.log("打开了设置", dataAu);
+                  if (dataAu.authSetting["scope.userInfo"]) {
+
+                  }
+                }
+              });
             }
           });
         }
@@ -1232,11 +1252,10 @@ export default {
       }
     },
     cancelNotice() {
-      this.userNotice = false;
       this.is_read = false;
+      this.userNotice = false;
     },
     pay() {
-      this.userNotice = false;
       this.set_field();
       this.wxPayMent(this.goodsInfo[0]);
     }

@@ -14,12 +14,22 @@
         paddingTop: navHeight + 'px'
       }"
     >
+    <!-- #ifndef MP-TOUTIAO -->
       <view
         class="content"
         v-bind:style="{
           paddingBottom: 2 * tabHeight + 30 + 'px'
         }"
       >
+      <!-- #endif -->
+      <!-- #ifdef MP-TOUTIAO -->
+      <view
+        class="content"
+         v-bind:style="{
+          paddingBottom: tabHeight + 'px'
+        }"
+      >
+      <!-- #endif -->
         <image
           :src="skin.img"
           class="allBgImg"
@@ -29,7 +39,7 @@
           }"
         ></image>
 
-        <button @click="cleanEvent">清理</button>
+        <!-- <button @click="cleanEvent">清理</button> -->
         <view
           class="goods_card"
           v-for="(item, index) in goodsInfo"
@@ -132,6 +142,7 @@
           </view>
         </view>
         <!-- banner -->
+        <!-- #ifndef MP-TOUTIAO -->
         <view
           class="banner"
           @click="Share"
@@ -154,6 +165,31 @@
             </view>
           </view>
         </view>
+        <!-- #endif -->
+        <!-- #ifdef MP-TOUTIAO -->
+        <button
+          class="banner"
+          open-type="share"
+          v-for="(item, index) in banners"
+          :key="index"
+          v-bind:style="{
+            background: 'url(' + item.img + ')no-repeat center',
+            backgroundSize: 'cover',
+            height: item.height + 'rpx',
+            width: item.width + 'rpx',
+            color: item.color
+          }"
+        >
+          <view class="card_content">
+            <view class="text1">
+              <text>{{ item.title }}</text>
+            </view>
+            <view class="text2">
+              <text>{{ item.introduce }}</text>
+            </view>
+          </view>
+        </button>
+        <!-- #endif -->
         <!-- 温馨提示 -->
         <view v-if="userAgree === false" class="warmPrompt">
           <view class="Prompttitle">
@@ -226,10 +262,10 @@
         </view>
         <!-- 使用须知 -->
         <!-- #ifndef MP-BAIDU -->
-        <view v-if="userNotice" class="notice" catchtouchmove="true">
+        <view v-if="userNotice" class="notice" >
           <view class="notice_Content">
             <text class="notice_title">使用须知</text>
-            <scroll-view scroll-y="true" class="texta" bind:scroll="scroll">
+            <scroll-view scroll-y class="texta" bind:scroll="scroll">
               <text v-for="(item, index) in instructions_for_use" :key="index">
                 {{ item }}
               </text>
@@ -365,13 +401,13 @@
   background-size: cover;
 }
 .shadowBox {
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
   right: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.8);
   z-index: 1000;
 }
@@ -387,7 +423,7 @@
   position: fixed;
   top: 44%;
   // #ifdef MP-TOUTIAO
-  top:55%;
+  top: 48%;
   // #endif
   left: 0;
   transform: translateY(-50%);
@@ -446,6 +482,9 @@
 .notice {
   position: fixed;
   top: 26%;
+  // #ifdef MP-TOUTIAO
+  top:24%;
+  // #endif
   left: 50%;
   transform: translateX(-50%);
   padding: 60rpx 60rpx 100rpx;
@@ -685,11 +724,15 @@
       font-size: 40rpx;
       color: #ffffff;
       font-weight: bold;
+      text-align: left;
+      line-height: normal
     }
     .text2 {
       opacity: 0.6;
       font-size: 30rpx;
       color: #ffffff;
+      text-align: left;
+      line-height: normal
     }
   }
 }

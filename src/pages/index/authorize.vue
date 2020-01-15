@@ -10,6 +10,9 @@
       <!-- #ifdef MP-BAIDU -->
       <text>允许百度授权后，可体验更多功能</text>
       <!-- #endif -->
+      <!-- #ifdef MP-TOUTIAO -->
+      <text>允许今日头条授权后，可体验更多功能</text>
+      <!-- #endif -->
     </view>
     <view class="bottom">
       <!--#ifndef MP-ALIPAY-->
@@ -122,6 +125,9 @@ export default {
           tt.getUserInfo({
             withCredentials: true,
             success: userinfo => {
+              uni.showLoading({
+                title: "登录中..."
+              });
               if (reslogin.code) {
                 this.Ajax(
                   "post",
@@ -135,6 +141,7 @@ export default {
                   res => {
                     console.log("调登录接口返回：", res);
                     if (res.data.code === "200") {
+                      uni.hideLoading();
                       uni.setStorageSync("hasLogin", 1);
                       uni.setStorage({
                         key: "storage_key",
@@ -154,6 +161,7 @@ export default {
                         getApp().globalData.is_read = true;
                       }
                     } else {
+                      uni.hideLoading();
                     }
                   }
                 );
@@ -163,6 +171,13 @@ export default {
             },
             fail(res) {
               console.log(`getUserInfo 调用失败`);
+              uni.openSetting({
+                success(dataAu) {
+                  console.log("打开了设置", dataAu);
+                  if (dataAu.authSetting["scope.userInfo"]) {
+                  }
+                }
+              });
             }
           });
         }

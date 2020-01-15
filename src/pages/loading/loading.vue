@@ -230,9 +230,6 @@ export default {
         );
       }
     })
-    uni.navigateTo({
-      url: "/pages/index/authorize"
-    });
     // #endif
     uni.setNavigationBarColor({
       backgroundColor: "#F3F4F3",

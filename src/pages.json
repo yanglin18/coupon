@@ -34,7 +34,9 @@
     {
       "path": "pages/myCardBug/cards",
       "style": {
-        "navigationBarTitleText": "向星伙伴展示优惠券码"
+        "navigationBarTitleText": "向星伙伴展示优惠券码",
+        "navigationBarBackgroundColor":"#0D5A3A",
+        "navigationBarTextStyle":"white"
       }
     },
     {
@@ -99,7 +101,8 @@
       "path": "pages/index/detials",
       "style": {
         "navigationBarTitleText": "全国星巴克中杯通兑券",
-        "backgroundColor":"#0D5A3A"
+        "navigationBarBackgroundColor":"#0D5A3A",
+        "navigationBarTextStyle":"white"
       }
     }
   ],

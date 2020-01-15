@@ -270,6 +270,9 @@ export default {
           tt.getUserInfo({
             withCredentials: true,
             success: userinfo => {
+              uni.showLoading({
+                title: "登录中..."
+              });
               if (reslogin.code) {
                 this.Ajax(
                   "post",
@@ -283,6 +286,7 @@ export default {
                   res => {
                     console.log("调登录接口返回：", res);
                     if (res.data.code === "200") {
+                      uni.hideLoading();
                       uni.setStorageSync("hasLogin", 1);
                       this.hasLogin1 = true;
                       uni.setStorage({
@@ -301,6 +305,7 @@ export default {
                         getApp().globalData.is_read = true;
                       }
                     } else {
+                      uni.hideLoading();
                     }
                   }
                 );
@@ -310,6 +315,13 @@ export default {
             },
             fail(res) {
               console.log(`getUserInfo 调用失败`);
+              uni.openSetting({
+                success(dataAu) {
+                  console.log("打开了设置", dataAu);
+                  if (dataAu.authSetting["scope.userInfo"]) {
+                  }
+                }
+              });
             }
           });
         }
@@ -704,6 +716,7 @@ export default {
   /deep/ .uni-button:after {
     border: 0 !important;
   }
+  width: 100%;
 }
 .notLoginIn {
   height: 100%;
@@ -818,7 +831,9 @@ export default {
   }
 }
 .share {
+  // #ifndef MP-TOUTIAO
   margin: 16rpx 40rpx 0;
+  // #endif
   background: #ffffff;
   border-radius: 16rpx;
   color: #ffffff;

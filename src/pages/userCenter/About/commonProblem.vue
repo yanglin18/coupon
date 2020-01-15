@@ -36,16 +36,11 @@ export default {
     };
   },
   onShow() {
-    uni.getStorage({
-      key: "storage_key",
-      success: res0 => {
-        this.Ajax("post", "member/index/question", {}, res => {
-          if (res.data.code === "200") {
-            this.issues = res.data.data.list.map(item => {
-              item.showAllVal = false;
-              return item;
-            });
-          }
+    this.Ajax("post", "member/index/question", {}, res => {
+      if (res.data.code === "200") {
+        this.issues = res.data.data.list.map(item => {
+          item.showAllVal = false;
+          return item;
         });
       }
     });

@@ -304,7 +304,8 @@ export default {
                   // #ifdef MP-BAIDU
                   swan.requestPolymerPayment({
                     orderInfo: res.data.data,
-                    success: res => {
+                    success: paysuccess => {
+                      uni.hideLoading();
                       swan.showToast({
                         title: "支付成功",
                         icon: "success"
@@ -324,7 +325,69 @@ export default {
                       );
                     },
                     fail: err => {
+                      uni.hideLoading();
                       swan.showToast({
+                        title: "取消支付",
+                        icon: "none"
+                      });
+                      console.log("pay fail", err);
+                      // 记录取消支付的人
+                      this.Record(
+                        {
+                          openId: res0.data.openid,
+                          event_type: 3,
+                          result: 0,
+                          order_id: res.data.data.order_id,
+                          msg: ""
+                        },
+                        record => {}
+                      );
+                    }
+                  });
+                  // #endif
+                  // #ifdef MP-TOUTIAO
+                  console.log(res.data.data, typeof res.data.data);
+                  tt.pay({
+                    orderInfo: res.data.data,
+                    service: 1,
+                    getOrderStatus(res) {
+                      let { out_order_no } = res;
+                      return new Promise(function(resolve, reject) {
+                        // 商户前端根据 out_order_no 请求商户后端查询微信支付订单状态
+                        tt.request({
+                          url: "<your-backend-url>",
+                          success(res) {
+                            // 商户后端查询的微信支付状态，通知收银台支付结果
+                            resolve({ code: 0 | 1 | 2 | 3 | 9 });
+                          },
+                          fail(err) {
+                            reject(err);
+                          }
+                        });
+                      });
+                    },
+                    success: payment => {
+                      uni.hideLoading();
+                      if (payment.code === 0) {
+                        console.log("订单号", res.data.data.order_id);
+                        uni.navigateTo({
+                          url: `../myCardBug/cards?order_id=${res.data.data.order_id}`
+                        });
+                        this.Record(
+                          {
+                            openId: res0.data.openid,
+                            event_type: 3,
+                            result: 1,
+                            order_id: res.data.data.order_id,
+                            msg: ""
+                          },
+                          record => {}
+                        );
+                      }
+                    },
+                    fail: err => {
+                      uni.hideLoading();
+                      uni.showToast({
                         title: "取消支付",
                         icon: "none"
                       });
@@ -376,6 +439,9 @@ export default {
           tt.getUserInfo({
             withCredentials: true,
             success: userinfo => {
+              uni.showLoading({
+                title: "登录中..."
+              });
               if (reslogin.code) {
                 this.Ajax(
                   "post",
@@ -389,7 +455,7 @@ export default {
                   res => {
                     console.log("调登录接口返回：", res);
                     if (res.data.code === "200") {
-                      this.is_getuserInfo = true
+                      this.is_getuserInfo = true;
                       uni.hideLoading();
                       uni.setStorageSync("hasLogin", 1);
                       uni.setStorage({
@@ -412,6 +478,13 @@ export default {
             },
             fail(res) {
               console.log(`getUserInfo 调用失败`);
+              uni.openSetting({
+                success(dataAu) {
+                  console.log("打开了设置", dataAu);
+                  if (dataAu.authSetting["scope.userInfo"]) {
+                  }
+                }
+              });
             }
           });
         }
@@ -638,7 +711,7 @@ export default {
                 console.log("调登录接口返回：", res);
 
                 if (res.data.code === "200") {
-                  this.is_getuserInfo = true
+                  this.is_getuserInfo = true;
                   uni.hideLoading();
                   uni.setStorageSync("hasLogin", 1);
                   uni.setStorage({
