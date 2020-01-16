@@ -421,7 +421,9 @@
   margin: 100rpx 50rpx;
   padding: 60rpx 60rpx 100rpx;
   position: fixed;
+  // #ifndef MP-TOUTIAO
   top: 44%;
+  // #endif
   // #ifdef MP-TOUTIAO
   top: 48%;
   // #endif
@@ -713,6 +715,7 @@
   background-size: cover;
   // margin-bottom: 40rpx;
   border-radius: 24rpx;
+  padding-left:0; 
   display: flex;
   margin-top: 30rpx;
   flex-direction: column;

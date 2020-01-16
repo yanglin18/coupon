@@ -10,13 +10,20 @@
       :status_img="skin.status_img"
       :title="title"
     ></navigationbar>
-    <scroll-view class="scrollBox" :scroll-y="list.length === 0 ? false : true">
+    <scroll-view :trap-scroll="true" class="scrollBox" :scroll-y="list.length === 0 ? false : true">
+   <!-- #ifndef MP-TOUTIAO -->
       <view
         class="content"
         v-bind:style="{
           paddingBottom: 2 * tabHeight + 30 + 'px'
         }"
       >
+      <!-- #endif -->
+      <!-- #ifdef MP-TOUTIAO -->
+      <view
+        class="content"
+      >
+      <!-- #endif -->
         <image
           :src="skin.img"
           class="allBgImg"
@@ -209,17 +216,21 @@ export default {
   },
 
   // 用户分享
-  onShareAppMessage() {
+  onShareAppMessage(option) {
     return {
-      // #ifdef MP-BAIDU
+      // #ifndef MP-ALIPAY
       title: "摩卡星",
       // #endif
-      // #ifndef MP-BAIDU
+      // #ifdef MP-ALIPAY
       title: "这是喝星吧克最优惠的一种方式",
       // #endif
+      // #ifdef MP-TOUTIAO
+      title:"摩卡星-喝星吧克最优惠的方式",
+      // #endif
       path: "/pages/loading/loading",
-      desc: "星吧克咖啡电子优惠券售卖平台"
-      // imageUrl: "../../static/assets/logo.png"
+      desc: "星吧克咖啡电子优惠券售卖平台",
+      imageUrl: "../../static/assets/logo.png",
+      templateId:""
     };
   },
   methods: {
@@ -472,8 +483,9 @@ export default {
   }
 }
 .scrollBox {
-  height: 100vh;
+  height: 90vh;
   width: 100vw;
+  z-index: 1100;
   overflow: hidden;
   box-sizing: border-box;
 }

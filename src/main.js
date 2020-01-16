@@ -5,8 +5,8 @@ Vue.config.productionTip = false;
 
 App.mpType = "app";
 
-// let baseURL = "https://coupon.houselai.com/public/index.php/";
-let baseURL = "https://coupontest.yingbei365.com/public/index.php/"
+let baseURL = "https://coupon.houselai.com/public/index.php/";
+// let baseURL = "https://coupontest.yingbei365.com/public/index.php/"
 Vue.prototype.Ajax = (method, url, data, callback) => {
   // let m = ""
   // for(let key in data){
@@ -40,8 +40,8 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
 Vue.prototype.Record =(data,callback) => {
   uni.request({
     method:"post",
-    // url:'https://coupon.houselai.com/public/index.php/member/Record/index',
-    url:'https://coupontest.yingbei365.com/public/index.php/member/Record/index',
+    url:'https://coupon.houselai.com/public/index.php/member/Record/index',
+    // url:'https://coupontest.yingbei365.com/public/index.php/member/Record/index',
     data:data,
     header: {
       "content-type": "application/json"

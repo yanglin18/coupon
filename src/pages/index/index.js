@@ -69,6 +69,7 @@ export default {
     }, 300);
     // #endif
     this.getGoodsInfo();
+    this.userNotice = false;
     const UserNumber = uni.getStorageSync("UserNumber");
     if (UserNumber) {
       this.is_getNumber = true;
@@ -107,18 +108,22 @@ export default {
     });
     // endif
   },
-  // 用户分享
-  onShareAppMessage() {
+  // // 用户分享
+  onShareAppMessage(option) {
     return {
-      // #ifdef MP-BAIDU
+      // #ifndef MP-ALIPAY
       title: "摩卡星",
       // #endif
-      // #ifndef MP-BAIDU
+      // #ifdef MP-ALIPAY
       title: "这是喝星吧克最优惠的一种方式",
       // #endif
+      // #ifdef MP-TOUTIAO
+      title:"摩卡星-喝星吧克最优惠的方式",
+      // #endif
       path: "/pages/loading/loading",
-      desc: "星吧克咖啡电子优惠券售卖平台"
-      // imageUrl: "../../static/assets/logo.png"
+      desc: "星吧克咖啡电子优惠券售卖平台",
+      imageUrl: "../../static/assets/logo.png",
+      templateId:""
     };
   },
   onPageScroll() {
@@ -1256,6 +1261,7 @@ export default {
       this.userNotice = false;
     },
     pay() {
+      this.userNotice = false;
       this.set_field();
       this.wxPayMent(this.goodsInfo[0]);
     }
