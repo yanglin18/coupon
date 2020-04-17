@@ -280,24 +280,6 @@ export default {
       });
     }
   },
-  // 用户分享
-  onShareAppMessage(option) {
-    return {
-      // #ifndef MP-ALIPAY
-      title: "摩卡星",
-      // #endif
-      // #ifdef MP-ALIPAY
-      title: "这是喝星吧克最优惠的一种方式",
-      // #endif
-      // #ifdef MP-TOUTIAO
-      title:"摩卡星-喝星吧克最优惠的方式",
-      // #endif
-      path: "/pages/loading/loading",
-      desc: "星吧克咖啡电子优惠券售卖平台",
-      imageUrl: "../../static/assets/logo.png",
-      templateId:""
-    };
-  },
   methods: {}
 };
 </script>

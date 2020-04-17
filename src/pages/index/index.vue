@@ -5,20 +5,38 @@
       :status_img="skin.status_img"
       :title="title"
     ></navigationbar>
+    <!--#ifdef MP-TOUTIAO  -->
+    <scroll-view
+      :trap-scroll="true"
+      :class="userNotice || !userAgree ? 'indexFixed' : ''"
+      :scroll-y="userNotice || !userAgree ? false : true"
+      v-bind:style="{
+          paddingBottom: 2 * tabHeight + 30 + 'px',
+        }"
+    >
+    <!-- #endif -->
+     <!--#ifdef MP-ALIPAY  -->
+    <scroll-view :scroll-y="userNotice || !userAgree ? false : true" style="height:100vh">
+  <!-- #endif -->
+      <!--#ifdef MP-WEIXIN  -->
+      <view v-bind:style="{
+          height:navHeight+'px'
+        }"></view>
     <scroll-view
       :trap-scroll="true"
       class="scrollBox"
       :class="userNotice || !userAgree ? 'indexFixed' : ''"
       :scroll-y="userNotice || !userAgree ? false : true"
       v-bind:style="{
-        paddingTop: navHeight + 'px'
-      }"
+          paddingBottom: tabHeight + 'px',
+        }"
     >
+    <!-- #endif -->
     <!-- #ifndef MP-TOUTIAO -->
       <view
         class="content"
         v-bind:style="{
-          paddingBottom: 2 * tabHeight + 30 + 'px'
+          paddingBottom: 2 * tabHeight + 30 + 'px',
         }"
       >
       <!-- #endif -->
@@ -328,16 +346,16 @@
         </view>
         <!-- #endif -->
         <!-- 遮罩 -->
-      </view>
-      <!-- #ifndef MP-TOUTIAO -->
-      <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
-      <!-- #endif -->
-      <!-- #ifndef MP-BAIDU -->
+              <!-- #ifndef MP-BAIDU -->
       <view
         class="shadowBox"
         catchtouchmove="ture"
         v-show="share || !userAgree || userNotice"
       ></view>
+      <!-- #endif -->
+      </view>
+      <!-- #ifdef MP-WEIXIN -->
+      <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
       <!-- #endif -->
       <!-- #ifdef MP-BAIDU -->
       <view
@@ -350,8 +368,18 @@
     <view
       class="shadowBox shadowBox1"
       v-show="share || !userAgree || userNotice"
+      v-bind:style="{
+            paddingTop: navHeight + 'px',
+          }"
     ></view>
     <!-- #endif -->
+    <!-- #ifdef MP-ALIPAY -->
+    <view v-bind:style="{
+          height: tabHeight+ 'px',
+        }">
+    </view>
+      <tabBar class="tabBar" :banner="skin.banner ? skin.banner : ''"></tabBar>
+      <!-- #endif -->
   </view>
 </template>
 
@@ -368,7 +396,7 @@
     height: auto;
     top: 0;
     left: 0;
-    z-index: 999;
+    z-index: 10;
     background: #ffffff;
   }
   .tabBar {
@@ -382,32 +410,36 @@
 }
 .scrollBox {
   height: 100vh;
+  position: relative;
   overflow: hidden;
   box-sizing: border-box;
-  z-index: 1100;
+  z-index: 1000;
 }
+// #ifndef MP-ALIPAY
 .indexFixed {
   position: fixed;
-  // top: 88px;
+  top: 88px;
   left: 0;
   bottom: 0;
   right: 0;
 }
+// #endif
 .content {
   flex: 1;
   box-sizing: border-box;
   position: relative;
   padding: 24rpx 40rpx 40rpx;
   background-size: cover;
+  overflow: auto;
 }
 .shadowBox {
-  position: fixed;
+  position: absolute;
   left: 0;
   top: 0;
-  bottom: 0;
-  right: 0;
+  // bottom: 0;
+  // right: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background: rgba(0, 0, 0, 0.8);
   z-index: 1000;
 }
@@ -496,7 +528,7 @@
   font-size: 30rpx;
   border-radius: 24rpx;
   box-sizing: border-box;
-  z-index: 1500;
+  z-index: 2500;
   overflow: auto;
   .notice_Content {
     text-align: center;
@@ -599,7 +631,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 1px 15px 40px -10px rgba(4, 32, 8, 0.6);
+  box-shadow: 1px 15px 40 px -10px rgba(4, 32, 8, 0.6);
   overflow: hidden;
   .card_top {
     padding: 43rpx 50rpx 0;

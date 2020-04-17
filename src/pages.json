@@ -12,7 +12,7 @@
         "mp-navigation-bar": "../components/navigationBar/navigationBar"
       },
       "style": {
-        "navigationBarTitleText": "摩卡星",
+        "navigationBarTitleText": "首页",
         "navigationStyle": "custom",
         "transparentTitle": "always"
         
@@ -21,14 +21,14 @@
     {
       "path": "pages/index/authorize",
       "style": {
-        "navigationBarTitleText": "摩卡星",
+        "navigationBarTitleText": "微信授权",
         "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/loading/no_network",
       "style": {
-        "navigationBarTitleText": "摩卡星"
+        "navigationBarTitleText": "无网络"
       }
     },
     {
@@ -125,19 +125,19 @@
         "pagePath": "pages/index/index",
         "iconPath": "static/tabs/index_u.png",
         "selectedIconPath": "static/tabs/index.png",
-        "text": "摩卡星"
+        "text": "首页"
       },
       {
         "pagePath": "pages/myCardBug/cardList",
         "iconPath": "static/tabs/myCardBug_u.png",
         "selectedIconPath": "static/tabs/myCardBug.png",
-        "text": "我的卡券"
+        "text": "订单"
       },
       {
         "pagePath": "pages/userCenter/userCenter",
         "iconPath": "static/tabs/userCenter_u.png",
         "selectedIconPath": "static/tabs/userCenter.png",
-        "text": "星中心"
+        "text": "我的"
       }
     ]
   }

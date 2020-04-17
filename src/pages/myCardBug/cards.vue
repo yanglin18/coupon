@@ -46,20 +46,9 @@
       </view>
     </view>
     <view class="affirm">
-      <button v-if="status === '1'" @click="HaveScan">确认星伙伴已扫码</button>
+
     </view>
     <!-- 弹窗 -->
-    <view class="Toast" v-if="clickScna">
-      <view class="title">已扫码确认</view>
-      <view class="row1">{{ num }}张“星巴克中杯通兑券“已完成扫码？</view>
-      <view class="row2"> （在“我的卡券”可查看已购买的券码）</view>
-      <view class="button">
-        <button size="mini" class="button1" @click="cancel">未完成</button>
-        <button size="mini" class="button2" @click="submit">
-          确认星伙伴已扫码
-        </button>
-      </view>
-    </view>
     <!-- 遮罩 -->
     <view class="shadowBox" v-show="clickScna"></view>
   </view>
@@ -145,19 +134,21 @@ export default {
   // 用户分享
   onShareAppMessage(option) {
     return {
-      // #ifndef MP-ALIPAY
-      title: "摩卡星",
+      // #ifdef MP-WEIXIN
+      title: "我告诉你，这是喝星巴克最优惠的方式",
+      imageUrl: "../../static/images/shareCard.jpg",
       // #endif
       // #ifdef MP-ALIPAY
       title: "这是喝星吧克最优惠的一种方式",
-      // #endif
-      // #ifdef MP-TOUTIAO
-      title:"摩卡星-喝星吧克最优惠的方式",
-      // #endif
+      imageUrl: "../../static/assets/logo.png",
       path: "/pages/loading/loading",
       desc: "星吧克咖啡电子优惠券售卖平台",
+      templateId: "",
+      // #endif
+      // #ifdef MP-TOUTIAO
+      title: "摩卡星-喝星吧克最优惠的方式",
       imageUrl: "../../static/assets/logo.png",
-      templateId:""
+      // #endif
     };
   },
   methods: {
@@ -205,60 +196,6 @@ export default {
         }
       });
     },
-    // 点击确认扫码
-    HaveScan() {
-      this.clickScna = true;
-    },
-    submit() {
-      this.clickScna = false;
-      uni.showToast({
-        title: "扫码已完成"
-      });
-      // 改全局数据值
-      // #ifdef MP-WEIXIN
-      let app = getApp();
-      app.globalData.share = true;
-      console.log("app:", app);
-      // #endif
-      // 记录点击了确认星伙伴已扫码的人
-      uni.switchTab({
-        url: "./cardList"
-      });
-      uni.getStorage({
-        key: "userID",
-        success: success => {
-          this.Record(
-            {
-              openId: success.data,
-              event_type: 4,
-              result: 1,
-              order_id: "",
-              msg: ""
-            },
-            record => {}
-          );
-        }
-      });
-    },
-    cancel() {
-      this.clickScna = false;
-      // 记录未反馈是否扫码的人
-      uni.getStorage({
-        key: "userID",
-        success: success => {
-          this.Record(
-            {
-              openId: success.data,
-              event_type: 4,
-              result: 0,
-              order_id: "",
-              msg: ""
-            },
-            record => {}
-          );
-        }
-      });
-    }
   }
 };
 </script>

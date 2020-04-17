@@ -38,21 +38,21 @@ export default {
           pagePath: "../../pages/index/index",
           iconPath: "../../static/tabs/index_u.png",
           selectedIconPath: "../../static/tabs/index.png",
-          text: "摩卡星",
+          text: "首页",
           active: false
         },
         {
           pagePath: "../../pages/myCardBug/cardList",
           iconPath: "../../static/tabs/myCardBug_u.png",
           selectedIconPath: "../../static/tabs/myCardBug.png",
-          text: "我的卡券",
+          text: "订单",
           active: false
         },
         {
           pagePath: "../../pages/userCenter/userCenter",
           iconPath: "../../static/tabs/userCenter_u.png",
           selectedIconPath: "../../static/tabs/userCenter.png",
-          text: "星中心",
+          text: "我的",
           active: false
         }
       ]
@@ -65,6 +65,7 @@ export default {
   },
   watch: {
     page(val) {
+      console.log("页面切换：",val);
       switch (val) {
         case "pages/index/index":
           this.tabs[0].active = true;

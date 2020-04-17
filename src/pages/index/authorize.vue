@@ -1,8 +1,10 @@
 <template>
   <view class="content">
+    
     <view class="top">
+      <image src="../../static/assets/logo1.png"></image>
       <!-- #ifdef MP-WEIXIN -->
-      <text>允许微信授权后，可体验更多功能</text>
+      <text>申请获取你的微信绑定的基本信息</text>
       <!-- #endif -->
       <!-- #ifdef MP-ALIPAY -->
       <text>允许支付宝授权后，可体验更多功能</text>
@@ -348,6 +350,14 @@ export default {
   .top {
     padding-top: 424rpx;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    image{
+      height: 60px;
+      width: 60px;
+      margin-bottom: 40rpx;
+    }
     text {
       opacity: 0.6;
       font-size: 30rpx;

@@ -5,8 +5,8 @@ Vue.config.productionTip = false;
 
 App.mpType = "app";
 
-let baseURL = "https://coupon.houselai.com/public/index.php/";
-// let baseURL = "https://coupontest.yingbei365.com/public/index.php/"
+let baseURL = "https://coupon.houselai.com";
+// let baseURL = "https://coupontest.yingbei365.com";
 Vue.prototype.Ajax = (method, url, data, callback) => {
   // let m = ""
   // for(let key in data){
@@ -14,7 +14,7 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
   //   m += `${key}&`
   // }
   // console.log("mmm",m);
-  let Url = baseURL + url;
+  let Url = baseURL + "/public/index.php/" + url;
   uni.request({
     method: method,
     url: Url, //仅为示例，并非真实接口地址。
@@ -28,36 +28,33 @@ Vue.prototype.Ajax = (method, url, data, callback) => {
       callback(res);
     },
     fail: error => {
-        uni.showToast({
-          title: "网络异常，请稍后重试",
-          icon: "none"
-        });
+      uni.showToast({
+        title: "网络异常，请稍后重试",
+        icon: "none"
+      });
     },
-    complete: com => {
-    }
+    complete: com => {}
   });
 };
-Vue.prototype.Record =(data,callback) => {
+Vue.prototype.Record = (data, callback) => {
   uni.request({
-    method:"post",
-    url:'https://coupon.houselai.com/public/index.php/member/Record/index',
-    // url:'https://coupontest.yingbei365.com/public/index.php/member/Record/index',
-    data:data,
+    method: "post",
+    url: baseURL + "/public/index.php/member/Record/index",
+    data: data,
     header: {
       "content-type": "application/json"
     },
     success: res => {
-      if (res.data.code !== "200" ) {
+      if (res.data.code !== "200") {
         // uni.showToast({
         //   title: res.data.msg || "网络异常，请稍后重试",
         //   icon: "none"
         // });
       }
       callback(res);
-    },
-  })
-
-}
+    }
+  });
+};
 
 const app = new Vue({
   ...App

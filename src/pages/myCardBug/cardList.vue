@@ -10,13 +10,12 @@
       :status_img="skin.status_img"
       :title="title"
     ></navigationbar>
-    <scroll-view :trap-scroll="true" class="scrollBox" :scroll-y="list.length === 0 ? false : true">
+    <scroll-view :trap-scroll="true" class="scrollBox" :scroll-y="list.length == 0 ? false : true" v-bind:style="{
+          paddingBottom: tabHeight + 'px'
+        }">
    <!-- #ifndef MP-TOUTIAO -->
       <view
         class="content"
-        v-bind:style="{
-          paddingBottom: 2 * tabHeight + 30 + 'px'
-        }"
       >
       <!-- #endif -->
       <!-- #ifdef MP-TOUTIAO -->
@@ -34,7 +33,7 @@
         ></image>
         <view v-if="list.length === 0" class="empty">
           <view id="title" class="title">
-            <text>我的卡券 </text>
+            <text>订单</text>
           </view>
           <view class="tips">
             <image src="../../static/images/empty.png" />
@@ -52,7 +51,7 @@
         <view v-else class="not_empty">
           <view>
             <view id="title" class="title">
-              <text>我的卡券 </text>
+              <text>订单 </text>
             </view>
             <view v-for="(item, index) in list" :key="index" class="by_mouth">
               <view class="mouth">
@@ -88,7 +87,7 @@
                       class="isUsed"
                       size="mini"
                     >
-                      已收货
+                      已扫码
                     </button>
                     <button
                       class="not_used"
@@ -96,32 +95,12 @@
                       v-else
                       size="mini"
                     >
-                      确认收货
+                      确认扫码
                     </button>
                   </view>
                 </view>
               </view>
             </view>
-          </view>
-        </view>
-        <!-- 分享弹窗 -->
-        <view v-if="share" class="sharePopup">
-          <view class="imgWrap" @longpress="saveImg(beautifulPhoto.filename)">
-            <image :src="beautifulPhoto.show_img" class="bgImage"></image>
-            <view class="weixinIcon">
-              <view class="image_share">
-                <button class="image_share_button" open-type="share">
-                  <image src="../../static/assets/weixin.png" class="imgIcon" />
-                </button>
-                <view class="text_weixin">
-                  微信好友
-                </view>
-              </view>
-            </view>
-          </view>
-          <!-- 关闭按钮 -->
-          <view class="close" @click="close_share">
-            <image class="close_img" src="../../static/assets/close.png" />
           </view>
         </view>
       </view>
@@ -145,7 +124,7 @@ export default {
     const app = getApp();
     return {
       // #ifdef MP-WEIXIN
-      title: "摩卡星",
+      title: "",
       // #endif
       // #ifdef MP-ALIPAY
       title: "",
@@ -168,36 +147,12 @@ export default {
   },
   onShow() {
     this.getOrderList();
-    // #ifdef MP-WEIXIN
-    let app = getApp();
-    this.share = app.globalData.share;
-    console.log("是支付完成进入的卡券页面", this.share);
-    if (this.share) {
-      uni.getStorage({
-        key: "storage_key",
-        success: res0 => {
-          console.log("storage参数：", res0);
-          this.Ajax(
-            "post",
-            "member/user/my_qrcode",
-            { session3rd: res0.data.session3rd },
-            res => {
-              if (res.data.code === "200") {
-                console.log("我要的生成美图", res.data.data.list[0]);
-                this.beautifulPhoto = res.data.data.list;
-              }
-            }
-          );
-        }
-      });
-    }
-    // #endif
   },
 
   onPageScroll(scrollTop) {
     // #ifdef MP-WEIXIN
-    if (scrollTop.scrollTop >= 120) {
-      this.title = "我的卡券";
+    if (scrollTop.scrollTop >= 80) {
+      this.title = "订单";
     } else {
       this.title = "";
     }
@@ -205,7 +160,7 @@ export default {
     // #ifdef MP-ALIPAY
     if (scrollTop.scrollTop >= 120) {
       uni.setNavigationBarTitle({
-        title: "我的卡券"
+        title: "订单"
       });
     } else {
       uni.setNavigationBarTitle({
@@ -215,22 +170,24 @@ export default {
     // #endif
   },
 
-  // 用户分享
+  // // 用户分享
   onShareAppMessage(option) {
     return {
-      // #ifndef MP-ALIPAY
-      title: "摩卡星",
+      // #ifdef MP-WEIXIN
+      title: "我告诉你，这是喝星巴克最优惠的方式",
+      imageUrl: "../../static/images/shareCard.jpg",
       // #endif
       // #ifdef MP-ALIPAY
       title: "这是喝星吧克最优惠的一种方式",
-      // #endif
-      // #ifdef MP-TOUTIAO
-      title:"摩卡星-喝星吧克最优惠的方式",
-      // #endif
+      imageUrl: "../../static/assets/logo.png",
       path: "/pages/loading/loading",
       desc: "星吧克咖啡电子优惠券售卖平台",
+      templateId: "",
+      // #endif
+      // #ifdef MP-TOUTIAO
+      title: "摩卡星-喝星吧克最优惠的方式",
       imageUrl: "../../static/assets/logo.png",
-      templateId:""
+      // #endif
     };
   },
   methods: {
@@ -282,91 +239,6 @@ export default {
         }
       });
     },
-    // 关闭分享
-    close_share() {
-      this.share = false;
-      let app = getApp();
-      app.globalData.share = false;
-    },
-    // 长按保存图片
-    saveImg(src) {
-      console.log("长按图片");
-      // 先获取相册权限
-      uni.authorize({
-        scope: "scope.writePhotosAlbum",
-        success(res) {
-          console.log("授权成功", res);
-          uni.setStorage({
-            key: "PhotoAlbum",
-            data: "true"
-          });
-        },
-        fail(error) {
-          // console.log("error:", error);
-          uni.showToast({
-            title: "请授权后再保存",
-            duration: 1000,
-            icon: "none"
-          });
-          uni.setStorage({
-            key: "PhotoAlbum",
-            data: "false"
-          });
-        },
-        complete() {}
-      });
-      // 再保存
-      uni.getStorage({
-        key: "PhotoAlbum",
-        success: res0 => {
-          if (res0.data === "true") {
-            // 处理图片
-            uni.getImageInfo({
-              src: src,
-              success: function(image) {
-                let image_path = image.path;
-                uni.saveImageToPhotosAlbum({
-                  filePath: image_path,
-                  success: function(res) {
-                    uni.showToast({
-                      title: "保存成功",
-                      duration: 1000
-                    });
-                  },
-                  fail: function(error) {
-                    console.log(error);
-                  }
-                });
-              }
-            });
-          } else {
-            console.log("进入false");
-            // 重新调起设置授权相册
-            uni.showModal({
-              title: "提示",
-              content: "必须要授权后才能保存哦",
-              confirmText: "去授权",
-              success: function(res) {
-                if (res.confirm) {
-                  uni.openSetting({
-                    success(dataAu) {
-                      if (dataAu.authSetting["scope.writePhotosAlbum"]) {
-                        uni.setStorage({
-                          key: "PhotoAlbum",
-                          data: "true"
-                        });
-                      }
-                    }
-                  });
-                } else if (res.cancel) {
-                  console.log("用户点击取消");
-                }
-              }
-            });
-          }
-        }
-      });
-    },
     //   跳转到订单详情
     NavToDetail(er) {
       console.log("e:", er);
@@ -402,7 +274,7 @@ export default {
       console.log("val:", val);
       uni.showModal({
         title: "",
-        content: "您确定已收到所有饮品吗？",
+        content: "确定"+val.num+"张“"+val.goods_name+"”已完成扫码吗？",
         confirmColor: "#42b069",
         success: function(resShowModel) {
           if (resShowModel.confirm) {
@@ -416,7 +288,7 @@ export default {
                   res => {
                     if (res.data.code === "200") {
                       uni.showToast({
-                        title: "收货成功"
+                        title: "扫码完成"
                       });
                       that.getOrderList();
                     }
@@ -427,7 +299,7 @@ export default {
           } else if (resShowModel.cancel) {
             console.log("用户点击取消");
             uni.showToast({
-              title: "取消收货",
+              title: "已取消",
               icon: "none"
             });
           }
@@ -470,7 +342,7 @@ export default {
     left: 0;
     width: 100%;
     height: auto;
-    z-index: 5000;
+    z-index: 999;
     background: #ffffff;
   }
   .tabBar {
@@ -483,9 +355,10 @@ export default {
   }
 }
 .scrollBox {
-  height: 90vh;
+
+  // height: 90vh;
   width: 100vw;
-  z-index: 1100;
+  z-index: 900;
   overflow: hidden;
   box-sizing: border-box;
 }
