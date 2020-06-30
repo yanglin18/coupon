@@ -631,7 +631,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 1px 15px 40 px -10px rgba(4, 32, 8, 0.6);
+  box-shadow: 1px 15px 40px -10px rgba(4, 32, 8, 0.6);
   overflow: hidden;
   .card_top {
     padding: 43rpx 50rpx 0;
@@ -661,7 +661,6 @@
       opacity: 0.8;
       font-weight: 600;
       font-size: 36rpx;
-      color: #ffffff;
       letter-spacing: 2rpx;
     }
   }

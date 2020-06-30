@@ -87,15 +87,14 @@
                       class="isUsed"
                       size="mini"
                     >
-                      已扫码
+                      已使用
                     </button>
                     <button
                       class="not_used"
-                      @click.stop="affirmReceive(val)"
                       v-else
                       size="mini"
                     >
-                      确认扫码
+                      待使用
                     </button>
                   </view>
                 </view>

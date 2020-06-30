@@ -165,7 +165,19 @@ export default {
       this.Ajax(
         "post",
         "member/index/goods_info",
-        { goods_id: this.goodsId },
+        { goods_id: this.goodsId,
+        // #ifdef MP-WEIXIN
+          channel: "wechat",
+          // #endif
+          // #ifdef MP-ALIPAY
+          channel: "ali",
+          // #endif
+          // #ifdef MP-BAIDU
+          channel: "baidu",
+          // #endif
+          // #ifdef MP-TOUTIAO
+          channel: "byte"
+          // #endif },
         res => {
           if (res.data.code === "200") {
             this.goodsInfo = res.data.data.info;
